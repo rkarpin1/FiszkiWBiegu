@@ -31,11 +31,11 @@ Run `./gradlew` commands from `frontend/`; run `cargo` commands from `backend/`.
 
 ## Key Versions
 
-Kotlin 2.3.21 · Compose Multiplatform 1.11.0 · Android compileSdk 37 / minSdk 30 · Ktor 3.5.0 · Koin 4.2.1 — see `@frontend/gradle/libs.versions.toml`. Rust Actix-web 4.13.0 · Tokio 1.52.3 — see `@backend/Cargo.toml`.
+See @frontend/gradle/libs.versions.toml and @backend/Cargo.toml for pinned versions.
 
 ## Code Conventions
 
-No detekt, lint, or format tooling is configured — follow the style of sibling files. Tests use `kotlin.test` and live in `frontend/shared/src/commonTest/`. Rust uses `#[test]`. No CI is configured.
+No detekt, lint, or format tooling is configured. Kotlin: PascalCase for classes/objects, camelCase for functions and properties, file named after its primary class. Tests use `kotlin.test` and live in `frontend/shared/src/commonTest/`.
 
 ## Commits
 
