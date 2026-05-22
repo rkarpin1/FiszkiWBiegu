@@ -29,7 +29,7 @@ kotlin {
         browser()
     }
     
-    androidLibrary {
+    android {
        namespace = "pl.karpinski.fiszkiwbiegu.shared"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
@@ -69,7 +69,7 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
-            implementation(libs.navigation.compose)
+            implementation(libs.navigation3.compose)
             implementation(libs.multiplatform.settings)
             implementation(libs.multiplatform.settings.no.arg)
         }
