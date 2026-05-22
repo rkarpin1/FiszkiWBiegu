@@ -1,3 +1,7 @@
+// -------------------------------------------------------------------------------------------------
+//   Copyright 2026 (c) Robert Karpiński
+// -------------------------------------------------------------------------------------------------
+
 package pl.karpinski.fiszkiwbiegu
 
 import androidx.compose.ui.ExperimentalComposeUiApi
