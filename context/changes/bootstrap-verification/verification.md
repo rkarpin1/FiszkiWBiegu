@@ -42,15 +42,15 @@ hints:
 ### Why this stack
 
 Solo developer building FiszkiWBiegu — a hands-free flashcard audio app for runners.
-The project is genuinely two applications: a Rust/Actix-web backend API (cloud storage
-for flashcards, OAuth Google auth) and a native Android app (Kotlin + Jetpack Compose,
-foreground audio service, MediaSession headphone control). No single registry starter
-covers this combination; `rust` binary crate is the bootstrapper entry point for the
-backend, with actix-web added manually after scaffolding. The Android app is set up
-separately in Android Studio — bootstrapper does not scaffold it. Flutter was the
-alternative that would have covered Android + Web from one Dart codebase, but the user
-chose native Kotlin for full Android API access. quality_override is set because
-Actix-web is not in the registry and the Android component has no bootstrapper support.
+The project is two components: a Rust/Actix-web backend API (cloud storage for flashcards,
+OAuth Google auth) in `backend/`, and a Kotlin Multiplatform frontend (Kotlin 2.3.21 +
+Compose Multiplatform 1.11.0) in `frontend/`. The KMP frontend targets Android (foreground
+audio service, MediaSession headphone control for learning mode) and Web (flashcard
+management UI) from a single shared Kotlin codebase; iOS is not configured in MVP.
+No single registry starter covers this combination; `rust` binary crate is the bootstrapper
+entry point for the backend, with actix-web added manually after scaffolding. The KMP
+frontend is set up separately in Android Studio. quality_override is set because Actix-web
+is not in the registry and the KMP frontend has no bootstrapper support.
 
 ## Pre-scaffold verification
 
@@ -95,15 +95,29 @@ Local toolchain: cargo 1.95.0 (2026-03-21) — fresh.
 | has_ai                  | false                                                                                                  |
 | has_background_jobs     | true                                                                                                   |
 
-Note: `quality_override: true` and `bootstrapper_confidence: best-effort` appear here — v1 surfaces but does not compensate. A future M1L4 skill will generate CLAUDE.md / AGENTS.md with ecosystem-specific guidance for Actix-web and Kotlin/Jetpack Compose.
+Note: `quality_override: true` and `bootstrapper_confidence: best-effort` appear here — v1 surfaces but does not compensate. A future M1L4 skill will generate CLAUDE.md / AGENTS.md with ecosystem-specific guidance for Actix-web and Kotlin Multiplatform.
 
 ## Next steps
 
 Next: a future skill will set up agent context (CLAUDE.md, AGENTS.md). For now, your project is scaffolded and verified — happy hacking.
 
-Useful manual steps in the meantime:
-- Your `.git` is already initialised — make an initial commit once you are happy with the scaffold.
-- Add Actix-web and its dependencies to `Cargo.toml`: `cargo add actix-web tokio --features tokio/full`.
-- Set up the Android app separately in Android Studio (Kotlin + Jetpack Compose) — bootstrapper does not scaffold it.
-- Run `cargo audit` after adding dependencies to check for known vulnerabilities in the Rust backend.
-- Review `hints` above for CI/CD (`github-actions`, `auto-deploy-on-merge`) and deployment (`fly`) — wire these up manually for now.
+### Stan projektu (2026-05-22)
+
+**Backend** (`backend/`):
+- `cargo new` — wykonano; `Cargo.toml` z `name = "fiszki-w-biegu"`, `edition = "2024"`
+- `actix-web 4.13.0` + `tokio 1.52.3` — dodano (`cargo add`)
+- `src/main.rs` — bazowy serwer HTTP na porcie 8080 z endpointem `GET /health`
+- `cargo build` — OK
+
+**Frontend** (`frontend/`):
+- Kotlin Multiplatform (Kotlin 2.3.21 + Compose Multiplatform 1.11.0) — skonfigurowany w Android Studio
+- Moduły: `androidApp`, `shared`, `webApp` (JS + WasmJS)
+- Dodane biblioteki w `shared`: Ktor 3.1.3, kotlinx-serialization 1.8.1, kotlinx-datetime 0.6.2, kotlinx-coroutines 1.10.2, Koin 4.0.3, Compose Navigation 2.8.0-alpha10, Multiplatform Settings 1.2.0
+
+### Pozostałe kroki ręczne
+
+- `.git` już zainicjowany — wykonaj pierwszy commit po zatwierdzeniu bieżącego stanu.
+- Dodaj `androidx.credentials` + `com.google.android.libraries.identity.googleid` do `androidApp` (OAuth Google — FR-001).
+- Dodaj SQLDelight jeśli zdecydujesz się na lokalną bazę danych do trybu offline.
+- Uruchom `cargo audit` po dodaniu kolejnych zależności w backendzie.
+- Skonfiguruj CI/CD (`github-actions`, `auto-deploy-on-merge`) i deployment (`fly`) — na razie ręcznie.
