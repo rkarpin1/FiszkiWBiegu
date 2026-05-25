@@ -1,0 +1,96 @@
+use actix_web::{web, HttpResponse, Responder};
+use serde_json::json;
+use sqlx::PgPool;
+use uuid::Uuid;
+
+use crate::auth::AuthUser;
+use crate::models::{Collection, CollectionRequest};
+
+pub async fn list(pool: web::Data<PgPool>, user: AuthUser) -> impl Responder {
+    let result = sqlx::query_as::<_, Collection>(
+        "SELECT id, user_id, name, created_at FROM collections WHERE user_id = $1 ORDER BY created_at DESC",
+    )
+    .bind(user.id)
+    .fetch_all(pool.get_ref())
+    .await;
+
+    match result {
+        Ok(collections) => HttpResponse::Ok().json(collections),
+        Err(e) => {
+            eprintln!("DB error listing collections: {e}");
+            HttpResponse::InternalServerError().json(json!({"error": "Database error"}))
+        }
+    }
+}
+
+pub async fn create(
+    pool: web::Data<PgPool>,
+    user: AuthUser,
+    body: web::Json<CollectionRequest>,
+) -> impl Responder {
+    let result = sqlx::query_as::<_, Collection>(
+        "INSERT INTO collections (user_id, name) VALUES ($1, $2) RETURNING id, user_id, name, created_at",
+    )
+    .bind(user.id)
+    .bind(&body.name)
+    .fetch_one(pool.get_ref())
+    .await;
+
+    match result {
+        Ok(collection) => HttpResponse::Created().json(collection),
+        Err(e) => {
+            eprintln!("DB error creating collection: {e}");
+            HttpResponse::InternalServerError().json(json!({"error": "Database error"}))
+        }
+    }
+}
+
+pub async fn update(
+    pool: web::Data<PgPool>,
+    user: AuthUser,
+    path: web::Path<Uuid>,
+    body: web::Json<CollectionRequest>,
+) -> impl Responder {
+    let id = path.into_inner();
+    let result = sqlx::query_as::<_, Collection>(
+        "UPDATE collections SET name = $1 WHERE id = $2 AND user_id = $3 RETURNING id, user_id, name, created_at",
+    )
+    .bind(&body.name)
+    .bind(id)
+    .bind(user.id)
+    .fetch_optional(pool.get_ref())
+    .await;
+
+    match result {
+        Ok(Some(collection)) => HttpResponse::Ok().json(collection),
+        Ok(None) => HttpResponse::NotFound().json(json!({"error": "Collection not found"})),
+        Err(e) => {
+            eprintln!("DB error updating collection: {e}");
+            HttpResponse::InternalServerError().json(json!({"error": "Database error"}))
+        }
+    }
+}
+
+pub async fn delete(
+    pool: web::Data<PgPool>,
+    user: AuthUser,
+    path: web::Path<Uuid>,
+) -> impl Responder {
+    let id = path.into_inner();
+    let result = sqlx::query("DELETE FROM collections WHERE id = $1 AND user_id = $2")
+        .bind(id)
+        .bind(user.id)
+        .execute(pool.get_ref())
+        .await;
+
+    match result {
+        Ok(r) if r.rows_affected() == 0 => {
+            HttpResponse::NotFound().json(json!({"error": "Collection not found"}))
+        }
+        Ok(_) => HttpResponse::NoContent().finish(),
+        Err(e) => {
+            eprintln!("DB error deleting collection: {e}");
+            HttpResponse::InternalServerError().json(json!({"error": "Database error"}))
+        }
+    }
+}
