@@ -28,8 +28,8 @@ hints:
 
 Solo developer building FiszkiWBiegu — a hands-free flashcard audio app for runners.
 The project is two components: a Rust/Actix-web backend API (cloud storage for flashcards,
-OAuth Google auth) in `backend/`, and a Kotlin Multiplatform frontend (Kotlin 2.3.21 +
-Compose Multiplatform 1.11.0) in `frontend/`. The KMP frontend targets Android (foreground
+OAuth Google auth via Supabase Auth; PostgreSQL via Supabase + sqlx) in `backend/`, and a
+Kotlin Multiplatform frontend (Kotlin 2.3.21 + Compose Multiplatform 1.11.0) in `frontend/`. The KMP frontend targets Android (foreground
 audio service, MediaSession headphone control for learning mode) and Web (flashcard
 management UI) from a single shared Kotlin codebase; iOS is not configured in MVP.
 No single registry starter covers this combination; `rust` binary crate is the bootstrapper
