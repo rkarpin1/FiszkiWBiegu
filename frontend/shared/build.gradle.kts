@@ -30,7 +30,7 @@ kotlin {
     }
     
     android {
-       namespace = "pl.karpinski.fiszkiwbiegu.shared"
+       namespace = "pl.rkarpinski.fiszkiwbiegu.shared"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
     

@@ -25,11 +25,11 @@ dependencies {
 }
 
 android {
-    namespace = "pl.karpinski.fiszkiwbiegu"
+    namespace = "pl.rkarpinski.fiszkiwbiegu"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "pl.karpinski.fiszkiwbiegu"
+        applicationId = "pl.rkarpinski.fiszkiwbiegu"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
