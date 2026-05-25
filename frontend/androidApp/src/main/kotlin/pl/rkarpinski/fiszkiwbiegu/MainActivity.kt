@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
         val tokenStorage = TokenStorage(Settings())
         val apiClient = ApiClient(tokenStorage)
         val authRepository = AuthRepository(apiClient, tokenStorage)
-        val webClientId = getString(R.string.google_web_client_id)
+        val webClientId = "71847229905-mqalk30tubb1pstdjq73krh0ovasqf2f.apps.googleusercontent.com"
 
         setContent {
             App(
