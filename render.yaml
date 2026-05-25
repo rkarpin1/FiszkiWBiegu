@@ -1,11 +1,12 @@
 services:
   - type: web
     name: fiszki-w-biegu-api
-    runtime: docker
+    runtime: rust
     region: frankfurt
     plan: starter
-    dockerContext: backend
-    dockerfilePath: backend/Dockerfile
+    rootDir: backend
+    buildCommand: cargo build --release
+    startCommand: ./target/release/fiszki-w-biegu
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
