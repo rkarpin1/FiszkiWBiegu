@@ -5,6 +5,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import pl.rkarpinski.fiszkiwbiegu.CollectionsViewModel
 import pl.rkarpinski.fiszkiwbiegu.FlashcardsViewModel
+import pl.rkarpinski.fiszkiwbiegu.LearningViewModel
 import pl.rkarpinski.fiszkiwbiegu.data.api.ApiClient
 import pl.rkarpinski.fiszkiwbiegu.data.api.TokenStorage
 import pl.rkarpinski.fiszkiwbiegu.data.repository.AuthRepository
@@ -20,4 +21,5 @@ val appModule = module {
     single { FlashcardRepository(get()) }
     viewModel { CollectionsViewModel(get()) }
     viewModel { params -> FlashcardsViewModel(get(), params.get()) }
+    viewModel { params -> LearningViewModel(get(), get(), params.get()) }
 }

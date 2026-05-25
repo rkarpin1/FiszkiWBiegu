@@ -41,6 +41,7 @@ fun FlashcardsScreen(
     collection: CollectionDto,
     viewModel: FlashcardsViewModel = koinViewModel { parametersOf(collection.id) },
     onBack: () -> Unit,
+    onStartLearning: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -67,6 +68,12 @@ fun FlashcardsScreen(
                 title = { Text(collection.name) },
                 navigationIcon = {
                     IconButton(onClick = onBack) { Text("←") }
+                },
+                actions = {
+                    TextButton(
+                        onClick = onStartLearning,
+                        enabled = uiState.flashcards.isNotEmpty(),
+                    ) { Text("▶ Nauka") }
                 },
             )
         },

@@ -20,6 +20,7 @@ private sealed interface Destination {
     data object Login : Destination
     data object Collections : Destination
     data class Flashcards(val collection: CollectionDto) : Destination
+    data class Learning(val collection: CollectionDto) : Destination
 }
 
 @Composable
@@ -57,6 +58,11 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
                 onCollectionClick = { destination = Destination.Flashcards(it) },
             )
             is Destination.Flashcards -> FlashcardsScreen(
+                collection = dest.collection,
+                onBack = { destination = Destination.Collections },
+                onStartLearning = { destination = Destination.Learning(dest.collection) },
+            )
+            is Destination.Learning -> LearningScreen(
                 collection = dest.collection,
                 onBack = { destination = Destination.Collections },
             )
