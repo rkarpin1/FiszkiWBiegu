@@ -1,18 +1,13 @@
 package pl.rkarpinski.fiszkiwbiegu
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.Service
 import android.content.Intent
-import android.content.pm.ServiceInfo
-import android.media.session.MediaSession
-import android.media.session.PlaybackState
-import android.os.IBinder
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
-import androidx.core.app.NotificationCompat
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSessionService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -29,7 +24,8 @@ import java.util.Locale
 import java.util.UUID
 import kotlin.coroutines.resume
 
-class LearningService : Service() {
+@UnstableApi
+class LearningService : MediaSessionService() {
 
     companion object {
         val state = MutableStateFlow(LearningState())
@@ -41,15 +37,13 @@ class LearningService : Service() {
         const val ACTION_PREV = "pl.rkarpinski.fiszkiwbiegu.learning.PREV"
         const val ACTION_STOP = "pl.rkarpinski.fiszkiwbiegu.learning.STOP"
         const val EXTRA_FLASHCARDS_JSON = "flashcards_json"
-
-        private const val NOTIFICATION_ID = 1001
-        private const val CHANNEL_ID = "learning"
     }
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var tts: TextToSpeech? = null
     private var ttsReady = false
-    private var mediaSession: MediaSession? = null
+    private lateinit var ttsPlayer: TtsPlayer
+    private lateinit var mediaSession: MediaSession
     private var playJob: Job? = null
 
     private var flashcards: List<FlashcardDto> = emptyList()
@@ -58,42 +52,31 @@ class LearningService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannel()
         initTts()
-        initMediaSession()
+        ttsPlayer = TtsPlayer().apply {
+            onPlayWhenReadyChanged = { playing -> if (playing) resume() else pause() }
+            onSeekToNext = ::next
+            onSeekToPrevious = ::previous
+        }
+        mediaSession = MediaSession.Builder(this, ttsPlayer).build()
     }
 
-    private fun createNotificationChannel() {
-        val channel = NotificationChannel(CHANNEL_ID, "Tryb nauki", NotificationManager.IMPORTANCE_LOW)
-        getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
-    }
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession = mediaSession
 
     private fun initTts() {
         tts = TextToSpeech(this) { status -> ttsReady = status == TextToSpeech.SUCCESS }
     }
 
-    private fun initMediaSession() {
-        mediaSession = MediaSession(this, "FiszkiWBiegu").apply {
-            setCallback(object : MediaSession.Callback() {
-                override fun onPlay() = resume()
-                override fun onPause() = pause()
-                override fun onSkipToNext() = next()
-                override fun onSkipToPrevious() = previous()
-                override fun onStop() = stopSelf()
-            })
-            isActive = true
-        }
-        updatePlaybackState()
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         when (intent?.action) {
             ACTION_START -> {
                 val json = intent.getStringExtra(EXTRA_FLASHCARDS_JSON) ?: return START_STICKY
                 flashcards = Json.decodeFromString(json)
                 currentIndex = 0
                 isPlaying = true
-                startForeground(NOTIFICATION_ID, buildNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+                ttsPlayer.updateCurrentItem(flashcards[0].toMediaItem())
+                ttsPlayer.setPlaying(true)
                 startPlayJob()
             }
             ACTION_PLAY -> resume()
@@ -119,7 +102,7 @@ class LearningService : Service() {
 
             val card = flashcards[currentIndex]
             publishState(LearningPhase.SPEAKING_POLISH)
-            updateNotification()
+            ttsPlayer.updateCurrentItem(card.toMediaItem())
 
             speakAndWait(card.polishText, Locale.forLanguageTag("pl-PL"))
             if (!isActive || !isPlaying) continue
@@ -160,17 +143,15 @@ class LearningService : Service() {
         isPlaying = false
         tts?.stop()
         playJob?.cancel()
+        ttsPlayer.setPlaying(false)
         publishState()
-        updatePlaybackState()
-        updateNotification()
     }
 
     private fun resume() {
         if (flashcards.isEmpty()) return
         isPlaying = true
+        ttsPlayer.setPlaying(true)
         startPlayJob()
-        updatePlaybackState()
-        updateNotification()
     }
 
     private fun next() {
@@ -178,6 +159,7 @@ class LearningService : Service() {
         currentIndex = (currentIndex + 1) % flashcards.size
         tts?.stop()
         playJob?.cancel()
+        ttsPlayer.updateCurrentItem(flashcards[currentIndex].toMediaItem())
         if (isPlaying) startPlayJob() else publishState()
     }
 
@@ -186,6 +168,7 @@ class LearningService : Service() {
         currentIndex = if (currentIndex > 0) currentIndex - 1 else flashcards.size - 1
         tts?.stop()
         playJob?.cancel()
+        ttsPlayer.updateCurrentItem(flashcards[currentIndex].toMediaItem())
         if (isPlaying) startPlayJob() else publishState()
     }
 
@@ -199,64 +182,23 @@ class LearningService : Service() {
         )
     }
 
-    private fun updatePlaybackState() {
-        val playState = if (isPlaying) PlaybackState.STATE_PLAYING else PlaybackState.STATE_PAUSED
-        mediaSession?.setPlaybackState(
-            PlaybackState.Builder()
-                .setActions(
-                    PlaybackState.ACTION_PLAY or
-                    PlaybackState.ACTION_PAUSE or
-                    PlaybackState.ACTION_PLAY_PAUSE or
-                    PlaybackState.ACTION_SKIP_TO_NEXT or
-                    PlaybackState.ACTION_SKIP_TO_PREVIOUS or
-                    PlaybackState.ACTION_STOP,
-                )
-                .setState(playState, PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1f)
-                .build(),
-        )
-    }
-
-    private fun updateNotification() {
-        getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, buildNotification())
-    }
-
-    private fun buildNotification(): Notification {
-        val card = flashcards.getOrNull(currentIndex)
-        val contentText = card?.let { "${it.polishText} → ${it.englishText}" } ?: "Ładowanie..."
-        val playPauseAction = if (isPlaying)
-            NotificationCompat.Action(0, "⏸", pendingIntent(ACTION_PAUSE))
-        else
-            NotificationCompat.Action(0, "▶", pendingIntent(ACTION_PLAY))
-
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_media_play)
-            .setContentTitle("FiszkiWBiegu – Tryb nauki")
-            .setContentText(contentText)
-            .addAction(NotificationCompat.Action(0, "⏮", pendingIntent(ACTION_PREV)))
-            .addAction(playPauseAction)
-            .addAction(NotificationCompat.Action(0, "⏭", pendingIntent(ACTION_NEXT)))
-            .addAction(NotificationCompat.Action(0, "✕ Stop", pendingIntent(ACTION_STOP)))
-            .setOngoing(true)
-            .setSilent(true)
-            .build()
-    }
-
-    private fun pendingIntent(action: String): PendingIntent {
-        val intent = Intent(this, LearningService::class.java).apply { this.action = action }
-        return PendingIntent.getService(
-            this, action.hashCode(), intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
-    }
-
     override fun onDestroy() {
         playJob?.cancel()
         serviceScope.cancel()
         tts?.shutdown()
-        mediaSession?.apply { isActive = false; release() }
+        mediaSession.release()
+        ttsPlayer.release()
         state.value = LearningState()
         super.onDestroy()
     }
-
-    override fun onBind(intent: Intent?): IBinder? = null
 }
+
+private fun FlashcardDto.toMediaItem() = MediaItem.Builder()
+    .setMediaId(id)
+    .setMediaMetadata(
+        MediaMetadata.Builder()
+            .setTitle(polishText)
+            .setSubtitle(englishText)
+            .build()
+    )
+    .build()
