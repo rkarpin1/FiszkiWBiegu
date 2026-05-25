@@ -11,8 +11,13 @@ async fn health() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let port: u16 = std::env::var("PORT")
+        .ok()
+        .and_then(|p| p.parse().ok())
+        .unwrap_or(8080);
+
     HttpServer::new(|| App::new().service(health))
-        .bind(("0.0.0.0", 8080))?
+        .bind(("0.0.0.0", port))?
         .run()
         .await
 }

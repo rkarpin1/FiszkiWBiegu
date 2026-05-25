@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: fiszki-w-biegu-api
+    runtime: docker
+    region: frankfurt
+    plan: starter
+    dockerContext: backend
+    dockerfilePath: backend/Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

@@ -1,3 +1,24 @@
 
-
 .idea/**
+
+# Rust
+backend/target/
+
+# Kotlin / Android / Gradle
+frontend/.gradle/
+frontend/build/
+frontend/androidApp/build/
+frontend/webApp/build/
+frontend/shared/build/
+frontend/iosApp/Pods/
+*.class
+*.jar
+*.aar
+
+# Environment
+.env
+backend/.env
+
+# OS
+.DS_Store
+Thumbs.db
