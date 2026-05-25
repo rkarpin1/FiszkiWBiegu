@@ -8,7 +8,7 @@ mod models;
 
 use actix_cors::Cors;
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
-use auth::JwtSecret;
+use auth::{GoogleConfig, JwtConfig};
 
 #[get("/health")]
 async fn health() -> impl Responder {
@@ -25,7 +25,9 @@ async fn main() -> std::io::Result<()> {
         .unwrap_or(8080);
 
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let jwt_secret = std::env::var("SUPABASE_JWT_SECRET").expect("SUPABASE_JWT_SECRET must be set");
+    let jwt_secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+    let google_client_id =
+        std::env::var("GOOGLE_CLIENT_ID").expect("GOOGLE_CLIENT_ID must be set");
 
     let pool = sqlx::PgPool::connect(&database_url)
         .await
@@ -37,7 +39,8 @@ async fn main() -> std::io::Result<()> {
         .expect("Failed to run database migrations");
 
     let pool = web::Data::new(pool);
-    let jwt_secret = web::Data::new(JwtSecret(jwt_secret));
+    let jwt_config = web::Data::new(JwtConfig { secret: jwt_secret });
+    let google_config = web::Data::new(GoogleConfig { client_id: google_client_id });
 
     HttpServer::new(move || {
         let cors = Cors::permissive();
@@ -45,8 +48,13 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(cors)
             .app_data(pool.clone())
-            .app_data(jwt_secret.clone())
+            .app_data(jwt_config.clone())
+            .app_data(google_config.clone())
             .service(health)
+            .service(
+                web::scope("/auth")
+                    .route("/login", web::post().to(handlers::auth::login)),
+            )
             .service(
                 web::scope("/collections")
                     .route("", web::get().to(handlers::collections::list))

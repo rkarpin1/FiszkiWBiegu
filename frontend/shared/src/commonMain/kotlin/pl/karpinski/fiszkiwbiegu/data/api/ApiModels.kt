@@ -37,3 +37,13 @@ data class FlashcardUpdateRequest(
     @SerialName("polish_text") val polishText: String? = null,
     @SerialName("english_text") val englishText: String? = null,
 )
+
+@Serializable
+data class LoginRequest(
+    @SerialName("id_token") val idToken: String,
+)
+
+@Serializable
+data class LoginResponse(
+    val token: String,
+)

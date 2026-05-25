@@ -66,6 +66,12 @@ class ApiClient(private val tokenStorage: TokenStorage) {
     suspend fun getLearningSession(collectionId: String): HttpResponse =
         client.get("$API_BASE_URL/collections/$collectionId/learning") { bearerAuth(requireToken()) }
 
+    suspend fun login(googleIdToken: String): HttpResponse =
+        client.post("$API_BASE_URL/auth/login") {
+            contentType(ContentType.Application.Json)
+            setBody(LoginRequest(googleIdToken))
+        }
+
     private fun requireToken(): String =
         tokenStorage.getToken() ?: throw IllegalStateException("Not authenticated")
 }

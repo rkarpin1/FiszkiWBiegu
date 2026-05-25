@@ -4,6 +4,19 @@ use sqlx::FromRow;
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, FromRow)]
+pub struct User {
+    pub id: Uuid,
+    pub google_id: String,
+    pub email: String,
+    pub created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct LoginRequest {
+    pub id_token: String,
+}
+
+#[derive(Debug, Serialize, FromRow)]
 pub struct Collection {
     pub id: Uuid,
     pub user_id: Uuid,
