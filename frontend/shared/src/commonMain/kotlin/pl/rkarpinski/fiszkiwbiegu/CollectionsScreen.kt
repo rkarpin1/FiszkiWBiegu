@@ -150,7 +150,7 @@ private fun DeleteConfirmationDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Usuń kolekcję") },
-        text = { Text("Czy na pewno chcesz usunąć kolekcję „$name"? Tej operacji nie można cofnąć.") },
+        text = { Text("Czy na pewno chcesz usunąć kolekcję „$name”? Tej operacji nie można cofnąć.") },
         confirmButton = {
             TextButton(onClick = onConfirm) {
                 Text("Usuń", color = MaterialTheme.colorScheme.error)

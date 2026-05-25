@@ -113,7 +113,7 @@ class LearningService : Service() {
         }
     }
 
-    private suspend fun playLoop() {
+    private suspend fun CoroutineScope.playLoop() {
         while (isActive && flashcards.isNotEmpty()) {
             if (!isPlaying) { delay(200); continue }
 
@@ -121,7 +121,7 @@ class LearningService : Service() {
             publishState(LearningPhase.SPEAKING_POLISH)
             updateNotification()
 
-            speakAndWait(card.polishText, Locale("pl", "PL"))
+            speakAndWait(card.polishText, Locale.forLanguageTag("pl-PL"))
             if (!isActive || !isPlaying) continue
             delay(800)
             if (!isActive || !isPlaying) continue
@@ -142,12 +142,13 @@ class LearningService : Service() {
     }
 
     private suspend fun speakAndWait(text: String, locale: Locale) =
-        suspendCancellableCoroutine<Unit> { cont ->
+        suspendCancellableCoroutine { cont ->
             val id = UUID.randomUUID().toString()
             tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) {}
                 override fun onDone(utteranceId: String?) { if (cont.isActive) cont.resume(Unit) }
                 override fun onError(utteranceId: String?) { if (cont.isActive) cont.resume(Unit) }
+                override fun onError(utteranceId: String?, errorCode: Int) { if (cont.isActive) cont.resume(Unit) }
             })
             tts?.language = locale
             val result = tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, id)

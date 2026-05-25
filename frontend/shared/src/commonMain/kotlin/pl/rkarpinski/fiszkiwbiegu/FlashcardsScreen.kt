@@ -188,7 +188,7 @@ private fun DeleteFlashcardDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Usuń fiszkę") },
-        text = { Text("Czy na pewno chcesz usunąć fiszkę „$polishText"? Tej operacji nie można cofnąć.") },
+        text = { Text("Czy na pewno chcesz usunąć fiszkę „$polishText”? Tej operacji nie można cofnąć.") },
         confirmButton = {
             TextButton(onClick = onConfirm) {
                 Text("Usuń", color = MaterialTheme.colorScheme.error)

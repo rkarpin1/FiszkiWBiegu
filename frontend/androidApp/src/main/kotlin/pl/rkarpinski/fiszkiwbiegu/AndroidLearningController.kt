@@ -3,7 +3,6 @@ package pl.rkarpinski.fiszkiwbiegu
 import android.content.Context
 import android.content.Intent
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 
