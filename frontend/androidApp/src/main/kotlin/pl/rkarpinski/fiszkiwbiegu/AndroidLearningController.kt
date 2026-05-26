@@ -3,6 +3,7 @@ package pl.rkarpinski.fiszkiwbiegu
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 
+@UnstableApi
 class AndroidLearningController(private val context: Context) : LearningController {
 
     override val state: StateFlow<LearningState> = LearningService.state

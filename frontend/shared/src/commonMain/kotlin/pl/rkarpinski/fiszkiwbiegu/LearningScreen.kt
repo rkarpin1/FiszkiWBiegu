@@ -18,6 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -35,6 +37,9 @@ fun LearningScreen(
     viewModel: LearningViewModel = koinViewModel { parametersOf(collection.id) },
     onBack: () -> Unit,
 ) {
+    LaunchedEffect(Unit) { viewModel.startSession() }
+    DisposableEffect(Unit) { onDispose { viewModel.stop() } }
+
     val state by viewModel.state.collectAsState()
     val card = state.flashcards.getOrNull(state.currentIndex)
 

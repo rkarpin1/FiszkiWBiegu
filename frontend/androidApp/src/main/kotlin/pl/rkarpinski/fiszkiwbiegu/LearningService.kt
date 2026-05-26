@@ -84,9 +84,18 @@ class LearningService : MediaSessionService() {
             ACTION_PAUSE -> pause()
             ACTION_NEXT -> next()
             ACTION_PREV -> previous()
-            ACTION_STOP -> stopSelf()
+            ACTION_STOP -> stopSession()
         }
         return START_STICKY
+    }
+
+    private fun stopSession() {
+        playJob?.cancel()
+        tts?.stop()
+        isPlaying = false
+        flashcards = emptyList()
+        ttsPlayer.setPlaying(false)
+        state.value = LearningState()
     }
 
     private fun startPlayJob() {

@@ -14,7 +14,7 @@ class LearningViewModel(
 
     val state: StateFlow<LearningState> = controller.state
 
-    init {
+    fun startSession() {
         viewModelScope.launch {
             repo.getAll(collectionId).onSuccess { flashcards ->
                 controller.start(flashcards)
