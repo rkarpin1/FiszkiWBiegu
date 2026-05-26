@@ -1,6 +1,7 @@
 package pl.rkarpinski.fiszkiwbiegu
 
 import android.content.Intent
+import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import androidx.media3.common.MediaItem
@@ -116,6 +117,9 @@ class LearningService : MediaSessionService() {
 
             speakAndWait(card.polishText, Locale.forLanguageTag("pl-PL"))
             if (!isActive || !isPlaying) continue
+
+            val timeForEnglishText = speakAndWait(card.englishText, Locale.ENGLISH, 0f)
+            if (!isActive || !isPlaying) continue
             delay(800)
             if (!isActive || !isPlaying) continue
 
@@ -123,7 +127,7 @@ class LearningService : MediaSessionService() {
             repeat(3) { i ->
                 if (isActive && isPlaying) {
                     speakAndWait(card.englishText, Locale.ENGLISH)
-                    if (i < 2 && isActive && isPlaying) delay(500)
+                    if (isActive && isPlaying) delay(timeForEnglishText + 500)
                 }
             }
             if (!isActive || !isPlaying) continue
@@ -134,18 +138,23 @@ class LearningService : MediaSessionService() {
         }
     }
 
-    private suspend fun speakAndWait(text: String, locale: Locale) =
+    private suspend fun speakAndWait(text: String, locale: Locale, volume: Float = 1.0f): Long =
         suspendCancellableCoroutine { cont ->
             val id = UUID.randomUUID().toString()
+            val startTime = LongArray(1)
             tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-                override fun onStart(utteranceId: String?) {}
-                override fun onDone(utteranceId: String?) { if (cont.isActive) cont.resume(Unit) }
-                override fun onError(utteranceId: String?) { if (cont.isActive) cont.resume(Unit) }
-                override fun onError(utteranceId: String?, errorCode: Int) { if (cont.isActive) cont.resume(Unit) }
+                override fun onStart(utteranceId: String?) { startTime[0] = System.currentTimeMillis() }
+                override fun onDone(utteranceId: String?) {
+                    if (cont.isActive) cont.resume(System.currentTimeMillis() - startTime[0])
+                }
+                @Suppress("OVERRIDE_DEPRECATION")
+                override fun onError(utteranceId: String?) { if (cont.isActive) cont.resume(0L) }
+                override fun onError(utteranceId: String?, errorCode: Int) { if (cont.isActive) cont.resume(0L) }
             })
             tts?.language = locale
-            val result = tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, id)
-            if (result == TextToSpeech.ERROR && cont.isActive) cont.resume(Unit)
+            val params = Bundle().apply { putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, volume) }
+            val result = tts?.speak(text, TextToSpeech.QUEUE_FLUSH, params, id)
+            if (result == TextToSpeech.ERROR && cont.isActive) cont.resume(0L)
             cont.invokeOnCancellation { tts?.stop() }
         }
 
