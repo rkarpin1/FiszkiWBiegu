@@ -124,7 +124,7 @@ class LearningService : MediaSessionService() {
             if (!isActive || !isPlaying) continue
 
             publishState(LearningPhase.SPEAKING_ENGLISH)
-            repeat(3) { i ->
+            repeat(3) {
                 if (isActive && isPlaying) {
                     speakAndWait(card.englishText, Locale.ENGLISH)
                     if (isActive && isPlaying) delay(timeForEnglishText + 500)
