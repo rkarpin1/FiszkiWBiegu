@@ -53,12 +53,13 @@ class LearningService : MediaSessionService() {
     override fun onCreate() {
         super.onCreate()
         initTts()
-        ttsPlayer = TtsPlayer().apply {
-            onPlayWhenReadyChanged = { playing -> if (playing) resume() else pause() }
-            onSeekToNext = ::next
-            onSeekToPrevious = ::previous
-        }
-        mediaSession = MediaSession.Builder(this, ttsPlayer).build()
+        val player = TtsPlayer()
+        ttsPlayer = player
+        player.onPlayWhenReadyChanged = { playing -> if (playing) resume() else pause() }
+        player.onSeekToNext = ::next
+        player.onSeekToPrevious = ::previous
+
+        mediaSession = MediaSession.Builder(this, player).build()
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession = mediaSession
@@ -140,6 +141,7 @@ class LearningService : MediaSessionService() {
         }
 
     private fun pause() {
+        if (!isPlaying) return
         isPlaying = false
         tts?.stop()
         playJob?.cancel()
@@ -148,7 +150,7 @@ class LearningService : MediaSessionService() {
     }
 
     private fun resume() {
-        if (flashcards.isEmpty()) return
+        if (flashcards.isEmpty() || isPlaying) return
         isPlaying = true
         ttsPlayer.setPlaying(true)
         startPlayJob()

@@ -39,8 +39,10 @@ class TtsPlayer : SimpleBasePlayer(Looper.getMainLooper()) {
         .build()
 
     override fun handleSetPlayWhenReady(playWhenReady: Boolean): ListenableFuture<*> {
-        isPlayWhenReady = playWhenReady
-        onPlayWhenReadyChanged?.invoke(playWhenReady)
+        if (isPlayWhenReady != playWhenReady) {
+            isPlayWhenReady = playWhenReady
+            onPlayWhenReadyChanged?.invoke(playWhenReady)
+        }
         return Futures.immediateVoidFuture()
     }
 
@@ -58,8 +60,10 @@ class TtsPlayer : SimpleBasePlayer(Looper.getMainLooper()) {
     }
 
     override fun handleStop(): ListenableFuture<*> {
-        isPlayWhenReady = false
-        onPlayWhenReadyChanged?.invoke(false)
+        if (isPlayWhenReady) {
+            isPlayWhenReady = false
+            onPlayWhenReadyChanged?.invoke(false)
+        }
         return Futures.immediateVoidFuture()
     }
 
