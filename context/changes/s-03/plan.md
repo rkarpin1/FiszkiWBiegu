@@ -104,13 +104,13 @@ Patrz Weryfikacja ręczna powyżej.
 
 #### Automatyczne
 
-- [x] 1.1 Health check bez cold start: `curl` zwraca `ok` < 3 sek
-- [x] 1.2 Build debug APK bez błędów: `./gradlew :androidApp:assembleDebug`
+- [x] 1.1 Health check bez cold start: `curl` zwraca `ok` < 3 sek — 34ce2c6
+- [x] 1.2 Build debug APK bez błędów: `./gradlew :androidApp:assembleDebug` — 34ce2c6
 
 #### Ręczne
 
-- [x] 1.3 Render plan upgraded (Starter lub wyższy)
-- [x] 1.4 Login Google działa w produkcji
-- [x] 1.5 Collections i flashcards widoczne (dane z Supabase)
-- [x] 1.6 Sesja nauki startuje: TTS odtwarza po załadowaniu
-- [x] 1.7 Brak crashy w logach ADB po starcie sesji
+- [x] 1.3 Render plan upgraded (Starter lub wyższy) — 34ce2c6
+- [x] 1.4 Login Google działa w produkcji — 34ce2c6
+- [x] 1.5 Collections i flashcards widoczne (dane z Supabase) — 34ce2c6
+- [x] 1.6 Sesja nauki startuje: TTS odtwarza po załadowaniu — 34ce2c6
+- [x] 1.7 Brak crashy w logach ADB po starcie sesji — 34ce2c6
