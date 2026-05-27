@@ -157,12 +157,9 @@ Scenariusze pełne — patrz Faza 1 i Faza 2 Weryfikacja ręczna powyżej.
 
 ### Faza 2: Full-run test — 30+ min z słuchawkami, ekran off
 
-#### Automatyczne
-
-- [x] 2.1 Brak krytycznych błędów w logach po biegu (`adb logcat | grep -i crash\|ANR`) — 13afbaa
-
 #### Ręczne
 
+- [x] 2.1 Brak krytycznych błędów w logach po biegu (`adb logcat | grep -i crash\|ANR`) — 13afbaa
 - [x] 2.2 TTS słyszalny w słuchawkach Bluetooth — 13afbaa
 - [x] 2.3 Screen-off: TTS kontynuuje bez przerwy — 13afbaa
 - [x] 2.4 Sterowanie z słuchawek (ekran off): PLAY/PAUSE, NEXT, PREV — 13afbaa
