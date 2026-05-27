@@ -105,6 +105,9 @@ fun FlashcardsScreen(
             uiState.error?.let {
                 Snackbar(
                     modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
+                    action = {
+                        TextButton(onClick = { viewModel.loadFlashcards() }) { Text("Ponów") }
+                    },
                 ) { Text(it) }
             }
         }

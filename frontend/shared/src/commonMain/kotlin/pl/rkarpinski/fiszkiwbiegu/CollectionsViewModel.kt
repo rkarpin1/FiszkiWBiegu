@@ -16,6 +16,8 @@ data class CollectionsUiState(
     val error: String? = null,
     val showAddDialog: Boolean = false,
     val pendingDeleteId: String? = null,
+    val editingCollectionId: String? = null,
+    val editingCollectionName: String = "",
 )
 
 class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel() {
@@ -48,6 +50,23 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
                 onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
             )
             _uiState.update { it.copy(showAddDialog = false) }
+        }
+    }
+
+    fun requestEdit(id: String, currentName: String) =
+        _uiState.update { it.copy(editingCollectionId = id, editingCollectionName = currentName) }
+
+    fun cancelEdit() =
+        _uiState.update { it.copy(editingCollectionId = null, editingCollectionName = "") }
+
+    fun confirmEdit(newName: String) {
+        val id = _uiState.value.editingCollectionId ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(editingCollectionId = null, editingCollectionName = "") }
+            repo.rename(id, newName).fold(
+                onSuccess = { loadCollections() },
+                onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
+            )
         }
     }
 

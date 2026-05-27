@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,10 +32,12 @@ import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CollectionsScreen(
     viewModel: CollectionsViewModel = koinViewModel(),
     onCollectionClick: (CollectionDto) -> Unit,
+    onLogout: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -53,7 +57,23 @@ fun CollectionsScreen(
         )
     }
 
+    uiState.editingCollectionId?.let {
+        EditCollectionDialog(
+            initialName = uiState.editingCollectionName,
+            onConfirm = { newName -> viewModel.confirmEdit(newName) },
+            onDismiss = { viewModel.cancelEdit() },
+        )
+    }
+
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Moje kolekcje") },
+                actions = {
+                    TextButton(onClick = onLogout) { Text("Wyloguj") }
+                },
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = { viewModel.showAddDialog() }) {
                 Text("+", style = MaterialTheme.typography.titleLarge)
@@ -73,6 +93,7 @@ fun CollectionsScreen(
                         CollectionItem(
                             collection = collection,
                             onClick = { onCollectionClick(collection) },
+                            onEditClick = { viewModel.requestEdit(collection.id, collection.name) },
                             onDeleteClick = { viewModel.requestDelete(collection.id) },
                         )
                         HorizontalDivider()
@@ -82,6 +103,9 @@ fun CollectionsScreen(
             uiState.error?.let {
                 Snackbar(
                     modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
+                    action = {
+                        TextButton(onClick = { viewModel.loadCollections() }) { Text("Ponów") }
+                    },
                 ) { Text(it) }
             }
         }
@@ -92,6 +116,7 @@ fun CollectionsScreen(
 private fun CollectionItem(
     collection: CollectionDto,
     onClick: () -> Unit,
+    onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
 ) {
     Row(
@@ -106,6 +131,7 @@ private fun CollectionItem(
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f),
         )
+        TextButton(onClick = onEditClick) { Text("Edytuj") }
         TextButton(onClick = onDeleteClick) {
             Text("Usuń", color = MaterialTheme.colorScheme.error)
         }
@@ -134,6 +160,36 @@ private fun AddCollectionDialog(
                 onClick = { onConfirm(name.trim()) },
                 enabled = name.isNotBlank(),
             ) { Text("Dodaj") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Anuluj") }
+        },
+    )
+}
+
+@Composable
+private fun EditCollectionDialog(
+    initialName: String,
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var name by remember { mutableStateOf(initialName) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Zmień nazwę kolekcji") },
+        text = {
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Nazwa") },
+                singleLine = true,
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onConfirm(name.trim()) },
+                enabled = name.isNotBlank(),
+            ) { Text("Zapisz") }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Anuluj") }

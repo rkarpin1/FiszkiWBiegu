@@ -56,6 +56,10 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
             )
             Destination.Collections -> CollectionsScreen(
                 onCollectionClick = { destination = Destination.Flashcards(it) },
+                onLogout = {
+                    authRepository.logout()
+                    destination = Destination.Login
+                },
             )
             is Destination.Flashcards -> FlashcardsScreen(
                 collection = dest.collection,

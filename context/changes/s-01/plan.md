@@ -234,7 +234,7 @@ Brak — zmiany wyłącznie frontendowe, bez zmian schematu DB ani endpointów A
 
 #### Automatyczne
 
-- [ ] 1.1 Build APK bez błędów: `./gradlew :androidApp:assembleDebug`
+- [x] 1.1 Build APK bez błędów: `./gradlew :androidApp:assembleDebug`
 
 #### Ręczne
 
