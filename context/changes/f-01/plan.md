@@ -217,10 +217,10 @@ fun FlashcardsScreen(
 
 #### Automatyczne
 
-- [x] 2.1 Kompilacja bez błędów: `./gradlew :androidApp:assembleDebug`
+- [x] 2.1 Kompilacja bez błędów: `./gradlew :androidApp:assembleDebug` — 1032318
 
 #### Ręczne
 
-- [x] 2.2 Tryb samolotowy → przycisk "▶ Nauka" wyłączony (reaktywnie, bez restartu)
-- [x] 2.3 Wyłącz tryb samolotowy → przycisk ponownie aktywny
-- [x] 2.4 Sesja nauki online → włącz tryb samolotowy w trakcie → sesja nie przerywa się (NFR)
+- [x] 2.2 Tryb samolotowy → przycisk "▶ Nauka" wyłączony (reaktywnie, bez restartu) — 1032318
+- [x] 2.3 Wyłącz tryb samolotowy → przycisk ponownie aktywny — 1032318
+- [x] 2.4 Sesja nauki online → włącz tryb samolotowy w trakcie → sesja nie przerywa się (NFR) — 1032318
