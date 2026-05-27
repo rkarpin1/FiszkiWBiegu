@@ -234,29 +234,29 @@ Brak — zmiany wyłącznie frontendowe, bez zmian schematu DB ani endpointów A
 
 #### Automatyczne
 
-- [x] 1.1 Build APK bez błędów: `./gradlew :androidApp:assembleDebug`
+- [x] 1.1 Build APK bez błędów: `./gradlew :androidApp:assembleDebug` — 3b67f94
 
 #### Ręczne
 
-- [x] 1.2 Rename kolekcji działa (dialog pre-filled, zmiana widoczna na liście)
-- [x] 1.3 Logout przechodzi do LoginScreen
-- [x] 1.4 Przycisk Retry widoczny przy błędzie, ponawia żądanie
+- [x] 1.2 Rename kolekcji działa (dialog pre-filled, zmiana widoczna na liście) — 3b67f94
+- [x] 1.3 Logout przechodzi do LoginScreen — 3b67f94
+- [x] 1.4 Przycisk Retry widoczny przy błędzie, ponawia żądanie — 3b67f94
 
 ### Faza 2: Build i weryfikacja E2E na urządzeniu
 
 #### Automatyczne
 
-- [ ] 2.1 Build APK: `./gradlew :androidApp:assembleDebug`
+- [x] 2.1 Build APK: `./gradlew :androidApp:assembleDebug`
 
 #### Ręczne
 
-- [ ] 2.2 Aplikacja uruchomiona ze wyczyszczonymi danymi → LoginScreen
-- [ ] 2.3 LoginScreen → Google Sign-In → CollectionsScreen
-- [ ] 2.4 Auto-login po ponownym uruchomieniu
-- [ ] 2.5 Create kolekcji
-- [ ] 2.6 Edit (rename) kolekcji
-- [ ] 2.7 Create 2 fiszek w kolekcji
-- [ ] 2.8 Edit fiszki
-- [ ] 2.9 Delete fiszki z potwierdzeniem (anulowanie nie usuwa)
-- [ ] 2.10 Delete kolekcji z potwierdzeniem (anulowanie nie usuwa)
-- [ ] 2.11 Logout → LoginScreen
+- [x] 2.2 Aplikacja uruchomiona ze wyczyszczonymi danymi → LoginScreen
+- [x] 2.3 LoginScreen → Google Sign-In → CollectionsScreen
+- [x] 2.4 Auto-login po ponownym uruchomieniu
+- [x] 2.5 Create kolekcji
+- [x] 2.6 Edit (rename) kolekcji
+- [x] 2.7 Create 2 fiszek w kolekcji
+- [x] 2.8 Edit fiszki
+- [x] 2.9 Delete fiszki z potwierdzeniem (anulowanie nie usuwa)
+- [x] 2.10 Delete kolekcji z potwierdzeniem (anulowanie nie usuwa)
+- [x] 2.11 Logout → LoginScreen
