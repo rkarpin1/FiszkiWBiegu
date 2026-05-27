@@ -159,13 +159,13 @@ Scenariusze pełne — patrz Faza 1 i Faza 2 Weryfikacja ręczna powyżej.
 
 #### Automatyczne
 
-- [x] 2.1 Brak krytycznych błędów w logach po biegu (`adb logcat | grep -i crash\|ANR`)
+- [x] 2.1 Brak krytycznych błędów w logach po biegu (`adb logcat | grep -i crash\|ANR`) — 13afbaa
 
 #### Ręczne
 
-- [x] 2.2 TTS słyszalny w słuchawkach Bluetooth
-- [x] 2.3 Screen-off: TTS kontynuuje bez przerwy
-- [x] 2.4 Sterowanie z słuchawek (ekran off): PLAY/PAUSE, NEXT, PREV
-- [x] 2.5 Notification controls działają; tekst i kolory aktualizują się
-- [x] 2.6 30-minutowy bieg bez crashy: TTS gra, wskaźnik aktualny
-- [x] 2.7 Pełna pętla kolekcji — powrót do pierwszej fiszki bez przerwy
+- [x] 2.2 TTS słyszalny w słuchawkach Bluetooth — 13afbaa
+- [x] 2.3 Screen-off: TTS kontynuuje bez przerwy — 13afbaa
+- [x] 2.4 Sterowanie z słuchawek (ekran off): PLAY/PAUSE, NEXT, PREV — 13afbaa
+- [x] 2.5 Notification controls działają; tekst i kolory aktualizują się — 13afbaa
+- [x] 2.6 30-minutowy bieg bez crashy: TTS gra, wskaźnik aktualny — 13afbaa
+- [x] 2.7 Pełna pętla kolekcji — powrót do pierwszej fiszki bez przerwy — 13afbaa
