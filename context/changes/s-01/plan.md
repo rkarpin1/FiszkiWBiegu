@@ -238,9 +238,9 @@ Brak — zmiany wyłącznie frontendowe, bez zmian schematu DB ani endpointów A
 
 #### Ręczne
 
-- [ ] 1.2 Rename kolekcji działa (dialog pre-filled, zmiana widoczna na liście)
-- [ ] 1.3 Logout przechodzi do LoginScreen
-- [ ] 1.4 Przycisk Retry widoczny przy błędzie, ponawia żądanie
+- [x] 1.2 Rename kolekcji działa (dialog pre-filled, zmiana widoczna na liście)
+- [x] 1.3 Logout przechodzi do LoginScreen
+- [x] 1.4 Przycisk Retry widoczny przy błędzie, ponawia żądanie
 
 ### Faza 2: Build i weryfikacja E2E na urządzeniu
 
