@@ -29,7 +29,7 @@ Biegacze tracą dziesiątki godzin miesięcznie, które mogłyby być poświęco
 
 | ID   | ID zmiany                      | Wynik (użytkownik może …)                                                          | Wymagania wstępne | Odniesienia do PRD                                | Status   |
 | ---- | ------------------------------ | ---------------------------------------------------------------------------------- | ----------------- | ------------------------------------------------- | -------- |
-| F-01 | offline-flashcard-cache        | (fundament) fiszki zsynchronizowane lokalnie; tryb nauki nie wymaga internetu      | —                 | NFR (offline), Open Question #2                   | ready    |
+| F-01 | offline-flashcard-cache        | (fundament) fiszki zsynchronizowane lokalnie; tryb nauki nie wymaga internetu      | —                 | NFR (offline), Open Question #2                   | done     |
 | S-01 | collections-flashcards-e2e    | zalogować się, tworzyć/przeglądać/edytować/usuwać kolekcje i fiszki               | —                 | US-02, FR-001–FR-009                              | done     |
 | S-02 | audio-learning-session-offline | uruchomić tryb nauki i słyszeć fiszki offline podczas biegu z ekranem wyłączonym  | F-01, S-01        | US-01, FR-010–FR-014, NFR (offline, audio, latency) | proposed |
 | S-03 | production-run-validation      | zainstalować APK i przeprowadzić pełną sesję nauki podczas rzeczywistego biegu    | S-02              | US-01, FR-012                                     | proposed |
@@ -68,7 +68,7 @@ Fundamenty poniżej zakładają, że te elementy są obecne i NIE tworzą ich po
 - **Blokady:** —
 - **Niewiadome:** -
 - **Ryzyko:** -
-- **Status:** ready
+- **Status:** done
 
 ## Fragmenty
 
@@ -141,4 +141,4 @@ Fundamenty poniżej zakładają, że te elementy są obecne i NIE tworzą ich po
 
 ## Zrobione
 
-(Puste przy pierwszym generowaniu. `/10x-archive` dodaje tutaj wpis gdy zmiana zostanie zarchiwizowana.)
+- **F-01: (fundament) fiszki zsynchronizowane lokalnie; tryb nauki nie wymaga internetu** — Zarchiwizowano 2026-05-27 → `context/archive/2026-05-27-f-01/`. Lekcja: —.
