@@ -30,7 +30,7 @@ Biegacze tracą dziesiątki godzin miesięcznie, które mogłyby być poświęco
 | ID   | ID zmiany                      | Wynik (użytkownik może …)                                                          | Wymagania wstępne | Odniesienia do PRD                                | Status   |
 | ---- | ------------------------------ | ---------------------------------------------------------------------------------- | ----------------- | ------------------------------------------------- | -------- |
 | F-01 | offline-flashcard-cache        | (fundament) fiszki zsynchronizowane lokalnie; tryb nauki nie wymaga internetu      | —                 | NFR (offline), Open Question #2                   | ready    |
-| S-01 | collections-flashcards-e2e    | zalogować się, tworzyć/przeglądać/edytować/usuwać kolekcje i fiszki               | —                 | US-02, FR-001–FR-009                              | ready    |
+| S-01 | collections-flashcards-e2e    | zalogować się, tworzyć/przeglądać/edytować/usuwać kolekcje i fiszki               | —                 | US-02, FR-001–FR-009                              | done     |
 | S-02 | audio-learning-session-offline | uruchomić tryb nauki i słyszeć fiszki offline podczas biegu z ekranem wyłączonym  | F-01, S-01        | US-01, FR-010–FR-014, NFR (offline, audio, latency) | proposed |
 | S-03 | production-run-validation      | zainstalować APK i przeprowadzić pełną sesję nauki podczas rzeczywistego biegu    | S-02              | US-01, FR-012                                     | proposed |
 
@@ -83,7 +83,7 @@ Fundamenty poniżej zakładają, że te elementy są obecne i NIE tworzą ich po
 - **Blokady:** —
 - **Niewiadome:** —
 - **Ryzyko:** Kod warstw auth + CRUD + UI jest obecny (GoogleSignInHelper.kt, CollectionsScreen, FlashcardsScreen), ale E2E integracja mogła nie być testowana kompleksowo; problemy z wiringiem mogą się ujawnić przy pierwszym pełnym przejściu przepływu.
-- **Status:** ready
+- **Status:** done
 
 ### S-02: Kompletna sesja nauki audio offline
 
@@ -115,7 +115,7 @@ Fundamenty poniżej zakładają, że te elementy są obecne i NIE tworzą ich po
 | ID mapy drogowej | ID zmiany                      | Sugerowany tytuł problemu                                     | Gotowe do `/10x-plan` | Uwagi                                                              |
 | ---------------- | ------------------------------ | ------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------ |
 | F-01             | offline-flashcard-cache        | Cache i synchronizacja fiszek offline (Android Room/SQLite)  | yes                   | Uruchom `/10x-plan offline-flashcard-cache`                        |
-| S-01             | collections-flashcards-e2e    | Zarządzanie kolekcjami i fiszkami — weryfikacja E2E           | yes                   | Uruchom `/10x-plan collections-flashcards-e2e`; równolegle z F-01 |
+| S-01             | collections-flashcards-e2e    | Zarządzanie kolekcjami i fiszkami — weryfikacja E2E           | done                  | Zrealizowane                                                       |
 | S-02             | audio-learning-session-offline | Tryb nauki audio offline — integracja i testy                 | no                    | Czeka na ukończenie F-01 + S-01                                    |
 | S-03             | production-run-validation      | Wdrożenie produkcyjne + pierwsza sesja na żywo                | no                    | Czeka na S-02; skonfiguruj Render env vars wcześniej               |
 
