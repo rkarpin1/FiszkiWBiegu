@@ -63,12 +63,11 @@ Fundamenty poniżej zakładają, że te elementy są obecne i NIE tworzą ich po
 - **ID zmiany:** offline-flashcard-cache
 - **Odniesienia do PRD:** NFR („odtwarzanie audio i dostęp do treści fiszek kolekcji nie są uzależnione od łączności sieciowej po uruchomieniu sesji"), Open Question #2
 - **Odblokowuje:** S-02 — compliance z NFR offline; bez lokalnego cache S-02 łamie NFR przy pierwszej utracie zasięgu podczas biegu
-- **Wymagania wstępne:** —
+- **Wymagania wstępne:** — cała kolekcja, która ma być wykorzystywana w trybie nauki, ma być pobrana i dostępna w lokalnym cache
 - **Równolegle z:** S-01
 - **Blokady:** —
-- **Niewiadome:**
-  - Kiedy i jak synchronizować fiszki na urządzenie? (przy każdym uruchomieniu / przy starcie trybu nauki / w tle / ręcznie) — Właściciel: Rafał. Blokada: nie (decyzja architektoniczna do podjęcia w `/10x-plan`; implementacja może startować od najprostszego wariantu i refaktorować).
-- **Ryzyko:** Backend zwraca dane przez REST — lokalne SQLite lub Room to nowa warstwa we frontendzie; błędna decyzja o momencie sync (zbyt agresywna = zużycie baterii, zbyt leniwa = nieaktualne dane na trasie).
+- **Niewiadome:** -
+- **Ryzyko:** -
 - **Status:** ready
 
 ## Fragmenty
