@@ -1,6 +1,7 @@
 package pl.rkarpinski.fiszkiwbiegu.data.api
 
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpCallValidator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.delete
@@ -16,10 +17,20 @@ import kotlinx.serialization.json.Json
 
 const val API_BASE_URL = "https://fiszki-w-biegu.onrender.com"
 
-class ApiClient(private val tokenStorage: TokenStorage) {
+class ApiClient(
+    private val tokenStorage: TokenStorage,
+    private val authEventBus: AuthEventBus,
+) {
     private val client = HttpClient {
         install(ContentNegotiation) {
             json(Json { ignoreUnknownKeys = true })
+        }
+        install(HttpCallValidator) {
+            validateResponse { response ->
+                if (response.status.value == 401) {
+                    authEventBus.emitUnauthorized()
+                }
+            }
         }
     }
 

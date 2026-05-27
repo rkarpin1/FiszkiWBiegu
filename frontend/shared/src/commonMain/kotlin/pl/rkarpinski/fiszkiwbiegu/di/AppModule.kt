@@ -7,6 +7,7 @@ import pl.rkarpinski.fiszkiwbiegu.CollectionsViewModel
 import pl.rkarpinski.fiszkiwbiegu.FlashcardsViewModel
 import pl.rkarpinski.fiszkiwbiegu.LearningViewModel
 import pl.rkarpinski.fiszkiwbiegu.data.api.ApiClient
+import pl.rkarpinski.fiszkiwbiegu.data.api.AuthEventBus
 import pl.rkarpinski.fiszkiwbiegu.data.api.TokenStorage
 import pl.rkarpinski.fiszkiwbiegu.data.repository.AuthRepository
 import pl.rkarpinski.fiszkiwbiegu.data.repository.CollectionRepository
@@ -15,7 +16,8 @@ import pl.rkarpinski.fiszkiwbiegu.data.repository.FlashcardRepository
 val appModule = module {
     single { Settings() }
     single { TokenStorage(get()) }
-    single { ApiClient(get()) }
+    single { AuthEventBus() }
+    single { ApiClient(get(), get()) }
     single { AuthRepository(get(), get()) }
     single { CollectionRepository(get()) }
     single { FlashcardRepository(get()) }
