@@ -207,20 +207,20 @@ fun FlashcardsScreen(
 
 #### Automatyczne
 
-- [x] 1.1 Kompilacja bez błędów: `./gradlew :androidApp:assembleDebug`
+- [x] 1.1 Kompilacja bez błędów: `./gradlew :androidApp:assembleDebug` — 0f8fb06
 
 #### Ręczne
 
-- [x] 1.2 Aplikacja startuje poprawnie na urządzeniu/emulatorze (brak Koin crash)
+- [x] 1.2 Aplikacja startuje poprawnie na urządzeniu/emulatorze (brak Koin crash) — 0f8fb06
 
 ### Faza 2: Offline guard w FlashcardsScreen
 
 #### Automatyczne
 
-- [ ] 2.1 Kompilacja bez błędów: `./gradlew :androidApp:assembleDebug`
+- [x] 2.1 Kompilacja bez błędów: `./gradlew :androidApp:assembleDebug`
 
 #### Ręczne
 
-- [ ] 2.2 Tryb samolotowy → przycisk "▶ Nauka" wyłączony (reaktywnie, bez restartu)
-- [ ] 2.3 Wyłącz tryb samolotowy → przycisk ponownie aktywny
-- [ ] 2.4 Sesja nauki online → włącz tryb samolotowy w trakcie → sesja nie przerywa się (NFR)
+- [x] 2.2 Tryb samolotowy → przycisk "▶ Nauka" wyłączony (reaktywnie, bez restartu)
+- [x] 2.3 Wyłącz tryb samolotowy → przycisk ponownie aktywny
+- [x] 2.4 Sesja nauki online → włącz tryb samolotowy w trakcie → sesja nie przerywa się (NFR)

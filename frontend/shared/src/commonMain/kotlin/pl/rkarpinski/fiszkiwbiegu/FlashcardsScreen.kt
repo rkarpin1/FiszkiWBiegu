@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
@@ -40,10 +41,12 @@ import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 fun FlashcardsScreen(
     collection: CollectionDto,
     viewModel: FlashcardsViewModel = koinViewModel { parametersOf(collection.id) },
+    networkChecker: NetworkChecker = koinInject(),
     onBack: () -> Unit,
     onStartLearning: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val isOnline by networkChecker.isOnline.collectAsState()
 
     if (uiState.showFormDialog) {
         FlashcardFormDialog(
@@ -72,7 +75,7 @@ fun FlashcardsScreen(
                 actions = {
                     TextButton(
                         onClick = onStartLearning,
-                        enabled = uiState.flashcards.isNotEmpty(),
+                        enabled = uiState.flashcards.isNotEmpty() && isOnline,
                     ) { Text("▶ Nauka") }
                 },
             )
