@@ -1,10 +1,10 @@
 ---
 change_id: s-02
 title: Kompletna sesja nauki audio offline
-status: impl_reviewed
+status: archived
 created: 2026-05-27
 updated: 2026-05-27
-archived_at: null
+archived_at: 2026-05-27T19:04:34Z
 ---
 
 ## Notes
