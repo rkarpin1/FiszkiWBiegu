@@ -147,19 +147,19 @@ Brak testów jednostkowych w tym zakresie — obecny codebase nie ma testów dla
 
 #### Automatyczne
 
-- [x] 1.1 Kod kompiluje się bez błędów: `./gradlew :shared:test`
+- [x] 1.1 Kod kompiluje się bez błędów: `./gradlew :shared:test` — 803fbd5
 
 #### Ręczne
 
-- [x] 1.2 Brak weryfikacji ręcznej na tym etapie
+- [x] 1.2 Brak weryfikacji ręcznej na tym etapie — 803fbd5
 
 ### Phase 2: Wiring App.kt + weryfikacja E2E
 
 #### Automatyczne
 
-- [ ] 2.1 APK buduje się: `./gradlew :androidApp:assembleDebug`
+- [x] 2.1 APK buduje się: `./gradlew :androidApp:assembleDebug`
 
 #### Ręczne
 
-- [ ] 2.2 Zalogować się → zmienić `auth_token` na `invalid_token` via App Inspection → operacja → cichy redirect do LoginScreen
-- [ ] 2.3 Zalogować się ponownie po 401-redirect → app działa normalnie
+- [x] 2.2 Zalogować się → zmienić `auth_token` na `invalid_token` via App Inspection → operacja → cichy redirect do LoginScreen
+- [x] 2.3 Zalogować się ponownie po 401-redirect → app działa normalnie

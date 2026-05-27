@@ -6,6 +6,7 @@ package pl.rkarpinski.fiszkiwbiegu
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -13,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import pl.rkarpinski.fiszkiwbiegu.data.api.AuthEventBus
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.repository.AuthRepository
 
@@ -26,6 +28,7 @@ private sealed interface Destination {
 @Composable
 fun App(onGoogleSignIn: suspend () -> Result<String>) {
     val authRepository: AuthRepository = koinInject()
+    val authEventBus: AuthEventBus = koinInject()
     val scope = rememberCoroutineScope()
     val initial: Destination = if (authRepository.isLoggedIn()) Destination.Collections else Destination.Login
     var destination by remember { mutableStateOf<Destination>(initial) }
@@ -33,6 +36,12 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
     var isLoggingIn by remember { mutableStateOf(false) }
 
     MaterialTheme {
+        LaunchedEffect(Unit) {
+            authEventBus.unauthorizedEvents.collect {
+                authRepository.logout()
+                destination = Destination.Login
+            }
+        }
         when (val dest = destination) {
             Destination.Login -> LoginScreen(
                 isLoading = isLoggingIn,
