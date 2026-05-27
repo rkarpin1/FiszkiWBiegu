@@ -246,17 +246,17 @@ Brak — zmiany wyłącznie frontendowe, bez zmian schematu DB ani endpointów A
 
 #### Automatyczne
 
-- [x] 2.1 Build APK: `./gradlew :androidApp:assembleDebug`
+- [x] 2.1 Build APK: `./gradlew :androidApp:assembleDebug` — 89a65c4
 
 #### Ręczne
 
-- [x] 2.2 Aplikacja uruchomiona ze wyczyszczonymi danymi → LoginScreen
-- [x] 2.3 LoginScreen → Google Sign-In → CollectionsScreen
-- [x] 2.4 Auto-login po ponownym uruchomieniu
-- [x] 2.5 Create kolekcji
-- [x] 2.6 Edit (rename) kolekcji
-- [x] 2.7 Create 2 fiszek w kolekcji
-- [x] 2.8 Edit fiszki
-- [x] 2.9 Delete fiszki z potwierdzeniem (anulowanie nie usuwa)
-- [x] 2.10 Delete kolekcji z potwierdzeniem (anulowanie nie usuwa)
-- [x] 2.11 Logout → LoginScreen
+- [x] 2.2 Aplikacja uruchomiona ze wyczyszczonymi danymi → LoginScreen — 89a65c4
+- [x] 2.3 LoginScreen → Google Sign-In → CollectionsScreen — 89a65c4
+- [x] 2.4 Auto-login po ponownym uruchomieniu — 89a65c4
+- [x] 2.5 Create kolekcji — 89a65c4
+- [x] 2.6 Edit (rename) kolekcji — 89a65c4
+- [x] 2.7 Create 2 fiszek w kolekcji — 89a65c4
+- [x] 2.8 Edit fiszki — 89a65c4
+- [x] 2.9 Delete fiszki z potwierdzeniem (anulowanie nie usuwa) — 89a65c4
+- [x] 2.10 Delete kolekcji z potwierdzeniem (anulowanie nie usuwa) — 89a65c4
+- [x] 2.11 Logout → LoginScreen — 89a65c4
