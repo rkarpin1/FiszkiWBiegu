@@ -143,29 +143,29 @@ Scenariusze pełne — patrz Faza 1 i Faza 2 Weryfikacja ręczna powyżej.
 
 #### Automatyczne
 
-- [x] 1.1 Kompilacja bez błędów: `./gradlew :androidApp:assembleDebug`
-- [x] 1.2 Brak błędów Koin w logach po starcie
+- [x] 1.1 Kompilacja bez błędów: `./gradlew :androidApp:assembleDebug` — 941e77b
+- [x] 1.2 Brak błędów Koin w logach po starcie — 941e77b
 
 #### Ręczne
 
-- [x] 1.3 Scenariusz podstawowy: app → Collections → fiszki → LearningScreen → TTS startuje
-- [x] 1.4 Cykl audio: PL full → EN silent → 3×EN full z przerwami → następna fiszka
-- [x] 1.5 Pauza/wznowienie działa poprawnie
-- [x] 1.6 Nawigacja ⏭/⏮ działa; pętla powrotu po ostatniej fiszce
-- [x] 1.7 Drugi wход do trybu nauki działa poprawnie (brak zamrożonego stanu)
-- [x] 1.8 Offline guard: tryb samolotowy wyłącza „▶ Nauka"
+- [x] 1.3 Scenariusz podstawowy: app → Collections → fiszki → LearningScreen → TTS startuje — 941e77b
+- [x] 1.4 Cykl audio: PL full → EN silent → 3×EN full z przerwami → następna fiszka — 941e77b
+- [x] 1.5 Pauza/wznowienie działa poprawnie — 941e77b
+- [x] 1.6 Nawigacja ⏭/⏮ działa; pętla powrotu po ostatniej fiszce — 941e77b
+- [x] 1.7 Drugi wход do trybu nauki działa poprawnie (brak zamrożonego stanu) — 941e77b
+- [x] 1.8 Offline guard: tryb samolotowy wyłącza „▶ Nauka" — 941e77b
 
 ### Faza 2: Full-run test — 30+ min z słuchawkami, ekran off
 
 #### Automatyczne
 
-- [ ] 2.1 Brak krytycznych błędów w logach po biegu (`adb logcat | grep -i crash\|ANR`)
+- [x] 2.1 Brak krytycznych błędów w logach po biegu (`adb logcat | grep -i crash\|ANR`)
 
 #### Ręczne
 
-- [ ] 2.2 TTS słyszalny w słuchawkach Bluetooth
-- [ ] 2.3 Screen-off: TTS kontynuuje bez przerwy
-- [ ] 2.4 Sterowanie z słuchawek (ekran off): PLAY/PAUSE, NEXT, PREV
-- [ ] 2.5 Notification controls działają; tekst i kolory aktualizują się
-- [ ] 2.6 30-minutowy bieg bez crashy: TTS gra, wskaźnik aktualny
-- [ ] 2.7 Pełna pętla kolekcji — powrót do pierwszej fiszki bez przerwy
+- [x] 2.2 TTS słyszalny w słuchawkach Bluetooth
+- [x] 2.3 Screen-off: TTS kontynuuje bez przerwy
+- [x] 2.4 Sterowanie z słuchawek (ekran off): PLAY/PAUSE, NEXT, PREV
+- [x] 2.5 Notification controls działają; tekst i kolory aktualizują się
+- [x] 2.6 30-minutowy bieg bez crashy: TTS gra, wskaźnik aktualny
+- [x] 2.7 Pełna pętla kolekcji — powrót do pierwszej fiszki bez przerwy
