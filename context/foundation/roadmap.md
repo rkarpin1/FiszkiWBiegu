@@ -32,7 +32,7 @@ Biegacze tracą dziesiątki godzin miesięcznie, które mogłyby być poświęco
 | F-01 | offline-flashcard-cache        | (fundament) fiszki zsynchronizowane lokalnie; tryb nauki nie wymaga internetu      | —                 | NFR (offline), Open Question #2                   | done     |
 | S-01 | collections-flashcards-e2e    | zalogować się, tworzyć/przeglądać/edytować/usuwać kolekcje i fiszki               | —                 | US-02, FR-001–FR-009                              | done     |
 | S-02 | audio-learning-session-offline | uruchomić tryb nauki i słyszeć fiszki offline podczas biegu z ekranem wyłączonym  | F-01, S-01        | US-01, FR-010–FR-014, NFR (offline, audio, latency) | done     |
-| S-03 | production-run-validation      | zainstalować APK i przeprowadzić pełną sesję nauki podczas rzeczywistego biegu    | S-02              | US-01, FR-012                                     | proposed |
+| S-03 | production-run-validation      | zainstalować APK i przeprowadzić pełną sesję nauki podczas rzeczywistego biegu    | S-02              | US-01, FR-012                                     | done     |
 
 ## Strumienie
 
@@ -107,7 +107,7 @@ Fundamenty poniżej zakładają, że te elementy są obecne i NIE tworzą ich po
 - **Blokady:** Render.com env vars — SUPABASE_SERVICE_ROLE_KEY i DATABASE_URL muszą być skonfigurowane w panelu Render przed pierwszym uruchomieniem produkcyjnym.
 - **Niewiadome:** —
 - **Ryzyko:** Problemy ze stabilnością Foreground Service (memory leaks, wakelocks, Android doze mode) ujawnią się dopiero podczas 45-60 minutowego biegu na prawdziwym urządzeniu; im wcześniej przetestowane, tym mniej niespodzianek przy docelowym użyciu.
-- **Status:** proposed
+- **Status:** done
 
 ## Przekazanie do backlogu
 
@@ -143,3 +143,4 @@ Fundamenty poniżej zakładają, że te elementy są obecne i NIE tworzą ich po
 
 - **F-01: (fundament) fiszki zsynchronizowane lokalnie; tryb nauki nie wymaga internetu** — Zarchiwizowano 2026-05-27 → `context/archive/2026-05-27-f-01/`. Lekcja: —.
 - **S-02: użytkownik może wybrać kolekcję, uruchomić tryb nauki i słyszeć fiszki przez TTS podczas biegu z ekranem wyłączonym, sterując przyciskami słuchawek (PLAY/PAUSE/NEXT/PREV), bez dostępu do internetu** — Zarchiwizowano 2026-05-27 → `context/archive/2026-05-27-s-02/`. Lekcja: —.
+- **S-03: użytkownik instaluje APK, aplikacja łączy się z backendem na Render.com, Rafał przeprowadza pierwszą pełną sesję nauki podczas rzeczywistego biegu (30-60 min, ekran wyłączony, słuchawki Bluetooth)** — Zarchiwizowano 2026-05-27 → `context/archive/2026-05-27-s-03/`. Lekcja: —.
