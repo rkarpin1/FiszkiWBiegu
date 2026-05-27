@@ -1,7 +1,7 @@
 ---
 change_id: f-01
 title: Cache i synchronizacja fiszek offline
-status: implemented
+status: impl_reviewed
 created: 2026-05-27
 updated: 2026-05-27
 

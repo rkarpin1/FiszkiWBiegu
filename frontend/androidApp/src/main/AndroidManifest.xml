@@ -25,6 +25,7 @@
             </intent-filter>
         </activity>
 
+        <!-- exported required by MediaSessionService (media3 media button routing) -->
         <service
             android:name=".LearningService"
             android:foregroundServiceType="mediaPlayback"
