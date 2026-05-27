@@ -27,7 +27,7 @@ class ApiClient(
         }
         install(HttpCallValidator) {
             validateResponse { response ->
-                if (response.status.value == 401) {
+                if (response.status.value == 401 && !response.call.request.url.encodedPath.endsWith("/auth/login")) {
                     authEventBus.emitUnauthorized()
                 }
             }
