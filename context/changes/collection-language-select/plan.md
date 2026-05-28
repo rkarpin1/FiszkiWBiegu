@@ -358,11 +358,11 @@ entry<Route.CollectionForm> { route ->
 ### Phase 3: Frontend UI — LangSelect + ekrany
 
 #### Automated
-- [x] 3.1 :androidApp:assembleDebug bez błędów
+- [x] 3.1 :androidApp:assembleDebug bez błędów — ea7f2af
 
 #### Manual
-- [x] 3.2 Nowa kolekcja — LangSelect pokazuje pl/en domyślnie, bottom-sheet z 6 językami
-- [x] 3.3 CTA disabled gdy source == target
-- [x] 3.4 Tworzenie kolekcji z niestandardową parą języków
-- [x] 3.5 Edycja kolekcji — języki wczytane z kolekcji
-- [x] 3.6 FlashcardsScreen — dynamiczne flagi i nazwy języków
+- [x] 3.2 Nowa kolekcja — LangSelect pokazuje pl/en domyślnie, bottom-sheet z 6 językami — ea7f2af
+- [x] 3.3 CTA disabled gdy source == target — ea7f2af
+- [x] 3.4 Tworzenie kolekcji z niestandardową parą języków — ea7f2af
+- [x] 3.5 Edycja kolekcji — języki wczytane z kolekcji — ea7f2af
+- [x] 3.6 FlashcardsScreen — dynamiczne flagi i nazwy języków — ea7f2af
