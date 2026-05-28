@@ -1,5 +1,6 @@
 
 .idea/**
+.tmp/**
 
 # Rust
 backend/target/
