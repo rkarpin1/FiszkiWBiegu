@@ -233,11 +233,11 @@ Wdrożenie komponentów wielokrotnego użytku (Flag, TrackBar, MediaControls) i 
 
 #### Automatyczne
 
-- [x] 2.1 `./gradlew :androidApp:assembleDebug` — exit code 0
-- [x] 2.2 `./gradlew :webApp:wasmJsBrowserDevelopmentRun` — kompiluje się bez błędów
+- [x] 2.1 `./gradlew :androidApp:assembleDebug` — exit code 0 — 719c409
+- [x] 2.2 `./gradlew :webApp:wasmJsBrowserDevelopmentRun` — kompiluje się bez błędów — 719c409
 
 #### Ręczne
 
-- [x] 2.3 APK instaluje się i uruchamia bez crashu
-- [x] 2.4 Pełny flow aplikacji (login → kolekcje → fiszki → nauka) działa bez regresji
-- [x] 2.5 Brak błędów Canvas/Font w Logcat i konsoli WasmJS
+- [x] 2.3 APK instaluje się i uruchamia bez crashu — 719c409
+- [x] 2.4 Pełny flow aplikacji (login → kolekcje → fiszki → nauka) działa bez regresji — 719c409
+- [x] 2.5 Brak błędów Canvas/Font w Logcat i konsoli WasmJS — 719c409
