@@ -221,23 +221,23 @@ Wdrożenie komponentów wielokrotnego użytku (Flag, TrackBar, MediaControls) i 
 
 #### Automatyczne
 
-- [x] 1.1 `./gradlew :shared:compileAndroidMain` — bez błędów kompilacji
+- [x] 1.1 `./gradlew :shared:compileAndroidMain` — bez błędów kompilacji — 39b94a3
 
 #### Ręczne
 
-- [x] 1.2 Katalog `theme/` zawiera `Color.kt`, `Theme.kt`, `Type.kt`
-- [x] 1.3 Katalog `composeResources/font/` zawiera 5 plików `.ttf`
-- [x] 1.4 Brak nierozwiązanych importów w plikach motywu
+- [x] 1.2 Katalog `theme/` zawiera `Color.kt`, `Theme.kt`, `Type.kt` — 39b94a3
+- [x] 1.3 Katalog `composeResources/font/` zawiera 5 plików `.ttf` — 39b94a3
+- [x] 1.4 Brak nierozwiązanych importów w plikach motywu — 39b94a3
 
 ### Faza 2: Komponenty UI + Aktywacja motywu
 
 #### Automatyczne
 
-- [ ] 2.1 `./gradlew :androidApp:assembleDebug` — exit code 0
-- [ ] 2.2 `./gradlew :webApp:wasmJsBrowserDevelopmentRun` — kompiluje się bez błędów
+- [x] 2.1 `./gradlew :androidApp:assembleDebug` — exit code 0
+- [x] 2.2 `./gradlew :webApp:wasmJsBrowserDevelopmentRun` — kompiluje się bez błędów
 
 #### Ręczne
 
-- [ ] 2.3 APK instaluje się i uruchamia bez crashu
-- [ ] 2.4 Pełny flow aplikacji (login → kolekcje → fiszki → nauka) działa bez regresji
-- [ ] 2.5 Brak błędów Canvas/Font w Logcat i konsoli WasmJS
+- [x] 2.3 APK instaluje się i uruchamia bez crashu
+- [x] 2.4 Pełny flow aplikacji (login → kolekcje → fiszki → nauka) działa bez regresji
+- [x] 2.5 Brak błędów Canvas/Font w Logcat i konsoli WasmJS

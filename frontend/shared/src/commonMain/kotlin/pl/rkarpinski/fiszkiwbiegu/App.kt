@@ -17,6 +17,7 @@ import org.koin.compose.koinInject
 import pl.rkarpinski.fiszkiwbiegu.data.api.AuthEventBus
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.repository.AuthRepository
+import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiAppTheme
 
 private sealed interface Destination {
     data object Login : Destination
@@ -35,50 +36,52 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
     var loginError by remember { mutableStateOf<String?>(null) }
     var isLoggingIn by remember { mutableStateOf(false) }
 
-    MaterialTheme {
-        LaunchedEffect(Unit) {
-            authEventBus.unauthorizedEvents.collect {
-                authRepository.logout()
-                destination = Destination.Login
-            }
-        }
-        when (val dest = destination) {
-            Destination.Login -> LoginScreen(
-                isLoading = isLoggingIn,
-                error = loginError,
-                onSignInClick = {
-                    isLoggingIn = true
-                    loginError = null
-                    scope.launch {
-                        onGoogleSignIn().fold(
-                            onSuccess = { idToken ->
-                                authRepository.loginWithGoogle(idToken).fold(
-                                    onSuccess = { destination = Destination.Collections },
-                                    onFailure = { e -> loginError = e.message ?: "Błąd logowania" },
-                                )
-                            },
-                            onFailure = { e -> loginError = e.message ?: "Błąd Google Sign-In" },
-                        )
-                        isLoggingIn = false
-                    }
-                },
-            )
-            Destination.Collections -> CollectionsScreen(
-                onCollectionClick = { destination = Destination.Flashcards(it) },
-                onLogout = {
+    FiszkiAppTheme(override = null) {
+        MaterialTheme {
+            LaunchedEffect(Unit) {
+                authEventBus.unauthorizedEvents.collect {
                     authRepository.logout()
                     destination = Destination.Login
-                },
-            )
-            is Destination.Flashcards -> FlashcardsScreen(
-                collection = dest.collection,
-                onBack = { destination = Destination.Collections },
-                onStartLearning = { destination = Destination.Learning(dest.collection) },
-            )
-            is Destination.Learning -> LearningScreen(
-                collection = dest.collection,
-                onBack = { destination = Destination.Collections },
-            )
+                }
+            }
+            when (val dest = destination) {
+                Destination.Login -> LoginScreen(
+                    isLoading = isLoggingIn,
+                    error = loginError,
+                    onSignInClick = {
+                        isLoggingIn = true
+                        loginError = null
+                        scope.launch {
+                            onGoogleSignIn().fold(
+                                onSuccess = { idToken ->
+                                    authRepository.loginWithGoogle(idToken).fold(
+                                        onSuccess = { destination = Destination.Collections },
+                                        onFailure = { e -> loginError = e.message ?: "Błąd logowania" },
+                                    )
+                                },
+                                onFailure = { e -> loginError = e.message ?: "Błąd Google Sign-In" },
+                            )
+                            isLoggingIn = false
+                        }
+                    },
+                )
+                Destination.Collections -> CollectionsScreen(
+                    onCollectionClick = { destination = Destination.Flashcards(it) },
+                    onLogout = {
+                        authRepository.logout()
+                        destination = Destination.Login
+                    },
+                )
+                is Destination.Flashcards -> FlashcardsScreen(
+                    collection = dest.collection,
+                    onBack = { destination = Destination.Collections },
+                    onStartLearning = { destination = Destination.Learning(dest.collection) },
+                )
+                is Destination.Learning -> LearningScreen(
+                    collection = dest.collection,
+                    onBack = { destination = Destination.Collections },
+                )
+            }
         }
     }
 }
