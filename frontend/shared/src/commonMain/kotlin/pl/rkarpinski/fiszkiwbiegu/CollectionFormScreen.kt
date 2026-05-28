@@ -170,8 +170,8 @@ fun CollectionFormScreen(
                         .background(if (name.isNotBlank()) c.accent else c.surface3)
                         .then(
                             if (name.isNotBlank()) Modifier.clickable {
-                                if (isEdit) viewModel.updateCollection(collectionId!!, name.trim())
-                                else viewModel.createCollection(name.trim())
+                                if (isEdit) viewModel.updateCollection(collectionId!!, name.trim(), "pl", "en")
+                                else viewModel.createCollection(name.trim(), "pl", "en")
                                 onBack()
                             } else Modifier,
                         ),

@@ -43,9 +43,9 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
 
     fun hideAddDialog() = _uiState.update { it.copy(showAddDialog = false) }
 
-    fun createCollection(name: String) {
+    fun createCollection(name: String, sourceLanguage: String, targetLanguage: String) {
         viewModelScope.launch {
-            repo.create(name).fold(
+            repo.create(name, sourceLanguage, targetLanguage).fold(
                 onSuccess = { loadCollections() },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
             )
@@ -63,7 +63,7 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
         val id = _uiState.value.editingCollectionId ?: return
         viewModelScope.launch {
             _uiState.update { it.copy(editingCollectionId = null, editingCollectionName = "") }
-            repo.rename(id, newName).fold(
+            repo.rename(id, newName, "pl", "en").fold(
                 onSuccess = { loadCollections() },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
             )
@@ -85,9 +85,9 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
         }
     }
 
-    fun updateCollection(id: String, name: String) {
+    fun updateCollection(id: String, name: String, sourceLanguage: String, targetLanguage: String) {
         viewModelScope.launch {
-            repo.rename(id, name).fold(
+            repo.rename(id, name, sourceLanguage, targetLanguage).fold(
                 onSuccess = { loadCollections() },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
             )

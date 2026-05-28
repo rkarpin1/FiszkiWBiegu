@@ -8,12 +8,16 @@ data class CollectionDto(
     val id: String,
     @SerialName("user_id") val userId: String,
     val name: String,
+    @SerialName("source_language") val sourceLanguage: String,
+    @SerialName("target_language") val targetLanguage: String,
     @SerialName("created_at") val createdAt: String,
 )
 
 @Serializable
 data class CollectionRequest(
     val name: String,
+    @SerialName("source_language") val sourceLanguage: String,
+    @SerialName("target_language") val targetLanguage: String,
 )
 
 @Serializable

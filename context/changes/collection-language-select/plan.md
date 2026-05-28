@@ -350,10 +350,10 @@ entry<Route.CollectionForm> { route ->
 ### Phase 2: Frontend — modele danych + repozytorium + VM
 
 #### Automated
-- [ ] 2.1 :androidApp:assembleDebug bez błędów kompilacji
+- [x] 2.1 :androidApp:assembleDebug bez błędów kompilacji
 
 #### Manual
-- [ ] 2.2 Brak błędów IDE w ApiModels.kt, CollectionRepository.kt, CollectionsViewModel.kt
+- [x] 2.2 Brak błędów IDE w ApiModels.kt, CollectionRepository.kt, CollectionsViewModel.kt
 
 ### Phase 3: Frontend UI — LangSelect + ekrany
 
