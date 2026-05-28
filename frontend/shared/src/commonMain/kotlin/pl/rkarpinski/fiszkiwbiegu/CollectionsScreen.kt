@@ -55,7 +55,6 @@ import pl.rkarpinski.fiszkiwbiegu.ui.components.TrackBar
 fun CollectionsScreen(
     viewModel: CollectionsViewModel = koinViewModel(),
     onCollectionClick: (CollectionDto) -> Unit,
-    @Suppress("UNUSED_PARAMETER") onLogout: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

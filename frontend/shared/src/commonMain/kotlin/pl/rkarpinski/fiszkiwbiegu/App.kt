@@ -4,26 +4,41 @@
 
 package pl.rkarpinski.fiszkiwbiegu
 
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.LibraryBooks
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import pl.rkarpinski.fiszkiwbiegu.data.api.AuthEventBus
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.repository.AuthRepository
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiAppTheme
+import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
+import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 
-private sealed interface Destination {
-    data object Login : Destination
-    data object Collections : Destination
-    data class Flashcards(val collection: CollectionDto) : Destination
-    data class Learning(val collection: CollectionDto) : Destination
+private sealed interface Route {
+    data object Login : Route
+    data object Collections : Route
+    data class Flashcards(val collection: CollectionDto) : Route
+    data class Learning(val collection: CollectionDto) : Route
+    data object Profile : Route
 }
 
 @Composable
@@ -31,57 +46,132 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
     val authRepository: AuthRepository = koinInject()
     val authEventBus: AuthEventBus = koinInject()
     val scope = rememberCoroutineScope()
-    val initial: Destination = if (authRepository.isLoggedIn()) Destination.Collections else Destination.Login
-    var destination by remember { mutableStateOf<Destination>(initial) }
+
+    val initial: Route = if (authRepository.isLoggedIn()) Route.Collections else Route.Login
+    val backStack = remember { mutableStateListOf<Route>(initial) }
+
     var loginError by remember { mutableStateOf<String?>(null) }
     var isLoggingIn by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        authEventBus.unauthorizedEvents.collect {
+            authRepository.logout()
+            backStack.clear()
+            backStack.add(Route.Login)
+        }
+    }
+
     FiszkiAppTheme(override = null) {
-        MaterialTheme {
-            LaunchedEffect(Unit) {
-                authEventBus.unauthorizedEvents.collect {
-                    authRepository.logout()
-                    destination = Destination.Login
-                }
-            }
-            when (val dest = destination) {
-                Destination.Login -> LoginScreen(
-                    isLoading = isLoggingIn,
-                    error = loginError,
-                    onSignInClick = {
-                        isLoggingIn = true
-                        loginError = null
-                        scope.launch {
-                            onGoogleSignIn().fold(
-                                onSuccess = { idToken ->
-                                    authRepository.loginWithGoogle(idToken).fold(
-                                        onSuccess = { destination = Destination.Collections },
-                                        onFailure = { e -> loginError = e.message ?: "Błąd logowania" },
-                                    )
+        FiszkiThemedScreen(naturalDark = true) {
+            val c = LocalFiszkiColors.current
+            val currentRoute = backStack.lastOrNull()
+            val showTabBar = currentRoute is Route.Collections || currentRoute is Route.Profile
+
+            Scaffold(
+                containerColor = c.surface,
+                bottomBar = {
+                    if (showTabBar) {
+                        AppBottomBar(
+                            current = currentRoute,
+                            onCollections = {
+                                if (currentRoute is Route.Profile) backStack.removeLastOrNull()
+                            },
+                            onProfile = {
+                                if (currentRoute !is Route.Profile) backStack.add(Route.Profile)
+                            },
+                        )
+                    }
+                },
+            ) { paddingValues ->
+                NavDisplay(
+                    backStack = backStack,
+                    modifier = Modifier.padding(paddingValues),
+                    entryProvider = entryProvider {
+                        entry<Route.Login> {
+                            LoginScreen(
+                                isLoading = isLoggingIn,
+                                error = loginError,
+                                onSignInClick = {
+                                    isLoggingIn = true
+                                    loginError = null
+                                    scope.launch {
+                                        onGoogleSignIn().fold(
+                                            onSuccess = { idToken ->
+                                                authRepository.loginWithGoogle(idToken).fold(
+                                                    onSuccess = {
+                                                        backStack.clear()
+                                                        backStack.add(Route.Collections)
+                                                    },
+                                                    onFailure = { e ->
+                                                        loginError = e.message ?: "Błąd logowania"
+                                                    },
+                                                )
+                                            },
+                                            onFailure = { e ->
+                                                loginError = e.message ?: "Błąd Google Sign-In"
+                                            },
+                                        )
+                                        isLoggingIn = false
+                                    }
                                 },
-                                onFailure = { e -> loginError = e.message ?: "Błąd Google Sign-In" },
                             )
-                            isLoggingIn = false
+                        }
+                        entry<Route.Collections> {
+                            CollectionsScreen(
+                                onCollectionClick = { backStack.add(Route.Flashcards(it)) },
+                            )
+                        }
+                        entry<Route.Flashcards> { route ->
+                            FlashcardsScreen(
+                                collection = route.collection,
+                                onBack = { backStack.removeLastOrNull() },
+                                onStartLearning = { backStack.add(Route.Learning(route.collection)) },
+                            )
+                        }
+                        entry<Route.Learning> { route ->
+                            LearningScreen(
+                                collection = route.collection,
+                                onBack = {
+                                    backStack.clear()
+                                    backStack.add(Route.Collections)
+                                },
+                            )
+                        }
+                        entry<Route.Profile> {
+                            ProfileScreen(
+                                onLogout = {
+                                    authRepository.logout()
+                                    backStack.clear()
+                                    backStack.add(Route.Login)
+                                },
+                            )
                         }
                     },
                 )
-                Destination.Collections -> CollectionsScreen(
-                    onCollectionClick = { destination = Destination.Flashcards(it) },
-                    onLogout = {
-                        authRepository.logout()
-                        destination = Destination.Login
-                    },
-                )
-                is Destination.Flashcards -> FlashcardsScreen(
-                    collection = dest.collection,
-                    onBack = { destination = Destination.Collections },
-                    onStartLearning = { destination = Destination.Learning(dest.collection) },
-                )
-                is Destination.Learning -> LearningScreen(
-                    collection = dest.collection,
-                    onBack = { destination = Destination.Collections },
-                )
             }
         }
+    }
+}
+
+@Composable
+private fun AppBottomBar(
+    current: Route?,
+    onCollections: () -> Unit,
+    onProfile: () -> Unit,
+) {
+    val c = LocalFiszkiColors.current
+    NavigationBar(containerColor = c.surface2) {
+        NavigationBarItem(
+            selected = current is Route.Collections,
+            onClick = onCollections,
+            icon = { Icon(Icons.Default.LibraryBooks, contentDescription = null) },
+            label = { Text("Kolekcje") },
+        )
+        NavigationBarItem(
+            selected = current is Route.Profile,
+            onClick = onProfile,
+            icon = { Icon(Icons.Default.AccountCircle, contentDescription = null) },
+            label = { Text("Konto") },
+        )
     }
 }

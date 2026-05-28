@@ -354,25 +354,25 @@ Tab bar callbacks:
 
 #### Automatyczne
 
-- [x] 1.1 `./gradlew :shared:wasmJsMainClasses` — BUILD SUCCESSFUL
-- [x] 1.2 `./gradlew :androidApp:assembleDebug` — BUILD SUCCESSFUL
+- [x] 1.1 `./gradlew :shared:wasmJsMainClasses` — BUILD SUCCESSFUL — 377e7aa
+- [x] 1.2 `./gradlew :androidApp:assembleDebug` — BUILD SUCCESSFUL — 377e7aa
 
 #### Ręczne
 
-- [x] 1.3 Wizualna weryfikacja 4 ekranów w dark design (ręcznie po APK lub Compose Preview)
+- [x] 1.3 Wizualna weryfikacja 4 ekranów w dark design (ręcznie po APK lub Compose Preview) — 377e7aa
 
 ### Faza 2: App.kt — navigation3 + tab bar + ProfileScreen
 
 #### Automatyczne
 
-- [ ] 2.0 Weryfikacja navigation3 API — potwierdzono importy `rememberNavBackStack`, `NavDisplay`, `entryProvider` z artefaktu navigation3-ui:1.1.1
-- [ ] 2.1 `./gradlew :androidApp:assembleDebug` — exit code 0
-- [ ] 2.2 `./gradlew :shared:wasmJsMainClasses` — BUILD SUCCESSFUL
+- [x] 2.0 Weryfikacja navigation3 API — potwierdzono importy `rememberNavBackStack`, `NavDisplay`, `entryProvider` z artefaktu navigation3-ui:1.1.1
+- [x] 2.1 `./gradlew :androidApp:assembleDebug` — exit code 0
+- [x] 2.2 `./gradlew :shared:wasmJsMainClasses` — BUILD SUCCESSFUL
 
 #### Ręczne
 
-- [ ] 2.3 APK instaluje się i uruchamia bez crashu
-- [ ] 2.4 Pełny flow (login → kolekcje → fiszki → nauka) działa bez regresji
-- [ ] 2.5 Tab bar widoczny na Collections/Profile; ukryty na Flashcards/Learning
-- [ ] 2.6 ProfileScreen stub działa; Wyloguj wraca do LoginScreen
+- [x] 2.3 APK instaluje się i uruchamia bez crashu
+- [x] 2.4 Pełny flow (login → kolekcje → fiszki → nauka) działa bez regresji
+- [x] 2.5 Tab bar widoczny na Collections/Profile; ukryty na Flashcards/Learning
+- [x] 2.6 ProfileScreen stub działa; Wyloguj wraca do LoginScreen
 - [ ] 2.7 Dialogi add/edit/delete dla kolekcji i fiszek działają poprawnie
