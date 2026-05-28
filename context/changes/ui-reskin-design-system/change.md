@@ -1,7 +1,7 @@
 ---
 change_id: ui-reskin-design-system
 title: UI reskin — faza A: design system i komponenty bazowe
-status: planned
+status: implementing
 created: 2026-05-28
 updated: 2026-05-28
 archived_at: null

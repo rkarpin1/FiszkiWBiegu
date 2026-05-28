@@ -221,13 +221,13 @@ Wdrożenie komponentów wielokrotnego użytku (Flag, TrackBar, MediaControls) i 
 
 #### Automatyczne
 
-- [ ] 1.1 `./gradlew :shared:compileDebugKotlinAndroid` — bez błędów kompilacji
+- [x] 1.1 `./gradlew :shared:compileAndroidMain` — bez błędów kompilacji
 
 #### Ręczne
 
-- [ ] 1.2 Katalog `theme/` zawiera `Color.kt`, `Theme.kt`, `Type.kt`
-- [ ] 1.3 Katalog `composeResources/font/` zawiera 5 plików `.ttf`
-- [ ] 1.4 Brak nierozwiązanych importów w plikach motywu
+- [x] 1.2 Katalog `theme/` zawiera `Color.kt`, `Theme.kt`, `Type.kt`
+- [x] 1.3 Katalog `composeResources/font/` zawiera 5 plików `.ttf`
+- [x] 1.4 Brak nierozwiązanych importów w plikach motywu
 
 ### Faza 2: Komponenty UI + Aktywacja motywu
 
