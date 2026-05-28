@@ -365,14 +365,14 @@ Tab bar callbacks:
 
 #### Automatyczne
 
-- [x] 2.0 Weryfikacja navigation3 API — potwierdzono importy `rememberNavBackStack`, `NavDisplay`, `entryProvider` z artefaktu navigation3-ui:1.1.1
-- [x] 2.1 `./gradlew :androidApp:assembleDebug` — exit code 0
-- [x] 2.2 `./gradlew :shared:wasmJsMainClasses` — BUILD SUCCESSFUL
+- [x] 2.0 Weryfikacja navigation3 API — potwierdzono importy `rememberNavBackStack`, `NavDisplay`, `entryProvider` z artefaktu navigation3-ui:1.1.1 — cfac55a
+- [x] 2.1 `./gradlew :androidApp:assembleDebug` — exit code 0 — cfac55a
+- [x] 2.2 `./gradlew :shared:wasmJsMainClasses` — BUILD SUCCESSFUL — cfac55a
 
 #### Ręczne
 
-- [x] 2.3 APK instaluje się i uruchamia bez crashu
-- [x] 2.4 Pełny flow (login → kolekcje → fiszki → nauka) działa bez regresji
-- [x] 2.5 Tab bar widoczny na Collections/Profile; ukryty na Flashcards/Learning
-- [x] 2.6 ProfileScreen stub działa; Wyloguj wraca do LoginScreen
+- [x] 2.3 APK instaluje się i uruchamia bez crashu — cfac55a
+- [x] 2.4 Pełny flow (login → kolekcje → fiszki → nauka) działa bez regresji — cfac55a
+- [x] 2.5 Tab bar widoczny na Collections/Profile; ukryty na Flashcards/Learning — cfac55a
+- [x] 2.6 ProfileScreen stub działa; Wyloguj wraca do LoginScreen — cfac55a
 - [ ] 2.7 Dialogi add/edit/delete dla kolekcji i fiszek działają poprawnie

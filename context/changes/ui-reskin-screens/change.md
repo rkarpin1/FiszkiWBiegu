@@ -1,9 +1,9 @@
 ---
 change_id: ui-reskin-screens
 title: UI reskin — faza B: reskin istniejących ekranów
-status: implementing
+status: implemented
 created: 2026-05-28
-updated: 2026-05-28
+updated: 2026-05-29
 archived_at: null
 ---
 
