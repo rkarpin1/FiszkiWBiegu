@@ -55,7 +55,7 @@ fun CollectionsScreen(
     viewModel: CollectionsViewModel = koinViewModel(),
     onCollectionClick: (CollectionDto) -> Unit,
     onAddClick: () -> Unit = {},
-    onEditClick: (String, String) -> Unit = { _, _ -> },
+    onEditClick: (CollectionDto) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -139,7 +139,7 @@ fun CollectionsScreen(
                                     collection = collection,
                                     onClick = { onCollectionClick(collection) },
                                     onEditClick = {
-                                        onEditClick(collection.id, collection.name)
+                                        onEditClick(collection)
                                     },
                                     onDeleteClick = { viewModel.requestDelete(collection.id) },
                                 )

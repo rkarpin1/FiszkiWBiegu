@@ -350,19 +350,19 @@ entry<Route.CollectionForm> { route ->
 ### Phase 2: Frontend — modele danych + repozytorium + VM
 
 #### Automated
-- [x] 2.1 :androidApp:assembleDebug bez błędów kompilacji
+- [x] 2.1 :androidApp:assembleDebug bez błędów kompilacji — 8db268f
 
 #### Manual
-- [x] 2.2 Brak błędów IDE w ApiModels.kt, CollectionRepository.kt, CollectionsViewModel.kt
+- [x] 2.2 Brak błędów IDE w ApiModels.kt, CollectionRepository.kt, CollectionsViewModel.kt — 8db268f
 
 ### Phase 3: Frontend UI — LangSelect + ekrany
 
 #### Automated
-- [ ] 3.1 :androidApp:assembleDebug bez błędów
+- [x] 3.1 :androidApp:assembleDebug bez błędów
 
 #### Manual
-- [ ] 3.2 Nowa kolekcja — LangSelect pokazuje pl/en domyślnie, bottom-sheet z 6 językami
-- [ ] 3.3 CTA disabled gdy source == target
-- [ ] 3.4 Tworzenie kolekcji z niestandardową parą języków
-- [ ] 3.5 Edycja kolekcji — języki wczytane z kolekcji
-- [ ] 3.6 FlashcardsScreen — dynamiczne flagi i nazwy języków
+- [x] 3.2 Nowa kolekcja — LangSelect pokazuje pl/en domyślnie, bottom-sheet z 6 językami
+- [x] 3.3 CTA disabled gdy source == target
+- [x] 3.4 Tworzenie kolekcji z niestandardową parą języków
+- [x] 3.5 Edycja kolekcji — języki wczytane z kolekcji
+- [x] 3.6 FlashcardsScreen — dynamiczne flagi i nazwy języków

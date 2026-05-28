@@ -43,6 +43,8 @@ private sealed interface Route {
     data class CollectionForm(
         val collectionId: String? = null,
         val collectionName: String = "",
+        val sourceLanguage: String = "pl",
+        val targetLanguage: String = "en",
     ) : Route
     data class CardForm(
         val collectionId: String,
@@ -130,7 +132,9 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
                             CollectionsScreen(
                                 onCollectionClick = { backStack.add(Route.Flashcards(it)) },
                                 onAddClick = { backStack.add(Route.CollectionForm()) },
-                                onEditClick = { id, name -> backStack.add(Route.CollectionForm(id, name)) },
+                                onEditClick = { collection ->
+                                    backStack.add(Route.CollectionForm(collection.id, collection.name, collection.sourceLanguage, collection.targetLanguage))
+                                },
                             )
                         }
                         entry<Route.Flashcards> { route ->
@@ -146,6 +150,8 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
                             CollectionFormScreen(
                                 collectionId = route.collectionId,
                                 collectionName = route.collectionName,
+                                sourceLanguage = route.sourceLanguage,
+                                targetLanguage = route.targetLanguage,
                                 onBack = { backStack.removeLastOrNull() },
                             )
                         }

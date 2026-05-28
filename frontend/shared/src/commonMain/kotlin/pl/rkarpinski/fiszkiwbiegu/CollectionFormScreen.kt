@@ -45,19 +45,25 @@ import org.koin.compose.viewmodel.koinViewModel
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
 import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
+import pl.rkarpinski.fiszkiwbiegu.ui.components.LangSelect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CollectionFormScreen(
     collectionId: String? = null,
     collectionName: String = "",
+    sourceLanguage: String = "pl",
+    targetLanguage: String = "en",
     viewModel: CollectionsViewModel = koinViewModel(),
     onBack: () -> Unit,
 ) {
     val isEdit = collectionId != null
     var name by remember { mutableStateOf(collectionName) }
     var description by remember { mutableStateOf("") }
+    var sourceLang by remember { mutableStateOf(sourceLanguage) }
+    var targetLang by remember { mutableStateOf(targetLanguage) }
     var showDeleteSheet by remember { mutableStateOf(false) }
+    val isValid = name.isNotBlank() && sourceLang != targetLang
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
@@ -153,6 +159,22 @@ fun CollectionFormScreen(
                     placeholder = { Text("Krótka podpowiedź, np. tematyka albo poziom.", color = c.mute) },
                 )
                 Spacer(Modifier.height(16.dp))
+                CapsLabel("J. OJCZYSTY")
+                Spacer(Modifier.height(6.dp))
+                LangSelect(
+                    code = sourceLang,
+                    onSelect = { sourceLang = it },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(16.dp))
+                CapsLabel("J. DO NAUKI")
+                Spacer(Modifier.height(6.dp))
+                LangSelect(
+                    code = targetLang,
+                    onSelect = { targetLang = it },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(16.dp))
             }
 
             // Sticky CTA
@@ -167,11 +189,11 @@ fun CollectionFormScreen(
                         .fillMaxWidth()
                         .height(56.dp)
                         .clip(RoundedCornerShape(18.dp))
-                        .background(if (name.isNotBlank()) c.accent else c.surface3)
+                        .background(if (isValid) c.accent else c.surface3)
                         .then(
-                            if (name.isNotBlank()) Modifier.clickable {
-                                if (isEdit) viewModel.updateCollection(collectionId!!, name.trim(), "pl", "en")
-                                else viewModel.createCollection(name.trim(), "pl", "en")
+                            if (isValid) Modifier.clickable {
+                                if (isEdit) viewModel.updateCollection(collectionId!!, name.trim(), sourceLang, targetLang)
+                                else viewModel.createCollection(name.trim(), sourceLang, targetLang)
                                 onBack()
                             } else Modifier,
                         ),
@@ -184,13 +206,13 @@ fun CollectionFormScreen(
                         Icon(
                             Icons.Default.Check,
                             contentDescription = null,
-                            tint = if (name.isNotBlank()) c.onAccent else c.mute2,
+                            tint = if (isValid) c.onAccent else c.mute2,
                             modifier = Modifier.size(18.dp),
                         )
                         Text(
                             text = if (isEdit) "Zapisz zmiany" else "Dodaj kolekcję",
                             style = MaterialTheme.typography.titleMedium,
-                            color = if (name.isNotBlank()) c.onAccent else c.mute2,
+                            color = if (isValid) c.onAccent else c.mute2,
                         )
                     }
                 }

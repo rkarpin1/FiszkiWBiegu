@@ -47,6 +47,7 @@ import pl.rkarpinski.fiszkiwbiegu.theme.bigNumber
 import pl.rkarpinski.fiszkiwbiegu.theme.mono
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
 import pl.rkarpinski.fiszkiwbiegu.ui.components.Flag
+import pl.rkarpinski.fiszkiwbiegu.ui.components.LanguageNames
 
 @Composable
 fun FlashcardsScreen(
@@ -131,7 +132,7 @@ fun FlashcardsScreen(
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                "PL → EN",
+                                "${collection.sourceLanguage.uppercase()} → ${collection.targetLanguage.uppercase()}",
                                 style = MaterialTheme.typography.bodyMedium.copy(fontFamily = mono()),
                                 color = c.mute,
                             )
@@ -205,16 +206,18 @@ fun FlashcardsScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            Flag("pl", 26.dp)
+                            Flag(collection.sourceLanguage, 26.dp)
                             Icon(
                                 Icons.Default.ArrowForward,
                                 contentDescription = null,
                                 tint = c.mute,
                                 modifier = Modifier.size(16.dp),
                             )
-                            Flag("en", 26.dp)
+                            Flag(collection.targetLanguage, 26.dp)
                             Spacer(Modifier.width(8.dp))
-                            CapsLabel("POLSKI → ANGIELSKI")
+                            CapsLabel(
+                                "${LanguageNames[collection.sourceLanguage]?.uppercase() ?: collection.sourceLanguage.uppercase()} → ${LanguageNames[collection.targetLanguage]?.uppercase() ?: collection.targetLanguage.uppercase()}"
+                            )
                         }
                         Spacer(Modifier.height(16.dp))
                     }
