@@ -84,4 +84,23 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
             )
         }
     }
+
+    fun updateCollection(id: String, name: String) {
+        viewModelScope.launch {
+            repo.rename(id, name).fold(
+                onSuccess = { loadCollections() },
+                onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
+            )
+        }
+    }
+
+    fun deleteCollection(id: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            repo.delete(id).fold(
+                onSuccess = { loadCollections() },
+                onFailure = { e -> _uiState.update { it.copy(error = e.message, isLoading = false) } },
+            )
+        }
+    }
 }
