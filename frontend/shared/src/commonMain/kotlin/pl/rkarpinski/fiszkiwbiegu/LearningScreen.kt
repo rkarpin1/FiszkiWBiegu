@@ -1,36 +1,48 @@
 package pl.rkarpinski.fiszkiwbiegu
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
+import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
+import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
+import pl.rkarpinski.fiszkiwbiegu.theme.mono
+import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
+import pl.rkarpinski.fiszkiwbiegu.ui.components.MediaControls
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LearningScreen(
     collection: CollectionDto,
@@ -43,82 +55,195 @@ fun LearningScreen(
     val state by viewModel.state.collectAsState()
     val card = state.flashcards.getOrNull(state.currentIndex)
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(collection.name) },
-                navigationIcon = {
-                    TextButton(onClick = { viewModel.stop(); onBack() }) { Text("← Wróć") }
-                },
-            )
-        },
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 32.dp, vertical = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween,
-        ) {
-            // Postęp
-            Text(
-                text = if (state.flashcards.isNotEmpty()) "${state.currentIndex + 1} / ${state.flashcards.size}" else "",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+    var elapsedSec by remember { mutableStateOf(0) }
+    LaunchedEffect(state.isPlaying) {
+        if (state.isPlaying) {
+            while (true) {
+                delay(1000)
+                elapsedSec++
+            }
+        }
+    }
 
-            // Fiszka
-            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                if (card == null) {
-                    CircularProgressIndicator()
-                } else {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    var speed by remember { mutableStateOf(1.0f) }
+    val speeds = listOf(0.75f to "0.75×", 1.0f to "1.0×", 1.25f to "1.25×", 1.5f to "1.5×")
+
+    FiszkiThemedScreen(naturalDark = true) {
+        val c = LocalFiszkiColors.current
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(c.surface)
+                .padding(horizontal = 22.dp),
+        ) {
+            Spacer(Modifier.height(16.dp))
+
+            // Top bar: back button + elapsed timer
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(c.surface2)
+                        .border(1.dp, c.line, RoundedCornerShape(12.dp))
+                        .clickable { viewModel.stop(); onBack() },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "Wróć",
+                        tint = c.text,
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+                Spacer(Modifier.weight(1f))
+                val mins = (elapsedSec / 60).toString().padStart(2, '0')
+                val secs = (elapsedSec % 60).toString().padStart(2, '0')
+                Text(
+                    text = "$mins:$secs",
+                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = mono()),
+                    color = c.mute,
+                )
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // Collection header + progress counter
+            CapsLabel("KOLEKCJA")
+            Spacer(Modifier.height(4.dp))
+            Text(
+                collection.name,
+                style = MaterialTheme.typography.headlineLarge,
+                color = c.text,
+            )
+            Spacer(Modifier.height(4.dp))
+            if (state.flashcards.isNotEmpty()) {
+                Text(
+                    text = "${(state.currentIndex + 1).toString().padStart(2, '0')} / ${state.flashcards.size}",
+                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = mono()),
+                    color = c.mute,
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Card stage
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(28.dp))
+                    .background(c.surface2)
+                    .border(1.dp, c.line, RoundedCornerShape(28.dp))
+                    .padding(28.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                if (card != null) {
+                    Text(
+                        text = card.englishText,
+                        style = MaterialTheme.typography.displayLarge,
+                        color = c.text,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Box(Modifier.fillMaxWidth().height(1.dp).background(c.line))
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        text = card.polishText,
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = c.mute,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        text = when (state.phase) {
+                            LearningPhase.SPEAKING_POLISH -> "Wymawiam po polsku..."
+                            LearningPhase.SPEAKING_ENGLISH -> "Wymawiam po angielsku..."
+                            LearningPhase.IDLE -> ""
+                        },
+                        style = MaterialTheme.typography.labelSmall,
+                        color = c.accentSoft,
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Speed chips
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                speeds.forEach { (value, label) ->
+                    val active = speed == value
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (active) c.accent else c.surface2)
+                            .border(1.dp, if (active) c.accent else c.line, RoundedCornerShape(12.dp))
+                            .clickable { speed = value }
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
                         Text(
-                            text = card.polishText,
-                            style = MaterialTheme.typography.headlineMedium,
-                            textAlign = TextAlign.Center,
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        Text(
-                            text = card.englishText,
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                        )
-                        Spacer(Modifier.height(24.dp))
-                        Text(
-                            text = when (state.phase) {
-                                LearningPhase.SPEAKING_POLISH -> "Wymawiam po polsku..."
-                                LearningPhase.SPEAKING_ENGLISH -> "Wymawiam po angielsku..."
-                                LearningPhase.IDLE -> ""
-                            },
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary,
+                            label,
+                            style = MaterialTheme.typography.labelSmall.copy(fontFamily = mono()),
+                            color = if (active) c.onAccent else c.mute,
                         )
                     }
                 }
             }
 
-            // Sterowanie
+            Spacer(Modifier.height(16.dp))
+
+            // Media controls (centred)
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                MediaControls(
+                    isPlaying = state.isPlaying,
+                    onPrev = viewModel::previous,
+                    onPlayPause = { if (state.isPlaying) viewModel.pause() else viewModel.play() },
+                    onNext = viewModel::next,
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Wiem / Nie wiem — disabled stubs
             Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                TextButton(onClick = { viewModel.previous() }) {
-                    Text("⏮", style = MaterialTheme.typography.headlineMedium)
-                }
-                Button(
-                    onClick = { if (state.isPlaying) viewModel.pause() else viewModel.play() },
-                    modifier = Modifier.size(72.dp),
-                    shape = MaterialTheme.shapes.extraLarge,
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(52.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(c.surface3)
+                        .border(1.dp, c.line, RoundedCornerShape(16.dp)),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Text(
-                        text = if (state.isPlaying) "⏸" else "▶",
-                        style = MaterialTheme.typography.headlineSmall,
-                    )
+                    Text("Nie wiem", style = MaterialTheme.typography.titleMedium, color = c.mute2)
                 }
-                TextButton(onClick = { viewModel.next() }) {
-                    Text("⏭", style = MaterialTheme.typography.headlineMedium)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(52.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(c.surface3)
+                        .border(1.dp, c.line, RoundedCornerShape(16.dp)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text("Wiem!", style = MaterialTheme.typography.titleMedium, color = c.mute2)
                 }
             }
+
+            Spacer(Modifier.height(24.dp))
         }
     }
 }
