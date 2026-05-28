@@ -6,9 +6,15 @@ use uuid::Uuid;
 use crate::auth::AuthUser;
 use crate::models::{Collection, CollectionRequest};
 
+const VALID_LANGUAGES: &[&str] = &["pl", "en", "de", "es", "fr", "it"];
+
+fn validate_languages(src: &str, tgt: &str) -> bool {
+    VALID_LANGUAGES.contains(&src) && VALID_LANGUAGES.contains(&tgt) && src != tgt
+}
+
 pub async fn list(pool: web::Data<PgPool>, user: AuthUser) -> impl Responder {
     let result = sqlx::query_as::<_, Collection>(
-        "SELECT id, user_id, name, created_at FROM collections WHERE user_id = $1 ORDER BY created_at DESC",
+        "SELECT id, user_id, name, source_language, target_language, created_at FROM collections WHERE user_id = $1 ORDER BY created_at DESC",
     )
     .bind(user.id)
     .fetch_all(pool.get_ref())
@@ -28,11 +34,18 @@ pub async fn create(
     user: AuthUser,
     body: web::Json<CollectionRequest>,
 ) -> impl Responder {
+    if !validate_languages(&body.source_language, &body.target_language) {
+        return HttpResponse::UnprocessableEntity()
+            .json(json!({"error": "Invalid or identical language codes"}));
+    }
+
     let result = sqlx::query_as::<_, Collection>(
-        "INSERT INTO collections (user_id, name) VALUES ($1, $2) RETURNING id, user_id, name, created_at",
+        "INSERT INTO collections (user_id, name, source_language, target_language) VALUES ($1, $2, $3, $4) RETURNING id, user_id, name, source_language, target_language, created_at",
     )
     .bind(user.id)
     .bind(&body.name)
+    .bind(&body.source_language)
+    .bind(&body.target_language)
     .fetch_one(pool.get_ref())
     .await;
 
@@ -51,11 +64,18 @@ pub async fn update(
     path: web::Path<Uuid>,
     body: web::Json<CollectionRequest>,
 ) -> impl Responder {
+    if !validate_languages(&body.source_language, &body.target_language) {
+        return HttpResponse::UnprocessableEntity()
+            .json(json!({"error": "Invalid or identical language codes"}));
+    }
+
     let id = path.into_inner();
     let result = sqlx::query_as::<_, Collection>(
-        "UPDATE collections SET name = $1 WHERE id = $2 AND user_id = $3 RETURNING id, user_id, name, created_at",
+        "UPDATE collections SET name = $1, source_language = $2, target_language = $3 WHERE id = $4 AND user_id = $5 RETURNING id, user_id, name, source_language, target_language, created_at",
     )
     .bind(&body.name)
+    .bind(&body.source_language)
+    .bind(&body.target_language)
     .bind(id)
     .bind(user.id)
     .fetch_optional(pool.get_ref())

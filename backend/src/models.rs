@@ -21,12 +21,16 @@ pub struct Collection {
     pub id: Uuid,
     pub user_id: Uuid,
     pub name: String,
+    pub source_language: String,
+    pub target_language: String,
     pub created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct CollectionRequest {
     pub name: String,
+    pub source_language: String,
+    pub target_language: String,
 }
 
 #[derive(Debug, Serialize, FromRow)]
