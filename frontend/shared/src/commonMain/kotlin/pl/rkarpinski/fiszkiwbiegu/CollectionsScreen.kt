@@ -27,7 +27,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
@@ -55,18 +54,13 @@ import pl.rkarpinski.fiszkiwbiegu.ui.components.TrackBar
 fun CollectionsScreen(
     viewModel: CollectionsViewModel = koinViewModel(),
     onCollectionClick: (CollectionDto) -> Unit,
+    onAddClick: () -> Unit = {},
+    onEditClick: (String, String) -> Unit = { _, _ -> },
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
-
-        if (uiState.showAddDialog) {
-            AddCollectionDialog(
-                onConfirm = { viewModel.createCollection(it) },
-                onDismiss = { viewModel.hideAddDialog() },
-            )
-        }
 
         uiState.pendingDeleteId?.let { id ->
             val name = uiState.collections.find { it.id == id }?.name.orEmpty()
@@ -74,14 +68,6 @@ fun CollectionsScreen(
                 name = name,
                 onConfirm = { viewModel.confirmDelete() },
                 onDismiss = { viewModel.cancelDelete() },
-            )
-        }
-
-        uiState.editingCollectionId?.let {
-            EditCollectionDialog(
-                initialName = uiState.editingCollectionName,
-                onConfirm = { newName -> viewModel.confirmEdit(newName) },
-                onDismiss = { viewModel.cancelEdit() },
             )
         }
 
@@ -93,7 +79,7 @@ fun CollectionsScreen(
                         .size(60.dp)
                         .clip(CircleShape)
                         .background(c.text)
-                        .clickable { viewModel.showAddDialog() },
+                        .clickable { onAddClick() },
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Dodaj", tint = c.surface)
@@ -153,7 +139,7 @@ fun CollectionsScreen(
                                     collection = collection,
                                     onClick = { onCollectionClick(collection) },
                                     onEditClick = {
-                                        viewModel.requestEdit(collection.id, collection.name)
+                                        onEditClick(collection.id, collection.name)
                                     },
                                     onDeleteClick = { viewModel.requestDelete(collection.id) },
                                 )
@@ -254,65 +240,6 @@ private fun LaneRow(
         Spacer(Modifier.width(4.dp))
         Icon(Icons.Default.ChevronRight, contentDescription = null, tint = c.mute)
     }
-}
-
-@Composable
-private fun AddCollectionDialog(
-    onConfirm: (String) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    var name by remember { mutableStateOf("") }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Nowa kolekcja") },
-        text = {
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Nazwa") },
-                singleLine = true,
-            )
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onConfirm(name.trim()) },
-                enabled = name.isNotBlank(),
-            ) { Text("Dodaj") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Anuluj") }
-        },
-    )
-}
-
-@Composable
-private fun EditCollectionDialog(
-    initialName: String,
-    onConfirm: (String) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    var name by remember { mutableStateOf(initialName) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Zmień nazwę kolekcji") },
-        text = {
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Nazwa") },
-                singleLine = true,
-            )
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onConfirm(name.trim()) },
-                enabled = name.isNotBlank(),
-            ) { Text("Zapisz") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Anuluj") }
-        },
-    )
 }
 
 @Composable

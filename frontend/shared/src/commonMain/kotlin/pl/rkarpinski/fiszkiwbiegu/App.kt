@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import pl.rkarpinski.fiszkiwbiegu.data.api.AuthEventBus
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
+import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 import pl.rkarpinski.fiszkiwbiegu.data.repository.AuthRepository
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiAppTheme
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
@@ -39,6 +40,15 @@ private sealed interface Route {
     data class Flashcards(val collection: CollectionDto) : Route
     data class Learning(val collection: CollectionDto) : Route
     data object Profile : Route
+    data class CollectionForm(
+        val collectionId: String? = null,
+        val collectionName: String = "",
+    ) : Route
+    data class CardForm(
+        val collectionId: String,
+        val collectionName: String,
+        val flashcard: FlashcardDto? = null,
+    ) : Route
 }
 
 @Composable
@@ -119,6 +129,8 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
                         entry<Route.Collections> {
                             CollectionsScreen(
                                 onCollectionClick = { backStack.add(Route.Flashcards(it)) },
+                                onAddClick = { backStack.add(Route.CollectionForm()) },
+                                onEditClick = { id, name -> backStack.add(Route.CollectionForm(id, name)) },
                             )
                         }
                         entry<Route.Flashcards> { route ->
@@ -126,6 +138,23 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
                                 collection = route.collection,
                                 onBack = { backStack.removeLastOrNull() },
                                 onStartLearning = { backStack.add(Route.Learning(route.collection)) },
+                                onAddCard = { backStack.add(Route.CardForm(route.collection.id, route.collection.name)) },
+                                onEditCard = { flashcard -> backStack.add(Route.CardForm(route.collection.id, route.collection.name, flashcard)) },
+                            )
+                        }
+                        entry<Route.CollectionForm> { route ->
+                            CollectionFormScreen(
+                                collectionId = route.collectionId,
+                                collectionName = route.collectionName,
+                                onBack = { backStack.removeLastOrNull() },
+                            )
+                        }
+                        entry<Route.CardForm> { route ->
+                            CardFormScreen(
+                                collectionId = route.collectionId,
+                                collectionName = route.collectionName,
+                                flashcard = route.flashcard,
+                                onBack = { backStack.removeLastOrNull() },
                             )
                         }
                         entry<Route.Learning> { route ->

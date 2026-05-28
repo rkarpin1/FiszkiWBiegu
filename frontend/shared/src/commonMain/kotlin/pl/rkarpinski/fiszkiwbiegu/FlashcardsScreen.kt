@@ -25,7 +25,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
@@ -33,9 +32,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,20 +55,14 @@ fun FlashcardsScreen(
     networkChecker: NetworkChecker = koinInject(),
     onBack: () -> Unit,
     onStartLearning: () -> Unit,
+    onAddCard: () -> Unit = {},
+    onEditCard: (FlashcardDto) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isOnline by networkChecker.isOnline.collectAsState()
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
-
-        if (uiState.showFormDialog) {
-            FlashcardFormDialog(
-                initial = uiState.editingFlashcard,
-                onConfirm = { pl, en -> viewModel.saveFlashcard(pl, en) },
-                onDismiss = { viewModel.hideFormDialog() },
-            )
-        }
 
         uiState.pendingDeleteId?.let { id ->
             val flashcard = uiState.flashcards.find { it.id == id }
@@ -91,7 +81,7 @@ fun FlashcardsScreen(
                         .size(60.dp)
                         .clip(RoundedCornerShape(30.dp))
                         .background(c.text)
-                        .clickable { viewModel.showAddDialog() },
+                        .clickable { onAddCard() },
                     contentAlignment = Alignment.Center,
                 ) {
                     Text("+", style = MaterialTheme.typography.titleLarge, color = c.surface)
@@ -251,7 +241,7 @@ fun FlashcardsScreen(
                             FlashcardItem(
                                 index = index,
                                 flashcard = flashcard,
-                                onEditClick = { viewModel.showEditDialog(flashcard) },
+                                onEditClick = { onEditCard(flashcard) },
                                 onDeleteClick = { viewModel.requestDelete(flashcard.id) },
                             )
                             Box(
@@ -328,49 +318,6 @@ private fun FlashcardItem(
             Text("Usuń", color = MaterialTheme.colorScheme.error)
         }
     }
-}
-
-@Composable
-private fun FlashcardFormDialog(
-    initial: FlashcardDto?,
-    onConfirm: (String, String) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    var polishText by remember { mutableStateOf(initial?.polishText ?: "") }
-    var englishText by remember { mutableStateOf(initial?.englishText ?: "") }
-    val isValid = polishText.isNotBlank() && englishText.isNotBlank()
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(if (initial == null) "Nowa fiszka" else "Edytuj fiszkę") },
-        text = {
-            Column {
-                OutlinedTextField(
-                    value = polishText,
-                    onValueChange = { polishText = it },
-                    label = { Text("Polski") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = englishText,
-                    onValueChange = { englishText = it },
-                    label = { Text("Angielski") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onConfirm(polishText.trim(), englishText.trim()) },
-                enabled = isValid,
-            ) { Text(if (initial == null) "Dodaj" else "Zapisz") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Anuluj") }
-        },
-    )
 }
 
 @Composable

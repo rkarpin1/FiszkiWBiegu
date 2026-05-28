@@ -519,24 +519,24 @@ entry<Route.Flashcards> { route ->
 ### Phase 2: CardFormScreen + FlashcardsViewModel
 
 #### Automated
-- [x] 2.1 :shared:compileDebugKotlinAndroid po dodaniu CardFormScreen.kt i metod VM
+- [x] 2.1 :shared:compileDebugKotlinAndroid po dodaniu CardFormScreen.kt i metod VM — a6112e0
 
 #### Manual
-- [x] 2.2 CardFormScreen.kt kompiluje się bez błędów IDE (weryfikacja po Phase 3)
+- [x] 2.2 CardFormScreen.kt kompiluje się bez błędów IDE (weryfikacja po Phase 3) — a6112e0
 
 ### Phase 3: Nawigacja — App.kt + CollectionsScreen + FlashcardsScreen
 
 #### Automated
-- [ ] 3.1 :androidApp:assembleDebug bez błędów
+- [x] 3.1 :androidApp:assembleDebug bez błędów
 
 #### Manual
-- [ ] 3.2 CollectionFormScreen add — FAB otwiera formularz, zapisanie tworzy kolekcję
-- [ ] 3.3 CollectionFormScreen edit — "Edytuj" otwiera formularz z danymi, zapisanie edytuje
-- [ ] 3.4 CollectionFormScreen delete — ModalBottomSheet potwierdza usunięcie kolekcji
-- [ ] 3.5 Delete z listy (DeleteConfirmationDialog) nadal działa
-- [ ] 3.6 CardFormScreen add — FAB otwiera formularz, zapisanie tworzy fiszkę
-- [ ] 3.7 CardFormScreen edit — "Edytuj" otwiera formularz z danymi, zapisanie edytuje
-- [ ] 3.8 CardFormScreen delete — AlertDialog potwierdza usunięcie fiszki
-- [ ] 3.9 Delete fiszki z listy nadal działa
-- [ ] 3.10 Przycisk Przetłumacz disabled, brak feedbacku
-- [ ] 3.11 Nawigacja E2E bez regresji
+- [x] 3.2 CollectionFormScreen add — FAB otwiera formularz, zapisanie tworzy kolekcję
+- [x] 3.3 CollectionFormScreen edit — "Edytuj" otwiera formularz z danymi, zapisanie edytuje
+- [x] 3.4 CollectionFormScreen delete — ModalBottomSheet potwierdza usunięcie kolekcji
+- [x] 3.5 Delete z listy (DeleteConfirmationDialog) nadal działa
+- [x] 3.6 CardFormScreen add — FAB otwiera formularz, zapisanie tworzy fiszkę
+- [x] 3.7 CardFormScreen edit — "Edytuj" otwiera formularz z danymi, zapisanie edytuje
+- [x] 3.8 CardFormScreen delete — AlertDialog potwierdza usunięcie fiszki
+- [x] 3.9 Delete fiszki z listy nadal działa
+- [x] 3.10 Przycisk Przetłumacz disabled, brak feedbacku
+- [x] 3.11 Nawigacja E2E bez regresji
