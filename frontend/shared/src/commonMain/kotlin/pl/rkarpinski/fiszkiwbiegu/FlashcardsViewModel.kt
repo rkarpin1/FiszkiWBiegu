@@ -79,4 +79,32 @@ class FlashcardsViewModel(
             )
         }
     }
+
+    fun createCard(polishText: String, englishText: String) {
+        viewModelScope.launch {
+            repo.create(collectionId, polishText, englishText).fold(
+                onSuccess = { loadFlashcards() },
+                onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
+            )
+        }
+    }
+
+    fun updateCard(id: String, polishText: String, englishText: String) {
+        viewModelScope.launch {
+            repo.update(id, polishText, englishText).fold(
+                onSuccess = { loadFlashcards() },
+                onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
+            )
+        }
+    }
+
+    fun deleteFlashcard(id: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            repo.delete(id).fold(
+                onSuccess = { loadFlashcards() },
+                onFailure = { e -> _uiState.update { it.copy(error = e.message, isLoading = false) } },
+            )
+        }
+    }
 }

@@ -511,18 +511,18 @@ entry<Route.Flashcards> { route ->
 ### Phase 1: CollectionFormScreen + CollectionsViewModel
 
 #### Automated
-- [x] 1.1 :shared:compileDebugKotlinAndroid po dodaniu CollectionFormScreen.kt i metod VM
+- [x] 1.1 :shared:compileDebugKotlinAndroid po dodaniu CollectionFormScreen.kt i metod VM — 376aa0e
 
 #### Manual
-- [x] 1.2 CollectionFormScreen.kt kompiluje się bez błędów IDE (weryfikacja po Phase 3)
+- [x] 1.2 CollectionFormScreen.kt kompiluje się bez błędów IDE (weryfikacja po Phase 3) — 376aa0e
 
 ### Phase 2: CardFormScreen + FlashcardsViewModel
 
 #### Automated
-- [ ] 2.1 :shared:compileDebugKotlinAndroid po dodaniu CardFormScreen.kt i metod VM
+- [x] 2.1 :shared:compileDebugKotlinAndroid po dodaniu CardFormScreen.kt i metod VM
 
 #### Manual
-- [ ] 2.2 CardFormScreen.kt kompiluje się bez błędów IDE (weryfikacja po Phase 3)
+- [x] 2.2 CardFormScreen.kt kompiluje się bez błędów IDE (weryfikacja po Phase 3)
 
 ### Phase 3: Nawigacja — App.kt + CollectionsScreen + FlashcardsScreen
 
