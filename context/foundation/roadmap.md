@@ -3,7 +3,7 @@ project: "FiszkiWBiegu"
 version: 1
 status: draft
 created: 2026-05-27
-updated: 2026-05-27
+updated: 2026-05-28
 prd_version: 1
 main_goal: market-feedback
 top_blocker: decisions
@@ -33,6 +33,10 @@ Biegacze tracą dziesiątki godzin miesięcznie, które mogłyby być poświęco
 | S-01 | collections-flashcards-e2e    | zalogować się, tworzyć/przeglądać/edytować/usuwać kolekcje i fiszki               | —                 | US-02, FR-001–FR-009                              | done     |
 | S-02 | audio-learning-session-offline | uruchomić tryb nauki i słyszeć fiszki offline podczas biegu z ekranem wyłączonym  | F-01, S-01        | US-01, FR-010–FR-014, NFR (offline, audio, latency) | done     |
 | S-03 | production-run-validation      | zainstalować APK i przeprowadzić pełną sesję nauki podczas rzeczywistego biegu    | S-02              | US-01, FR-012                                     | done     |
+| S-04-A | ui-reskin-design-system    | (faza A) design system i komponenty wgrane, projekt kompiluje się z nową paletą   | S-03              | —                                                 | planned  |
+| S-04-B | ui-reskin-screens          | (faza B) 4 istniejące ekrany reskinowane; aplikacja wygląda jak projekt graficzny | S-04-A            | —                                                 | planned  |
+| S-04-C | ui-reskin-new-screens      | (faza C) 3 nowe ekrany (stub dane) + nawigacja bottom-tab                         | S-04-B            | —                                                 | planned  |
+| S-04-D | ui-reskin-backend-stubs    | (faza D) realne dane zamiast zaślepek: /me, lastStudied, progress, translate      | S-04-C            | —                                                 | backlog  |
 
 ## Strumienie
 
@@ -109,14 +113,89 @@ Fundamenty poniżej zakładają, że te elementy są obecne i NIE tworzą ich po
 - **Ryzyko:** Problemy ze stabilnością Foreground Service (memory leaks, wakelocks, Android doze mode) ujawnią się dopiero podczas 45-60 minutowego biegu na prawdziwym urządzeniu; im wcześniej przetestowane, tym mniej niespodzianek przy docelowym użyciu.
 - **Status:** done
 
+### S-04: Reskin UI — przeniesienie projektu graficznego
+
+- **Wynik:** aplikacja wygląda jak projekt graficzny z `.tmp/UI` (paleta „Dawn Run", czcionki Bricolage + JetBrains Mono, layout „tor biegowy"); funkcjonalność bez zmian; brakujące dane zaślepione.
+- **ID zmiany:** ui-reskin
+- **Odniesienia do PRD:** —
+- **Wymagania wstępne:** S-03
+- **Równolegle z:** —
+- **Blokady:** —
+- **Niewiadome:** —
+- **Ryzyko:** Prototyp używa pakietu `pl.fiszki.wbiegu`; istniejący kod używa `pl.rkarpinski.fiszkiwbiegu` — pełna adaptacja package names przy kopiowaniu plików.
+- **Status:** planned
+
+#### S-04-A: Design system + komponenty bazowe
+
+**Wynik:** moduł shared kompiluje się z nową paletą i typografią; stare ekrany nadal działają (bez reskinowania).
+
+Zakres:
+1. Skopiuj `theme/Color.kt`, `theme/Theme.kt`, `theme/Type.kt` → `frontend/shared/src/commonMain/kotlin/pl/rkarpinski/fiszkiwbiegu/theme/`
+2. Pobierz fonty (Bricolage Grotesque: Regular/SemiBold/Bold; JetBrains Mono: Regular/Bold) z Google Fonts → `frontend/shared/src/commonMain/composeResources/font/`
+3. Skopiuj `ui/components/Flag.kt`, `Components.kt`, `MediaControls.kt` → `frontend/shared/src/commonMain/kotlin/pl/rkarpinski/fiszkiwbiegu/ui/components/`
+4. Zaktualizuj `frontend/shared/build.gradle.kts`: dodaj `compose.components.resources`, `material-icons-extended`
+5. Weryfikacja: `./gradlew :shared:compileDebugKotlinAndroid` bez błędów
+
+#### S-04-B: Reskin istniejących ekranów
+
+**Wynik:** 4 istniejące przepływy aplikacji wyglądają jak projekt graficzny; logika ViewModeli bez zmian.
+
+Zakres:
+1. `LoginScreen.kt` → przepisać layout do `AuthScreen.kt` (brand hero + 3 przyciski social); Apple + Facebook = `Button(enabled=false)` + Toast "Wkrótce"
+2. `CollectionsScreen.kt` → przepisać do Variant B (header z pozdrowieniem + LastUsedHero + lane rows); pola stub: `lastStudied=null` (hero hidden), `progress=0f` (TrackBar pusta), accent = `accentColor(collection.id)` deterministycznie z id
+3. `FlashcardsScreen.kt` → przepisać do `CollectionDetailScreen` (top bar + hero + stats stub + CTA „Słuchaj w biegu" + LazyColumn fiszek)
+4. `LearningScreen.kt` → przepisać do `StudyScreen` Variant B (card stage z fazami PL/EN, MediaControls)
+5. `App.kt` → dolny tab bar: zakładki Kolekcje + Konto (ProfileScreen = stub na ten etap)
+6. Weryfikacja: APK instaluje się, wszystkie 4 ekrany wyświetlają nowy design, sesja nauki działa
+
+#### S-04-C: Nowe ekrany + kompletna nawigacja
+
+**Wynik:** pełne 7-ekranowe drzewo nawigacji; nowe ekrany mają stub dane tam gdzie brak API.
+
+Zakres:
+1. `ProfileScreen.kt` — nowy ekran: avatar (gradient Ember→Peach, inicjały), email z `TokenStorage`, displayName = stub "Ty", streakDays = 0 (chip hidden), przycisk Wyloguj
+2. `CollectionFormScreen.kt` — zastępuje dialogi `AddCollectionDialog` / `EditCollectionDialog`; pola: nazwa + opis; bottom-sheet ConfirmDelete (istniejąca logika VM)
+3. `CardFormScreen.kt` — zastępuje `FlashcardFormDialog`; pola: PL + EN z flagami; przycisk Przetłumacz = `Button(enabled=false)` + Toast "Wkrótce"
+4. `App.kt` → zaktualizuj nawigację: Login → Collections → CollectionDetail → StudyScreen; Collections ↔ Profile (tab bar); Collections/Detail → CollectionForm; Detail → CardForm
+5. Weryfikacja: pełna nawigacja działa E2E; wszystkie destrukcyjne akcje mają potwierdzenie (PRD hard rule)
+
+#### S-04-D: Backend — dane pod zaślepki (backlog)
+
+**Wynik:** zaślepki zastąpione realnymi danymi.
+
+Zakres (każdy punkt = osobny `/10x-plan`):
+- GET `/auth/me` → displayName, streakDays (Rust backend + migracja DB)
+- Backend track `lastStudied` per kolekcja → pole + endpoint
+- Backend track `progress` per kolekcja (count learned / total) → pole + endpoint
+- `Collection.icon` → pole emoji/string w DB + API
+- `TranslateService` Android actual → ML Kit on-device translate (PL⇄EN)
+- Apple/Facebook Sign-In → pełna implementacja (poza MVP scope — v2)
+
+**Zaślepki aktywne po S-04-C:**
+
+| Zaślepka | Zachowanie | Faza docelowa |
+| -------- | ---------- | ------------- |
+| `Collection.lastStudied` | null → LastUsedHero ukryty | S-04-D |
+| `Collection.progress` | 0.0f → TrackBar pusta | S-04-D |
+| `Collection.icon/accent` | deterministyczny kolor z id (6-kolorowa paleta) — brak pola w DB | S-04-D |
+| `UserState.streakDays` | 0 → streak chip ukryty | S-04-D |
+| `ProfileScreen` displayName | "Ty" (stub) — brak endpointu `/auth/me` | S-04-D |
+| `TranslateService` | button disabled + Toast "Wkrótce" | S-04-D |
+| Apple Sign-In | button disabled + Toast "Wkrótce" | poza MVP |
+| Facebook Sign-In | button disabled + Toast "Wkrótce" | poza MVP |
+
 ## Przekazanie do backlogu
 
 | ID mapy drogowej | ID zmiany                      | Sugerowany tytuł problemu                                     | Gotowe do `/10x-plan` | Uwagi                                                              |
-| ---------------- | ------------------------------ | ------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------ |
-| F-01             | offline-flashcard-cache        | Cache i synchronizacja fiszek offline (Android Room/SQLite)  | yes                   | Uruchom `/10x-plan offline-flashcard-cache`                        |
+| ---------------- | ------------------------------ | ------------------------------------------------------------- |-----------------------| ------------------------------------------------------------------ |
+| F-01             | offline-flashcard-cache        | Cache i synchronizacja fiszek offline (Android Room/SQLite)  | done                  | Uruchom `/10x-plan offline-flashcard-cache`                        |
 | S-01             | collections-flashcards-e2e    | Zarządzanie kolekcjami i fiszkami — weryfikacja E2E           | done                  | Zrealizowane                                                       |
-| S-02             | audio-learning-session-offline | Tryb nauki audio offline — integracja i testy                 | no                    | Czeka na ukończenie F-01 + S-01                                    |
-| S-03             | production-run-validation      | Wdrożenie produkcyjne + pierwsza sesja na żywo                | no                    | Czeka na S-02; skonfiguruj Render env vars wcześniej               |
+| S-02             | audio-learning-session-offline | Tryb nauki audio offline — integracja i testy                 | done                  | Czeka na ukończenie F-01 + S-01                                    |
+| S-03             | production-run-validation      | Wdrożenie produkcyjne + pierwsza sesja na żywo                | done                  | Zrealizowane                                                       |
+| S-04-A           | ui-reskin-design-system        | Reskin UI — faza A: design system                             | yes                   | Uruchom `/10x-plan ui-reskin-design-system`                        |
+| S-04-B           | ui-reskin-screens              | Reskin UI — faza B: reskin istniejących ekranów               | no                    | Czeka na S-04-A                                                    |
+| S-04-C           | ui-reskin-new-screens          | Reskin UI — faza C: nowe ekrany + nawigacja                   | no                    | Czeka na S-04-B                                                    |
+| S-04-D           | ui-reskin-backend-stubs        | Reskin UI — faza D: backend dla zaślepek                      | no                    | Czeka na S-04-C; każda zaślepka = osobny plan                      |
 
 ## Otwarte pytania dotyczące mapy drogowej
 
