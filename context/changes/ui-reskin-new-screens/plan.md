@@ -527,16 +527,16 @@ entry<Route.Flashcards> { route ->
 ### Phase 3: Nawigacja — App.kt + CollectionsScreen + FlashcardsScreen
 
 #### Automated
-- [x] 3.1 :androidApp:assembleDebug bez błędów
+- [x] 3.1 :androidApp:assembleDebug bez błędów — ce05b33
 
 #### Manual
-- [x] 3.2 CollectionFormScreen add — FAB otwiera formularz, zapisanie tworzy kolekcję
-- [x] 3.3 CollectionFormScreen edit — "Edytuj" otwiera formularz z danymi, zapisanie edytuje
-- [x] 3.4 CollectionFormScreen delete — ModalBottomSheet potwierdza usunięcie kolekcji
-- [x] 3.5 Delete z listy (DeleteConfirmationDialog) nadal działa
-- [x] 3.6 CardFormScreen add — FAB otwiera formularz, zapisanie tworzy fiszkę
-- [x] 3.7 CardFormScreen edit — "Edytuj" otwiera formularz z danymi, zapisanie edytuje
-- [x] 3.8 CardFormScreen delete — AlertDialog potwierdza usunięcie fiszki
-- [x] 3.9 Delete fiszki z listy nadal działa
-- [x] 3.10 Przycisk Przetłumacz disabled, brak feedbacku
-- [x] 3.11 Nawigacja E2E bez regresji
+- [x] 3.2 CollectionFormScreen add — FAB otwiera formularz, zapisanie tworzy kolekcję — ce05b33
+- [x] 3.3 CollectionFormScreen edit — "Edytuj" otwiera formularz z danymi, zapisanie edytuje — ce05b33
+- [x] 3.4 CollectionFormScreen delete — ModalBottomSheet potwierdza usunięcie kolekcji — ce05b33
+- [x] 3.5 Delete z listy (DeleteConfirmationDialog) nadal działa — ce05b33
+- [x] 3.6 CardFormScreen add — FAB otwiera formularz, zapisanie tworzy fiszkę — ce05b33
+- [x] 3.7 CardFormScreen edit — "Edytuj" otwiera formularz z danymi, zapisanie edytuje — ce05b33
+- [x] 3.8 CardFormScreen delete — AlertDialog potwierdza usunięcie fiszki — ce05b33
+- [x] 3.9 Delete fiszki z listy nadal działa — ce05b33
+- [x] 3.10 Przycisk Przetłumacz disabled, brak feedbacku — ce05b33
+- [x] 3.11 Nawigacja E2E bez regresji — ce05b33
