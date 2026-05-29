@@ -210,18 +210,18 @@ Dla każdego ekranu ta sama zasada:
 
 #### Automatyczne
 
-- [x] 2.1 `./gradlew :shared:compileDebugKotlinAndroid` bez błędów po migracji komponentów
+- [x] 2.1 `./gradlew :shared:compileDebugKotlinAndroid` bez błędów po migracji komponentów — 0dca1b5
 
 #### Ręczne
 
-- [x] 2.2 Komponenty wyglądają identycznie jak przed migracją
+- [x] 2.2 Komponenty wyglądają identycznie jak przed migracją — 0dca1b5
 
 ### Faza 3: Migracja ekranów
 
 #### Automatyczne
 
-- [ ] 3.1 `./gradlew :shared:compileDebugKotlinAndroid` bez błędów
-- [ ] 3.2 `./gradlew :androidApp:assembleDebug` bez błędów
+- [x] 3.1 `./gradlew :shared:compileAndroidMain` bez błędów
+- [x] 3.2 `./gradlew :androidApp:assembleDebug` bez błędów
 
 #### Ręczne
 

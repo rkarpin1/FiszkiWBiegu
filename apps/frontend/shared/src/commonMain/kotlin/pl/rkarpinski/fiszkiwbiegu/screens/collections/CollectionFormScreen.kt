@@ -109,8 +109,9 @@ fun CollectionFormContent(
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
+        val scheme = MaterialTheme.colorScheme
 
-        Column(Modifier.fillMaxSize().background(c.surface).imePadding()) {
+        Column(Modifier.fillMaxSize().background(scheme.background).imePadding()) {
             // Top bar
             Row(
                 modifier = Modifier
@@ -121,16 +122,16 @@ fun CollectionFormContent(
                 Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(c.surface2)
-                        .border(1.dp, c.line, RoundedCornerShape(12.dp))
+                        .clip(MaterialTheme.shapes.medium)
+                        .background(scheme.surface)
+                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium)
                         .clickable(onClick = actions::onBack),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         if (isEdit) Icons.AutoMirrored.Filled.ArrowBack else Icons.Default.Close,
                         contentDescription = "Wróć",
-                        tint = c.text,
+                        tint = scheme.onBackground,
                         modifier = Modifier.size(20.dp),
                     )
                 }
@@ -138,23 +139,23 @@ fun CollectionFormContent(
                 Text(
                     text = if (isEdit) "Edytuj kolekcję" else "Nowa kolekcja",
                     style = MaterialTheme.typography.titleMedium,
-                    color = c.text,
+                    color = scheme.onBackground,
                 )
                 Spacer(Modifier.weight(1f))
                 if (isEdit) {
                     Box(
                         modifier = Modifier
                             .size(40.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(c.surface2)
-                            .border(1.dp, c.line, RoundedCornerShape(12.dp))
+                            .clip(MaterialTheme.shapes.medium)
+                            .background(scheme.surface)
+                            .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium)
                             .clickable { showDeleteSheet = true },
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = "Usuń",
-                            tint = c.accent,
+                            tint = scheme.primary,
                             modifier = Modifier.size(20.dp),
                         )
                     }
@@ -175,7 +176,7 @@ fun CollectionFormContent(
                     Text(
                         text = if (isEdit) "Co\nzmieniamy?" else "Co dziś\ndo nauki?",
                         style = MaterialTheme.typography.displayMedium,
-                        color = c.text,
+                        color = scheme.onBackground,
                     )
                 }
                 Spacer(Modifier.height(24.dp))
@@ -198,7 +199,7 @@ fun CollectionFormContent(
                     placeholder = {
                         Text(
                             "Krótka podpowiedź, np. tematyka albo poziom.",
-                            color = c.mute
+                            color = scheme.onSurfaceVariant
                         )
                     },
                 )
@@ -232,8 +233,8 @@ fun CollectionFormContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp)
-                            .clip(RoundedCornerShape(18.dp))
-                            .background(if (isValid) c.accent else c.surface3)
+                            .clip(MaterialTheme.shapes.large)
+                            .background(if (isValid) scheme.primary else scheme.surfaceVariant)
                             .then(
                                 if (isValid) Modifier.clickable {
                                     actions.onSave(
@@ -253,13 +254,13 @@ fun CollectionFormContent(
                             Icon(
                                 Icons.Default.Check,
                                 contentDescription = null,
-                                tint = if (isValid) c.onAccent else c.mute2,
+                                tint = if (isValid) scheme.onPrimary else c.mute2,
                                 modifier = Modifier.size(18.dp),
                             )
                             Text(
                                 text = if (isEdit) "Zapisz zmiany" else "Dodaj kolekcję",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = if (isValid) c.onAccent else c.mute2,
+                                color = if (isValid) scheme.onPrimary else c.mute2,
                             )
                         }
                     }
@@ -277,19 +278,19 @@ fun CollectionFormContent(
                             .background(c.accentSoft),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Icon(Icons.Default.Delete, contentDescription = null, tint = c.accent)
+                        Icon(Icons.Default.Delete, contentDescription = null, tint = scheme.primary)
                     }
                     Spacer(Modifier.height(12.dp))
                     Text(
                         "Usunąć kolekcję?",
                         style = MaterialTheme.typography.headlineMedium,
-                        color = c.text,
+                        color = scheme.onBackground,
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
                         "\"${collection?.name}\" zostanie trwale usunięta. Tej akcji nie można cofnąć.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = c.mute,
+                        color = scheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(20.dp))
                     Row(
@@ -308,9 +309,9 @@ fun CollectionFormContent(
                                 collection?.let { actions.onDelete(it.id) }
                             },
                             modifier = Modifier.weight(1.2f),
-                            colors = ButtonDefaults.buttonColors(containerColor = c.accent),
+                            colors = ButtonDefaults.buttonColors(containerColor = scheme.primary),
                         ) {
-                            Text("Usuń kolekcję", color = c.onAccent)
+                            Text("Usuń kolekcję", color = scheme.onPrimary)
                         }
                     }
                     Spacer(Modifier.height(16.dp))

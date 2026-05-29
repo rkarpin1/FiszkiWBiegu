@@ -44,17 +44,18 @@ fun ProfileScreen(
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
+        val scheme = MaterialTheme.colorScheme
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(c.surface)
+                .background(scheme.background)
                 .padding(horizontal = 26.dp),
         ) {
             Spacer(Modifier.height(32.dp))
             Text(
                 "Konto",
                 style = MaterialTheme.typography.headlineLarge,
-                color = c.text,
+                color = scheme.onBackground,
             )
             Spacer(Modifier.height(24.dp))
 
@@ -63,8 +64,8 @@ fun ProfileScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(24.dp))
-                    .background(c.surface2)
-                    .border(1.dp, c.line, RoundedCornerShape(24.dp))
+                    .background(scheme.surface)
+                    .border(1.dp, scheme.outlineVariant, RoundedCornerShape(24.dp))
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -75,7 +76,7 @@ fun ProfileScreen(
                         .size(88.dp)
                         .clip(CircleShape)
                         .background(
-                            Brush.linearGradient(listOf(c.accent, c.accentSoft)),
+                            Brush.linearGradient(listOf(scheme.primary, c.accentSoft)),
                         ),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -91,14 +92,14 @@ fun ProfileScreen(
                 Text(
                     uiState.displayName.ifBlank { "…" },
                     style = MaterialTheme.typography.headlineMedium,
-                    color = c.text,
+                    color = scheme.onBackground,
                 )
                 if (uiState.email.isNotBlank()) {
                     Spacer(Modifier.height(4.dp))
                     Text(
                         uiState.email,
                         style = MaterialTheme.typography.bodySmall,
-                        color = c.mute,
+                        color = scheme.onSurfaceVariant,
                     )
                 }
                 Spacer(Modifier.height(8.dp))
@@ -106,9 +107,9 @@ fun ProfileScreen(
                 // Provider badge
                 Row(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(c.surface3)
-                        .border(1.dp, c.line, RoundedCornerShape(12.dp))
+                        .clip(MaterialTheme.shapes.medium)
+                        .background(scheme.surfaceVariant)
+                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium)
                         .padding(horizontal = 10.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -116,7 +117,7 @@ fun ProfileScreen(
                         modifier = Modifier
                             .size(18.dp)
                             .clip(CircleShape)
-                            .background(c.accent),
+                            .background(scheme.primary),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
@@ -125,7 +126,7 @@ fun ProfileScreen(
                         )
                     }
                     Spacer(Modifier.width(6.dp))
-                    CapsLabel("Zalogowano przez Google", color = c.mute)
+                    CapsLabel("Zalogowano przez Google", color = scheme.onSurfaceVariant)
                 }
             }
 
@@ -136,8 +137,8 @@ fun ProfileScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .border(1.dp, c.line, RoundedCornerShape(18.dp))
+                    .clip(MaterialTheme.shapes.large)
+                    .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large)
                     .clickable(onClick = onLogout)
                     .padding(horizontal = 20.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -145,14 +146,14 @@ fun ProfileScreen(
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = null,
-                    tint = c.mute,
+                    tint = scheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp),
                 )
                 Spacer(Modifier.width(12.dp))
                 Text(
                     "Wyloguj",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                    color = c.text,
+                    color = scheme.onBackground,
                 )
             }
 

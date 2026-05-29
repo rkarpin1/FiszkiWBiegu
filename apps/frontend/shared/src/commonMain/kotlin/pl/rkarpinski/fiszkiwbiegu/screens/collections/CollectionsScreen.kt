@@ -82,7 +82,7 @@ fun CollectionsScreenContent(
     onRetry: () -> Unit,
 ) {
     FiszkiThemedScreen(naturalDark = true) {
-        val c = LocalFiszkiColors.current
+        val scheme = MaterialTheme.colorScheme
 
         uiState.pendingDeleteId?.let { id ->
             val name = uiState.collections.find { it.id == id }?.name.orEmpty()
@@ -94,17 +94,17 @@ fun CollectionsScreenContent(
         }
 
         Scaffold(
-            containerColor = c.surface,
+            containerColor = scheme.background,
             floatingActionButton = {
                 Box(
                     modifier = Modifier
                         .size(60.dp)
                         .clip(CircleShape)
-                        .background(c.text)
+                        .background(scheme.onBackground)
                         .clickable { onAddClick() },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Dodaj", tint = c.surface)
+                    Icon(Icons.Default.Add, contentDescription = "Dodaj", tint = scheme.background)
                 }
             },
         ) { paddingValues ->
@@ -120,7 +120,7 @@ fun CollectionsScreenContent(
                         Text(
                             "Twoje kolekcje",
                             style = MaterialTheme.typography.headlineLarge,
-                            color = c.text,
+                            color = scheme.onBackground,
                         )
                     }
 
@@ -133,17 +133,17 @@ fun CollectionsScreenContent(
                                         .fillMaxWidth()
                                         .padding(horizontal = 22.dp)
                                         .clip(RoundedCornerShape(24.dp))
-                                        .background(c.surface2)
-                                        .border(1.dp, c.line, RoundedCornerShape(24.dp))
+                                        .background(scheme.surface)
+                                        .border(1.dp, scheme.outlineVariant, RoundedCornerShape(24.dp))
                                         .padding(22.dp),
                                 ) {
                                     Column {
-                                        CapsLabel("DODAJ NOWĄ KOLEKCJĘ", color = c.text)
+                                        CapsLabel("DODAJ NOWĄ KOLEKCJĘ", color = scheme.onBackground)
                                         Spacer(Modifier.height(6.dp))
                                         Text(
                                             "Zacznij od utworzenia nowej kolekcji",
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = c.mute,
+                                            color = scheme.onSurfaceVariant,
                                         )
                                     }
                                 }
@@ -185,7 +185,7 @@ fun CollectionsScreenContent(
                                         Modifier
                                             .fillMaxWidth()
                                             .height(1.dp)
-                                            .background(c.line),
+                                            .background(scheme.outlineVariant),
                                     )
                                 }
                             }
@@ -196,7 +196,7 @@ fun CollectionsScreenContent(
                 if (uiState.isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
-                        color = c.accent,
+                        color = scheme.primary,
                     )
                 }
 
@@ -220,6 +220,7 @@ private fun LaneRow(
     onClick: () -> Unit,
 ) {
     val c = LocalFiszkiColors.current
+    val scheme = MaterialTheme.colorScheme
     val accent = accentColorForId(collection.id)
 
     Row(
@@ -233,7 +234,7 @@ private fun LaneRow(
             text = (index + 1).toString().padStart(2, '0'),
             style = MaterialTheme.typography.labelSmall.copy(
                 fontFamily = mono(),
-                color = c.mute,
+                color = scheme.onSurfaceVariant,
             ),
         )
         Spacer(Modifier.width(14.dp))
@@ -241,7 +242,7 @@ private fun LaneRow(
             Text(
                 collection.name,
                 style = MaterialTheme.typography.headlineSmall,
-                color = c.text,
+                color = scheme.onBackground,
             )
             Spacer(Modifier.height(4.dp))
             Row(
@@ -258,7 +259,7 @@ private fun LaneRow(
                 Text("·", style = MaterialTheme.typography.labelMedium, color = c.mute2)
                 Text(
                     formatLastStudied(collection.lastStudied),
-                    style = MaterialTheme.typography.labelMedium.copy(color = c.mute),
+                    style = MaterialTheme.typography.labelMedium.copy(color = scheme.onSurfaceVariant),
                 )
             }
             Spacer(Modifier.height(8.dp))
@@ -271,7 +272,7 @@ private fun LaneRow(
             )
         }
         Spacer(Modifier.width(8.dp))
-        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = c.mute)
+        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = scheme.onSurfaceVariant)
     }
 }
 
@@ -282,20 +283,20 @@ private fun LastUsedHero(
     onResume: () -> Unit,
     onOpen: () -> Unit
 ) {
-    val c = LocalFiszkiColors.current
+    val scheme = MaterialTheme.colorScheme
 
     Column(
         Modifier
             .fillMaxWidth()
             .padding(horizontal = 22.dp)
             .clip(RoundedCornerShape(24.dp))
-            .background(c.surface2)
-            .border(1.dp, c.line, RoundedCornerShape(24.dp))
+            .background(scheme.surface)
+            .border(1.dp, scheme.outlineVariant, RoundedCornerShape(24.dp))
             .padding(22.dp)
             .clickable(onClick = onOpen),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(6.dp).clip(CircleShape).background(c.accent))
+            Box(Modifier.size(6.dp).clip(CircleShape).background(scheme.primary))
             Spacer(Modifier.width(8.dp))
             Text(
                 "OSTATNIO  //  KONTYNUUJ",
@@ -318,7 +319,7 @@ private fun LastUsedHero(
             Icon(
                 Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,
-                tint = c.mute,
+                tint = scheme.onSurfaceVariant,
                 modifier = Modifier.size(16.dp),
             )
             Flag(collection.targetLanguage, 16.dp)
@@ -332,13 +333,13 @@ private fun LastUsedHero(
         Spacer(Modifier.height(6.dp))
         Text(
             collection.name,
-            style = MaterialTheme.typography.headlineLarge.copy(color = c.text),
+            style = MaterialTheme.typography.headlineLarge.copy(color = scheme.onBackground),
         )
 
         Spacer(Modifier.height(14.dp))
         TrackBar(
             progress = collection.progress,
-            accent = c.accent,
+            accent = scheme.primary,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(14.dp))
@@ -351,8 +352,8 @@ private fun LastUsedHero(
             Row(
                 Modifier
                     .height(56.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(c.accent)
+                    .clip(MaterialTheme.shapes.large)
+                    .background(scheme.primary)
                     .clickable(onClick = onResume)
                     .padding(horizontal = 22.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -361,13 +362,13 @@ private fun LastUsedHero(
                 Icon(
                     Icons.Default.PlayArrow,
                     null,
-                    tint = c.onAccent,
+                    tint = scheme.onPrimary,
                     modifier = Modifier.size(18.dp)
                 )
                 Text(
                     "Wznów",
                     style = MaterialTheme.typography.titleLarge.copy(
-                        color = c.onAccent,
+                        color = scheme.onPrimary,
                         fontWeight = FontWeight.Bold,
                     ),
                 )
