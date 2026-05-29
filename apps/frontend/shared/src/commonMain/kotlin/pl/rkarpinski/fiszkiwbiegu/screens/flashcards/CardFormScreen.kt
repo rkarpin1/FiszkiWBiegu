@@ -31,6 +31,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import androidx.compose.ui.tooling.preview.Preview
+import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
 import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
@@ -49,19 +52,63 @@ import pl.rkarpinski.fiszkiwbiegu.theme.mono
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
 import pl.rkarpinski.fiszkiwbiegu.ui.components.Flag
 
+@Stable
+interface CardFormActions {
+    fun onBack()
+    fun onSave(newFlashcard: FlashcardDto)
+    fun onDelete()
+}
+
 @Composable
 fun CardFormScreen(
-    collectionId: String,
-    collectionName: String,
+    collection: CollectionDto,
     flashcard: FlashcardDto? = null,
-    viewModel: FlashcardsViewModel = koinViewModel(key = collectionId) { parametersOf(collectionId) },
+    viewModel: FlashcardsViewModel = koinViewModel(key = collection.id) { parametersOf(collection.id) },
     onBack: () -> Unit,
 ) {
-    val isEdit = flashcard != null
-    var sourceText by remember { mutableStateOf(flashcard?.sourceText ?: "") }
-    var targetText by remember { mutableStateOf(flashcard?.targetText ?: "") }
+    CardFormContent(
+        collection = collection,
+        flashcard = flashcard,
+
+        actions = object : CardFormActions {
+            override fun onBack() = onBack()
+            override fun onSave(newFlashcard: FlashcardDto) {
+                if (flashcard != null) viewModel.updateCard(newFlashcard)
+                else viewModel.createCard(newFlashcard)
+                onBack()
+            }
+
+            override fun onDelete() {
+                viewModel.deleteFlashcard(flashcard!!.id)
+                onBack()
+            }
+
+        }
+
+    )
+}
+
+@Composable
+fun CardFormContent(
+    collection: CollectionDto,
+    flashcard: FlashcardDto? = null,
+    actions: CardFormActions,
+) {
+    var draft by remember(flashcard) {
+        mutableStateOf(
+            flashcard ?: FlashcardDto(
+                id = "",
+                collectionId = collection.id,
+                sourceText = "",
+                targetText = "",
+                position = 0,
+                createdAt = ""
+            )
+        )
+    }
     var showDeleteDialog by remember { mutableStateOf(false) }
-    val isValid = sourceText.isNotBlank() && targetText.isNotBlank()
+    val isValid = draft.sourceText.isNotBlank() && draft.targetText.isNotBlank()
+    val isEdit = flashcard != null
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
@@ -70,12 +117,11 @@ fun CardFormScreen(
             AlertDialog(
                 onDismissRequest = { showDeleteDialog = false },
                 title = { Text("Usuń fiszkę") },
-                text = { Text("Czy na pewno chcesz usunąć fiszkę \"${flashcard!!.sourceText}\"? Tej operacji nie można cofnąć.") },
+                text = { Text("Czy na pewno chcesz usunąć fiszkę \"${draft.sourceText}\"? Tej operacji nie można cofnąć.") },
                 confirmButton = {
                     TextButton(onClick = {
                         showDeleteDialog = false
-                        viewModel.deleteFlashcard(flashcard!!.id)
-                        onBack()
+                        actions.onDelete()
                     }) {
                         Text("Usuń", color = MaterialTheme.colorScheme.error)
                     }
@@ -86,7 +132,11 @@ fun CardFormScreen(
             )
         }
 
-        Column(Modifier.fillMaxSize().background(c.surface).imePadding()) {
+        Column(
+            Modifier.fillMaxSize()
+                .background(c.surface)
+                .imePadding()
+        ) {
             // Top bar
             Row(
                 modifier = Modifier
@@ -100,7 +150,7 @@ fun CardFormScreen(
                         .clip(RoundedCornerShape(12.dp))
                         .background(c.surface2)
                         .border(1.dp, c.line, RoundedCornerShape(12.dp))
-                        .clickable(onClick = onBack),
+                        .clickable(onClick = actions::onBack),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -149,7 +199,7 @@ fun CardFormScreen(
                     .padding(horizontal = 14.dp, vertical = 8.dp),
             ) {
                 Text(
-                    text = collectionName,
+                    text = collection.name,
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontFamily = mono(),
                         fontWeight = FontWeight.SemiBold,
@@ -158,7 +208,6 @@ fun CardFormScreen(
                 )
             }
 
-            // Form fields (heading inside scroll so keyboard doesn't cover it)
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -185,8 +234,8 @@ fun CardFormScreen(
                 }
                 Spacer(Modifier.height(6.dp))
                 OutlinedTextField(
-                    value = sourceText,
-                    onValueChange = { sourceText = it },
+                    value = draft.sourceText,
+                    onValueChange = { draft = draft.copy(sourceText = it) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -249,58 +298,96 @@ fun CardFormScreen(
                 }
                 Spacer(Modifier.height(6.dp))
                 OutlinedTextField(
-                    value = targetText,
-                    onValueChange = { targetText = it },
+                    value = draft.targetText,
+                    onValueChange = { draft = draft.copy(targetText = it) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
 
-                Spacer(Modifier.height(16.dp))
-            }
+                Spacer(Modifier.weight(1f))
 
-            // Sticky CTA
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 22.dp, vertical = 16.dp),
-            ) {
+                // Sticky CTA
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp)
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(if (isValid) c.accent else c.surface3)
-                        .then(
-                            if (isValid) Modifier.clickable {
-                                if (isEdit) viewModel.updateCard(
-                                    flashcard.id,
-                                    sourceText.trim(),
-                                    targetText.trim()
-                                )
-                                else viewModel.createCard(sourceText.trim(), targetText.trim())
-                                onBack()
-                            } else Modifier,
-                        ),
-                    contentAlignment = Alignment.Center,
+                        .padding(horizontal = 22.dp, vertical = 16.dp),
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .clip(RoundedCornerShape(18.dp))
+                            .background(if (isValid) c.accent else c.surface3)
+                            .then(
+                                if (isValid) Modifier.clickable {
+                                    actions.onSave(
+                                        draft.copy(
+                                            sourceText = draft.sourceText.trim(),
+                                            targetText = draft.targetText.trim()
+                                        )
+                                    )
+                                } else Modifier,
+                            ),
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Icon(
-                            Icons.Default.Check,
-                            contentDescription = null,
-                            tint = if (isValid) c.onAccent else c.mute2,
-                            modifier = Modifier.size(18.dp),
-                        )
-                        Text(
-                            text = if (isEdit) "Zapisz zmiany" else "Dodaj fiszkę",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = if (isValid) c.onAccent else c.mute2,
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Icon(
+                                Icons.Default.Check,
+                                contentDescription = null,
+                                tint = if (isValid) c.onAccent else c.mute2,
+                                modifier = Modifier.size(18.dp),
+                            )
+                            Text(
+                                text = if (isEdit) "Zapisz zmiany" else "Dodaj fiszkę",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = if (isValid) c.onAccent else c.mute2,
+                            )
+                        }
                     }
                 }
             }
         }
     }
+}
+
+private val previewCollection = CollectionDto(
+    id = "col1",
+    userId = "",
+    name = "Moje Fiszki",
+    description = "",
+    sourceLanguage = "pl",
+    targetLanguage = "en",
+    createdAt = "",
+)
+
+private object NoOpCardFormActions : CardFormActions {
+    override fun onBack() {}
+    override fun onSave(newFlashcard: FlashcardDto) {}
+    override fun onDelete() {}
+}
+
+@Preview
+@Composable
+private fun CardFormNewPreview() {
+    CardFormContent(collection = previewCollection, actions = NoOpCardFormActions)
+}
+
+@Preview
+@Composable
+private fun CardFormEditPreview() {
+    CardFormContent(
+        collection = previewCollection,
+        flashcard = FlashcardDto(
+            id = "1",
+            collectionId = "col1",
+            sourceText = "Pies",
+            targetText = "Dog",
+            position = 0,
+            createdAt = "2023-01-01"
+        ),
+        actions = NoOpCardFormActions,
+    )
 }
