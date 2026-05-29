@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
 import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
@@ -38,6 +41,7 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(scheme.background)
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 28.dp),
         ) {
             Spacer(Modifier.height(56.dp))
@@ -86,6 +90,8 @@ fun LoginScreen(
             )
 
             Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(16.dp))
+
 
             if (error != null) {
                 Text(
@@ -136,4 +142,34 @@ private fun AuthButton(label: String, enabled: Boolean, onClick: () -> Unit) {
             color = if (enabled) scheme.onSurface else c.mute2,
         )
     }
+}
+
+@Preview
+@Composable
+fun LoginScreenPreview() {
+    LoginScreen(
+        isLoading = false,
+        error = null,
+        onSignInClick = {}
+    )
+}
+
+@Preview
+@Composable
+fun LoginScreenLoadingPreview() {
+    LoginScreen(
+        isLoading = true,
+        error = null,
+        onSignInClick = {}
+    )
+}
+
+@Preview
+@Composable
+fun LoginScreenErrorPreview() {
+    LoginScreen(
+        isLoading = false,
+        error = "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
+        onSignInClick = {}
+    )
 }

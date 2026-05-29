@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
@@ -27,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
@@ -39,12 +42,24 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    ProfileContent(
+        uiState = uiState,
+        onLogout = onLogout,
+    )
+}
+
+@Composable
+private fun ProfileContent(
+    uiState: ProfileUiState,
+    onLogout: () -> Unit,
+) {
     FiszkiThemedScreen(naturalDark = true) {
         val scheme = MaterialTheme.colorScheme
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(scheme.background)
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 26.dp),
         ) {
             Spacer(Modifier.height(32.dp))
@@ -128,6 +143,8 @@ fun ProfileScreen(
 
             Spacer(Modifier.weight(1f))
 
+            Spacer(Modifier.height(16.dp))
+
             // Wyloguj button
             Row(
                 modifier = Modifier
@@ -156,4 +173,26 @@ fun ProfileScreen(
             Spacer(Modifier.height(18.dp))
         }
     }
+}
+
+@Preview
+@Composable
+fun ProfileScreenPreview() {
+    ProfileContent(
+        uiState = ProfileUiState(
+            displayName = "Robert Karpiński",
+            email = "rkarpin1@gmail.com",
+            streakDays = 5,
+        ),
+        onLogout = {},
+    )
+}
+
+@Preview
+@Composable
+fun ProfileScreenEmptyPreview() {
+    ProfileContent(
+        uiState = ProfileUiState(),
+        onLogout = {},
+    )
 }
