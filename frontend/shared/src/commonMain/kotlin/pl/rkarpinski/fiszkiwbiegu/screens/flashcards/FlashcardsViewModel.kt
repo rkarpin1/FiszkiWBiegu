@@ -1,4 +1,4 @@
-package pl.rkarpinski.fiszkiwbiegu
+package pl.rkarpinski.fiszkiwbiegu.screens.flashcards
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

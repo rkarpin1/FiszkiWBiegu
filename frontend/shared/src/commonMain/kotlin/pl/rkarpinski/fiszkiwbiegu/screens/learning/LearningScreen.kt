@@ -1,4 +1,4 @@
-package pl.rkarpinski.fiszkiwbiegu
+package pl.rkarpinski.fiszkiwbiegu.screens.learning
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

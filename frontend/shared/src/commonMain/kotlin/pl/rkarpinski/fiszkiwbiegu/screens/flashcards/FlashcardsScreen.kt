@@ -1,4 +1,4 @@
-package pl.rkarpinski.fiszkiwbiegu
+package pl.rkarpinski.fiszkiwbiegu.screens.flashcards
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import pl.rkarpinski.fiszkiwbiegu.NetworkChecker
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen

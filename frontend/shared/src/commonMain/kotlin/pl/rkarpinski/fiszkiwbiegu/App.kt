@@ -31,6 +31,14 @@ import pl.rkarpinski.fiszkiwbiegu.data.api.AuthEventBus
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 import pl.rkarpinski.fiszkiwbiegu.data.repository.AuthRepository
+import pl.rkarpinski.fiszkiwbiegu.screens.collections.CollectionFormScreen
+import pl.rkarpinski.fiszkiwbiegu.screens.collections.CollectionsScreen
+import pl.rkarpinski.fiszkiwbiegu.screens.collections.CollectionsViewModel
+import pl.rkarpinski.fiszkiwbiegu.screens.flashcards.CardFormScreen
+import pl.rkarpinski.fiszkiwbiegu.screens.flashcards.FlashcardsScreen
+import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningScreen
+import pl.rkarpinski.fiszkiwbiegu.screens.login.LoginScreen
+import pl.rkarpinski.fiszkiwbiegu.screens.profile.ProfileScreen
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiAppTheme
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
 import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors

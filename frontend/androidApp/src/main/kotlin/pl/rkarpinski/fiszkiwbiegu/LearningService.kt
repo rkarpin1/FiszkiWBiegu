@@ -21,6 +21,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.json.Json
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
+import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningPhase
+import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningState
 import java.util.Locale
 import java.util.UUID
 import kotlin.coroutines.resume

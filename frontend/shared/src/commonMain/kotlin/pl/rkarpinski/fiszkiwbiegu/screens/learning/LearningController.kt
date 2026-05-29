@@ -1,4 +1,4 @@
-package pl.rkarpinski.fiszkiwbiegu
+package pl.rkarpinski.fiszkiwbiegu.screens.learning
 
 import kotlinx.coroutines.flow.StateFlow
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto

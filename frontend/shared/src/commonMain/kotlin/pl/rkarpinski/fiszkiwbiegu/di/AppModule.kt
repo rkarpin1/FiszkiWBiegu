@@ -3,10 +3,10 @@ package pl.rkarpinski.fiszkiwbiegu.di
 import com.russhwolf.settings.Settings
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
-import pl.rkarpinski.fiszkiwbiegu.CollectionsViewModel
-import pl.rkarpinski.fiszkiwbiegu.FlashcardsViewModel
-import pl.rkarpinski.fiszkiwbiegu.LearningViewModel
-import pl.rkarpinski.fiszkiwbiegu.ProfileViewModel
+import pl.rkarpinski.fiszkiwbiegu.screens.collections.CollectionsViewModel
+import pl.rkarpinski.fiszkiwbiegu.screens.flashcards.FlashcardsViewModel
+import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningViewModel
+import pl.rkarpinski.fiszkiwbiegu.screens.profile.ProfileViewModel
 import pl.rkarpinski.fiszkiwbiegu.data.api.ApiClient
 import pl.rkarpinski.fiszkiwbiegu.data.api.AuthEventBus
 import pl.rkarpinski.fiszkiwbiegu.data.api.TokenStorage

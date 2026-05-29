@@ -10,6 +10,8 @@ import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
+import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningController
+import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningState
 
 @UnstableApi
 class AndroidLearningController(private val context: Context) : LearningController {
