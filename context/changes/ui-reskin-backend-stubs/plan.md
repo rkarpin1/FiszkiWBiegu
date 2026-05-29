@@ -293,7 +293,7 @@ cd frontend && ./gradlew :androidApp:assembleDebug 2>&1 | tail -20
 - [x] 2.7 cargo test — wszystkie testy przechodzą
 
 #### Manual
-- [ ] 2.8 GET /auth/me zwraca display_name
+- [x] 2.8 GET /auth/me zwraca display_name
 - [ ] 2.9 GET /collections zawiera last_studied i progress
 - [ ] 2.10 POST .../learning/complete zwraca 204
 
