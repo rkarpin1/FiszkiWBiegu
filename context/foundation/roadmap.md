@@ -38,6 +38,7 @@ Biegacze tracą dziesiątki godzin miesięcznie, które mogłyby być poświęco
 | S-04-C | ui-reskin-new-screens      | (faza C) 3 nowe ekrany (stub dane) + nawigacja bottom-tab                         | S-04-B            | —                                                 | done     |
 | S-04-D | ui-reskin-backend-stubs    | (faza D) realne dane zamiast zaślepek: /me, lastStudied, progress, translate      | S-04-C            | —                                                 | done     |
 | S-05   | ui-tweaks                  | lista kolekcji bez menu + subtitle "N fiszek · X dni temu"; edycja/usuń kolekcji w widoku szczegółów; formularze nie zasłaniane przez klawiaturę | S-04-D | — | done |
+| S-06   | rename-flashcard-fields    | przemianowanie pól fiszki: `polish_text`→`source_text`, `english_text`→`target_text` w DB, API i całym frontendzie | S-05 | — | done |
 
 ## Strumienie
 
@@ -55,7 +56,7 @@ Fundamenty poniżej zakładają, że te elementy są obecne i NIE tworzą ich po
 
 - **Frontend:** obecny — Compose Multiplatform + Material3 + design system Dawn Run (paleta, czcionki Bricolage/JetBrains Mono); routing navigation3-compose (App.kt, mutableStateListOf backstack); 7 ekranów: LoginScreen, CollectionsScreen, FlashcardsScreen, LearningScreen, ProfileScreen, CollectionFormScreen, CardFormScreen; bottom-tab bar (Kolekcje / Konto); moduły androidApp i webApp
 - **Backend / API:** obecny — Actix-web 4.13; auth JWT (Google OAuth); endpointy: POST /auth/login; GET|POST /collections, PUT|DELETE /collections/{id}; GET|POST /collections/{id}/flashcards, GET /collections/{id}/learning; PUT|DELETE /flashcards/{id}; walidacja: kody języka (pl/en/de/es/fr/it), source ≠ target, nazwa niepusta (422)
-- **Dane:** częściowy — sqlx + PostgreSQL (backend); migracje: `001_init` (collections + flashcards, indeksy), `002_add_users` (tabela users + FK collections→users; S-01), `003_add_languages` (source/target_language w collections; collection-language-select), `004_add_description` (description w collections; collection-language-select); schemat: `users(google_id, email)`, `collections(user_id, name, description, source_language, target_language)`, `flashcards(collection_id, polish_text, english_text, position)`; BRAK lokalnego cache fiszek we frontendzie (dane sieciowe); token JWT persistowany przez multiplatform-settings
+- **Dane:** częściowy — sqlx + PostgreSQL (backend); migracje: `001_init` (collections + flashcards, indeksy), `002_add_users` (tabela users + FK collections→users), `003_add_languages` (source/target_language w collections), `004_add_description` (description w collections), `005_add_user_profile` (display_name, streak_days w users), `006_add_collection_tracking` (last_studied, progress, flashcard_count w collections), `007_rename_flashcard_columns` (polish_text→source_text, english_text→target_text; S-06); schemat: `users(google_id, email, display_name, streak_days)`, `collections(user_id, name, description, source_language, target_language, last_studied, progress, flashcard_count)`, `flashcards(collection_id, source_text, target_text, position)`; BRAK lokalnego cache fiszek we frontendzie (dane sieciowe); token JWT persistowany przez multiplatform-settings
 - **Autoryzacja:** obecna — backend: Google id_token validation (`auth.rs`), JWT issue/verify, `AuthUser` extractor na trasach; frontend: `GoogleSignInHelper.kt` (Android Credential Manager), `AuthRepository.kt` (login/logout/isLoggedIn + token storage), `AuthEventBus.kt` (unauthorizedEvents → auto-logout), `LoginScreen.kt`
 - **Wdrożenie / infra:** częściowe — GitHub Actions CI: backend (`cargo build --release` + `cargo test` na push/PR do master); BRAK pipeline CI dla frontendu (APK budowany lokalnie); backend: auto-deploy via Render.com (`render.yaml`, Frankfurt, starter plan, `healthCheckPath: /health`); env vars w panelu Render: DATABASE_URL, JWT_SECRET, GOOGLE_CLIENT_ID; BRAK Dockerfile (Render używa natywnego runtime Rust)
 - **Obserwowalność:** minimalna — backend: wyłącznie `eprintln!` na błędach DB/JWT (13 miejsc w handlerach); brak `tracing`/`log`; logi dostępne w panelu Render.com; frontend: brak Crashlytics / Sentry; brak metryk, alertów ani dashboardu
@@ -197,6 +198,18 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 - **Ryzyko:** —
 - **Status:** done
 
+### S-06: Przemianowanie pól fiszki
+
+- **Wynik:** kolumny DB `polish_text`/`english_text` przemianowane na `source_text`/`target_text`; odpowiednie zmiany w modelach Rust, zapytaniach SQL, serializacji JSON (backend i frontend) oraz wszystkich warstwach frontendu (Repository, ViewModel, ekrany, LearningService).
+- **ID zmiany:** rename-flashcard-fields
+- **Odniesienia do PRD:** —
+- **Wymagania wstępne:** S-05
+- **Równolegle z:** —
+- **Blokady:** wymaga migracji DB `007_rename_flashcard_columns.sql` na środowisku produkcyjnym
+- **Niewiadome:** —
+- **Ryzyko:** —
+- **Status:** done
+
 ## Przekazanie do backlogu
 
 | ID mapy drogowej | ID zmiany                           | Sugerowany tytuł problemu                                     | Gotowe do `/10x-plan` | Uwagi                                         |
@@ -210,12 +223,12 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 | S-04-C           | ui-reskin-new-screens               | Reskin UI — faza C: nowe ekrany + nawigacja                   | done                  | Zrealizowane                                  |
 | S-04-D           | ui-reskin-backend-stubs             | Reskin UI — faza D: backend dla zaślepek                      | done                  | Zrealizowane                                  |
 | S-05             | ui-tweaks                           | Poprawki UI — menu, subtitle, klawiatura                      | done                  | Zrealizowane                                  |
+| S-06             | rename-flashcard-fields             | Przemianowanie pól fiszki: polish_text→source_text, english_text→target_text | done          | Zrealizowane                                  |
 
 ## Otwarte pytania dotyczące mapy drogowej
 
-1. **Synchronizacja fiszek offline** — kiedy i jak aplikacja synchronizuje fiszki z backendu na urządzenie? (przy uruchomieniu / przy starcie sesji nauki / w tle / ręcznie). Właściciel: Rafał. Blokada: F-01 (decyzja architektoniczna do podjęcia w `/10x-plan offline-flashcard-cache`).
-2. **Długość pauz w cyklu audio** — ile sekund po tekście PL (przed EN) i między powtórzeniami EN? Właściciel: Rafał. Blokada: S-02 (decyzja empiryczna podczas implementacji — nie blokuje startu, ale musi być ustalona przed finalizacją UX trybu nauki).
-/19x
+_(brak aktywnych pytań — wszystkie zablokowane przez F-01/S-02 zostały rozwiązane w trakcie implementacji)_
+
 ## Zaparkowane
 
 - **FR-015: Tryb EN→PL (3x angielski, potem 1x polski)** — Dlaczego zaparkowane: PRD §Sokrates — „PL→EN to główny use case; EN→PL komplikuje UI bez kluczowej wartości dla MVP"; planowane w v2.
@@ -243,3 +256,4 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 - **S-04-C: (faza C) 3 nowe ekrany (stub dane) + nawigacja bottom-tab** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-reskin-new-screens/`. Lekcja: —.
 - **S-04-D: (faza D) realne dane zamiast zaślepek: /me, lastStudied, progress, translate** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-reskin-backend-stubs/`. Lekcja: —.
 - **S-05: lista kolekcji bez menu + subtitle "N fiszek · X dni temu"; edycja/usuń kolekcji w widoku szczegółów; formularze nie zasłaniane przez klawiaturę** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-tweaks/`. Lekcja: —.
+- **S-06: przemianowanie pól fiszki — `polish_text`→`source_text`, `english_text`→`target_text` w DB, API i całym frontendzie** — Zrealizowano 2026-05-29. Migracja `007_rename_flashcard_columns.sql` wymaga uruchomienia na środowisku produkcyjnym. Lekcja: —.

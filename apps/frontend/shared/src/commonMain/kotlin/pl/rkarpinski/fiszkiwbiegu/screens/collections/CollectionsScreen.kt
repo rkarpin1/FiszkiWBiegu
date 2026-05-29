@@ -122,7 +122,12 @@ fun CollectionsScreen(
                         if (uiState.collections.isNotEmpty()) {
                             item {
                                 Spacer(Modifier.height(4.dp))
-                                Box(modifier = Modifier.padding(horizontal = 22.dp, vertical = 6.dp)) {
+                                Box(
+                                    modifier = Modifier.padding(
+                                        horizontal = 22.dp,
+                                        vertical = 6.dp
+                                    )
+                                ) {
                                     CapsLabel("KOLEKCJE")
                                 }
                             }
@@ -205,7 +210,10 @@ private fun LaneRow(
             ) {
                 Text(
                     "${collection.flashcardCount} fiszek",
-                    style = MaterialTheme.typography.labelMedium.copy(fontFamily = mono(), color = accent),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontFamily = mono(),
+                        color = accent
+                    ),
                 )
                 Text("·", style = MaterialTheme.typography.labelMedium, color = c.mute2)
                 Text(
@@ -239,7 +247,9 @@ private fun formatLastStudied(lastStudied: String?): String {
             days < 30L -> "${days / 7} tyg. temu"
             else -> "${days / 30} mies. temu"
         }
-    } catch (_: Exception) { "" }
+    } catch (_: Exception) {
+        ""
+    }
 }
 
 @Composable

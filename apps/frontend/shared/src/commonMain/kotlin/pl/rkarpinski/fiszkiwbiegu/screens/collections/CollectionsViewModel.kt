@@ -13,8 +13,8 @@ import pl.rkarpinski.fiszkiwbiegu.data.repository.CollectionRepository
 data class CollectionsUiState(
     val collections: List<CollectionDto> = emptyList(),
     val isLoading: Boolean = false,
+    val isSubmitting: Boolean = false,
     val error: String? = null,
-    val showAddDialog: Boolean = false,
     val pendingDeleteId: String? = null,
 )
 
@@ -31,23 +31,34 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             repo.getAll().fold(
-                onSuccess = { list -> _uiState.update { it.copy(collections = list, isLoading = false) } },
-                onFailure = { e -> _uiState.update { it.copy(error = e.message, isLoading = false) } },
+                onSuccess = { list ->
+                    _uiState.update {
+                        it.copy(
+                            collections = list,
+                            isLoading = false
+                        )
+                    }
+                },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(
+                            error = e.message,
+                            isLoading = false
+                        )
+                    }
+                },
             )
         }
     }
 
-    fun showAddDialog() = _uiState.update { it.copy(showAddDialog = true) }
-
-    fun hideAddDialog() = _uiState.update { it.copy(showAddDialog = false) }
-
-    fun createCollection(name: String, description: String, sourceLanguage: String, targetLanguage: String) {
+    fun createCollection(dto: CollectionDto, onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
-            repo.create(name, description, sourceLanguage, targetLanguage).fold(
-                onSuccess = { loadCollections() },
+            _uiState.update { it.copy(isSubmitting = true, error = null) }
+            repo.create(dto).fold(
+                onSuccess = { loadCollections(); onSuccess() },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
             )
-            _uiState.update { it.copy(showAddDialog = false) }
+            _uiState.update { it.copy(isSubmitting = false) }
         }
     }
 
@@ -61,26 +72,42 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
             _uiState.update { it.copy(pendingDeleteId = null, isLoading = true) }
             repo.delete(id).fold(
                 onSuccess = { loadCollections() },
-                onFailure = { e -> _uiState.update { it.copy(error = e.message, isLoading = false) } },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(
+                            error = e.message,
+                            isLoading = false
+                        )
+                    }
+                },
             )
         }
     }
 
-    fun updateCollection(id: String, name: String, description: String, sourceLanguage: String, targetLanguage: String) {
+    fun updateCollection(dto: CollectionDto, onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
-            repo.rename(id, name, description, sourceLanguage, targetLanguage).fold(
-                onSuccess = { loadCollections() },
+            _uiState.update { it.copy(isSubmitting = true, error = null) }
+            repo.rename(dto).fold(
+                onSuccess = { loadCollections(); onSuccess() },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
             )
+            _uiState.update { it.copy(isSubmitting = false) }
         }
     }
 
-    fun deleteCollection(id: String) {
+    fun deleteCollection(id: String, onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             repo.delete(id).fold(
-                onSuccess = { loadCollections() },
-                onFailure = { e -> _uiState.update { it.copy(error = e.message, isLoading = false) } },
+                onSuccess = { loadCollections(); onSuccess() },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(
+                            error = e.message,
+                            isLoading = false
+                        )
+                    }
+                },
             )
         }
     }

@@ -6,8 +6,8 @@ package pl.rkarpinski.fiszkiwbiegu
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +36,7 @@ import pl.rkarpinski.fiszkiwbiegu.screens.collections.CollectionFormScreen
 import pl.rkarpinski.fiszkiwbiegu.screens.collections.CollectionsScreen
 import pl.rkarpinski.fiszkiwbiegu.screens.collections.CollectionsViewModel
 import pl.rkarpinski.fiszkiwbiegu.screens.flashcards.CardFormScreen
+import pl.rkarpinski.fiszkiwbiegu.screens.flashcards.FlashcardsActions
 import pl.rkarpinski.fiszkiwbiegu.screens.flashcards.FlashcardsScreen
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningScreen
 import pl.rkarpinski.fiszkiwbiegu.screens.login.LoginScreen
@@ -49,13 +51,7 @@ private sealed interface Route {
     data class Flashcards(val collection: CollectionDto) : Route
     data class Learning(val collection: CollectionDto) : Route
     data object Profile : Route
-    data class CollectionForm(
-        val collectionId: String? = null,
-        val collectionName: String = "",
-        val collectionDescription: String = "",
-        val sourceLanguage: String = "pl",
-        val targetLanguage: String = "en",
-    ) : Route
+    data class CollectionForm(val collection: CollectionDto? = null) : Route
     data class CardForm(
         val collectionId: String,
         val collectionName: String,
@@ -67,10 +63,11 @@ private sealed interface Route {
 fun App(onGoogleSignIn: suspend () -> Result<String>) {
     val authRepository: AuthRepository = koinInject()
     val authEventBus: AuthEventBus = koinInject()
+    val collectionsVm: CollectionsViewModel = koinViewModel()
     val scope = rememberCoroutineScope()
 
     val initial: Route = if (authRepository.isLoggedIn()) Route.Collections else Route.Login
-    val backStack = remember { mutableStateListOf<Route>(initial) }
+    val backStack = remember { mutableStateListOf(initial) }
 
     var loginError by remember { mutableStateOf<String?>(null) }
     var isLoggingIn by remember { mutableStateOf(false) }
@@ -140,37 +137,34 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
                         }
                         entry<Route.Collections> {
                             CollectionsScreen(
+                                viewModel = collectionsVm,
                                 onCollectionClick = { backStack.add(Route.Flashcards(it)) },
                                 onAddClick = { backStack.add(Route.CollectionForm()) },
                             )
                         }
                         entry<Route.Flashcards> { route ->
-                            val collectionsVm: CollectionsViewModel = koinViewModel()
+                            val collectionsState by collectionsVm.uiState.collectAsState()
+                            val collection = collectionsState.collections.find { it.id == route.collection.id }
+                                ?: route.collection
                             FlashcardsScreen(
-                                collection = route.collection,
-                                onBack = { backStack.removeLastOrNull() },
-                                onStartLearning = { backStack.add(Route.Learning(route.collection)) },
-                                onAddCard = { backStack.add(Route.CardForm(route.collection.id, route.collection.name)) },
-                                onEditCard = { flashcard -> backStack.add(Route.CardForm(route.collection.id, route.collection.name, flashcard)) },
-                                onEditCollection = {
-                                    backStack.add(Route.CollectionForm(
-                                        route.collection.id, route.collection.name,
-                                        route.collection.description, route.collection.sourceLanguage, route.collection.targetLanguage,
-                                    ))
-                                },
-                                onDeleteCollection = {
-                                    collectionsVm.deleteCollection(route.collection.id)
-                                    backStack.removeLastOrNull()
+                                collection = collection,
+                                actions = object : FlashcardsActions {
+                                    override fun onBack() { backStack.removeLastOrNull() }
+                                    override fun onStartLearning() { backStack.add(Route.Learning(collection)) }
+                                    override fun onAddCard() { backStack.add(Route.CardForm(collection.id, collection.name)) }
+                                    override fun onEditCard(flashcard: FlashcardDto) { backStack.add(Route.CardForm(collection.id, collection.name, flashcard)) }
+                                    override fun onEditCollection() { backStack.add(Route.CollectionForm(collection)) }
+                                    override fun onDeleteCollection() {
+                                        collectionsVm.deleteCollection(collection.id)
+                                        backStack.removeLastOrNull()
+                                    }
                                 },
                             )
                         }
                         entry<Route.CollectionForm> { route ->
                             CollectionFormScreen(
-                                collectionId = route.collectionId,
-                                collectionName = route.collectionName,
-                                collectionDescription = route.collectionDescription,
-                                sourceLanguage = route.sourceLanguage,
-                                targetLanguage = route.targetLanguage,
+                                collection = route.collection,
+                                viewModel = collectionsVm,
                                 onBack = { backStack.removeLastOrNull() },
                             )
                         }
@@ -218,7 +212,7 @@ private fun AppBottomBar(
         NavigationBarItem(
             selected = current is Route.Collections,
             onClick = onCollections,
-            icon = { Icon(Icons.Default.LibraryBooks, contentDescription = null) },
+            icon = { Icon(Icons.AutoMirrored.Filled.LibraryBooks, contentDescription = null) },
             label = { Text("Kolekcje") },
         )
         NavigationBarItem(

@@ -19,7 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -58,10 +58,10 @@ fun CardFormScreen(
     onBack: () -> Unit,
 ) {
     val isEdit = flashcard != null
-    var polishText by remember { mutableStateOf(flashcard?.polishText ?: "") }
-    var englishText by remember { mutableStateOf(flashcard?.englishText ?: "") }
+    var sourceText by remember { mutableStateOf(flashcard?.sourceText ?: "") }
+    var targetText by remember { mutableStateOf(flashcard?.targetText ?: "") }
     var showDeleteDialog by remember { mutableStateOf(false) }
-    val isValid = polishText.isNotBlank() && englishText.isNotBlank()
+    val isValid = sourceText.isNotBlank() && targetText.isNotBlank()
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
@@ -70,7 +70,7 @@ fun CardFormScreen(
             AlertDialog(
                 onDismissRequest = { showDeleteDialog = false },
                 title = { Text("Usuń fiszkę") },
-                text = { Text("Czy na pewno chcesz usunąć fiszkę \"${flashcard!!.polishText}\"? Tej operacji nie można cofnąć.") },
+                text = { Text("Czy na pewno chcesz usunąć fiszkę \"${flashcard!!.sourceText}\"? Tej operacji nie można cofnąć.") },
                 confirmButton = {
                     TextButton(onClick = {
                         showDeleteDialog = false
@@ -104,7 +104,7 @@ fun CardFormScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        if (isEdit) Icons.Default.ArrowBack else Icons.Default.Close,
+                        if (isEdit) Icons.AutoMirrored.Filled.ArrowBack else Icons.Default.Close,
                         contentDescription = "Wróć",
                         tint = c.text,
                         modifier = Modifier.size(20.dp),
@@ -185,8 +185,8 @@ fun CardFormScreen(
                 }
                 Spacer(Modifier.height(6.dp))
                 OutlinedTextField(
-                    value = polishText,
-                    onValueChange = { polishText = it },
+                    value = sourceText,
+                    onValueChange = { sourceText = it },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -249,8 +249,8 @@ fun CardFormScreen(
                 }
                 Spacer(Modifier.height(6.dp))
                 OutlinedTextField(
-                    value = englishText,
-                    onValueChange = { englishText = it },
+                    value = targetText,
+                    onValueChange = { targetText = it },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -272,8 +272,12 @@ fun CardFormScreen(
                         .background(if (isValid) c.accent else c.surface3)
                         .then(
                             if (isValid) Modifier.clickable {
-                                if (isEdit) viewModel.updateCard(flashcard!!.id, polishText.trim(), englishText.trim())
-                                else viewModel.createCard(polishText.trim(), englishText.trim())
+                                if (isEdit) viewModel.updateCard(
+                                    flashcard.id,
+                                    sourceText.trim(),
+                                    targetText.trim()
+                                )
+                                else viewModel.createCard(sourceText.trim(), targetText.trim())
                                 onBack()
                             } else Modifier,
                         ),

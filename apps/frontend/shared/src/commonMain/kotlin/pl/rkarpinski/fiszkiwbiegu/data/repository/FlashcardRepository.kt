@@ -14,14 +14,14 @@ class FlashcardRepository(private val api: ApiClient) {
         else error("HTTP ${response.status.value}")
     }
 
-    suspend fun create(collectionId: String, polishText: String, englishText: String): Result<FlashcardDto> = runCatching {
-        val response = api.createFlashcard(collectionId, FlashcardRequest(polishText, englishText))
+    suspend fun create(collectionId: String, sourceText: String, targetText: String): Result<FlashcardDto> = runCatching {
+        val response = api.createFlashcard(collectionId, FlashcardRequest(sourceText, targetText))
         if (response.status.isSuccess()) response.body()
         else error("HTTP ${response.status.value}")
     }
 
-    suspend fun update(id: String, polishText: String? = null, englishText: String? = null): Result<FlashcardDto> = runCatching {
-        val response = api.updateFlashcard(id, FlashcardUpdateRequest(polishText, englishText))
+    suspend fun update(id: String, sourceText: String? = null, targetText: String? = null): Result<FlashcardDto> = runCatching {
+        val response = api.updateFlashcard(id, FlashcardUpdateRequest(sourceText, targetText))
         if (response.status.isSuccess()) response.body()
         else error("HTTP ${response.status.value}")
     }

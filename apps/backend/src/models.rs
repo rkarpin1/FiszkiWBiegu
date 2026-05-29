@@ -50,20 +50,20 @@ pub struct LearningCompleteRequest {
 pub struct Flashcard {
     pub id: Uuid,
     pub collection_id: Uuid,
-    pub polish_text: String,
-    pub english_text: String,
+    pub source_text: String,
+    pub target_text: String,
     pub position: i32,
     pub created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct FlashcardRequest {
-    pub polish_text: String,
-    pub english_text: String,
+    pub source_text: String,
+    pub target_text: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct FlashcardUpdateRequest {
-    pub polish_text: Option<String>,
-    pub english_text: Option<String>,
+    pub source_text: Option<String>,
+    pub target_text: Option<String>,
 }

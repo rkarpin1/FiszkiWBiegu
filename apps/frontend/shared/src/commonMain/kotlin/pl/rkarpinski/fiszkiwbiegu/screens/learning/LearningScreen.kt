@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -95,7 +96,7 @@ fun LearningScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        Icons.Default.ArrowBack,
+                        Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Wróć",
                         tint = c.text,
                         modifier = Modifier.size(20.dp),
@@ -124,7 +125,9 @@ fun LearningScreen(
             Spacer(Modifier.height(4.dp))
             if (state.flashcards.isNotEmpty()) {
                 Text(
-                    text = "${(state.currentIndex + 1).toString().padStart(2, '0')} / ${state.flashcards.size}",
+                    text = "${
+                        (state.currentIndex + 1).toString().padStart(2, '0')
+                    } / ${state.flashcards.size}",
                     style = MaterialTheme.typography.bodyMedium.copy(fontFamily = mono()),
                     color = c.mute,
                 )
@@ -146,7 +149,7 @@ fun LearningScreen(
             ) {
                 if (card != null) {
                     Text(
-                        text = card.englishText,
+                        text = card.targetText,
                         style = MaterialTheme.typography.displayLarge,
                         color = c.text,
                         textAlign = TextAlign.Center,
@@ -155,7 +158,7 @@ fun LearningScreen(
                     Box(Modifier.fillMaxWidth().height(1.dp).background(c.line))
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        text = card.polishText,
+                        text = card.sourceText,
                         style = MaterialTheme.typography.headlineMedium,
                         color = c.mute,
                         textAlign = TextAlign.Center,
@@ -186,7 +189,11 @@ fun LearningScreen(
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
                             .background(if (active) c.accent else c.surface2)
-                            .border(1.dp, if (active) c.accent else c.line, RoundedCornerShape(12.dp))
+                            .border(
+                                1.dp,
+                                if (active) c.accent else c.line,
+                                RoundedCornerShape(12.dp)
+                            )
                             .clickable { speed = value }
                             .padding(horizontal = 12.dp, vertical = 6.dp),
                         contentAlignment = Alignment.Center,
