@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,14 +37,14 @@ fun LangSelect(
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val c = LocalFiszkiColors.current
+    val scheme = MaterialTheme.colorScheme
     var showSheet by remember { mutableStateOf(false) }
 
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(c.surface2)
-            .border(1.dp, c.line, RoundedCornerShape(12.dp))
+            .clip(MaterialTheme.shapes.medium)
+            .background(scheme.surface)
+            .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium)
             .clickable { showSheet = true }
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -55,13 +54,13 @@ fun LangSelect(
         Text(
             LanguageNames[code] ?: code,
             style = MaterialTheme.typography.bodyLarge,
-            color = c.text,
+            color = scheme.onBackground,
             modifier = Modifier.weight(1f),
         )
         Icon(
             Icons.Default.ChevronRight,
             contentDescription = null,
-            tint = c.mute,
+            tint = scheme.onSurfaceVariant,
             modifier = Modifier.size(16.dp),
         )
     }
@@ -85,14 +84,14 @@ fun LangSelect(
                     Text(
                         langName,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = c.text,
+                        color = scheme.onBackground,
                         modifier = Modifier.weight(1f),
                     )
                     if (langCode == code) {
                         Icon(
                             Icons.Default.Check,
                             contentDescription = null,
-                            tint = c.accent,
+                            tint = scheme.primary,
                             modifier = Modifier.size(18.dp),
                         )
                     }

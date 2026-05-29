@@ -19,7 +19,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.theme.capsMono
 import pl.rkarpinski.fiszkiwbiegu.theme.mono
 
@@ -28,13 +27,13 @@ import pl.rkarpinski.fiszkiwbiegu.theme.mono
  */
 @Composable
 fun StudyChip(label: String, modifier: Modifier = Modifier) {
-    val c = LocalFiszkiColors.current
+    val scheme = MaterialTheme.colorScheme
     Box(
         modifier = modifier
             .height(32.dp)
             .clip(RoundedCornerShape(10.dp))
-            .background(c.surface2)
-            .border(1.dp, c.line, RoundedCornerShape(10.dp))
+            .background(scheme.surface)
+            .border(1.dp, scheme.outlineVariant, RoundedCornerShape(10.dp))
             .padding(horizontal = 12.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -42,7 +41,7 @@ fun StudyChip(label: String, modifier: Modifier = Modifier) {
             label,
             style = MaterialTheme.typography.labelSmall.copy(
                 fontFamily = mono(),
-                color      = c.text,
+                color      = scheme.onBackground,
             ),
         )
     }
@@ -60,7 +59,7 @@ fun TrackBar(
     height: Dp = 5.dp,
     modifier: Modifier = Modifier,
 ) {
-    val c = LocalFiszkiColors.current
+    val scheme = MaterialTheme.colorScheme
     Row(
         modifier = modifier.height(height),
         horizontalArrangement = Arrangement.spacedBy(3.dp),
@@ -72,7 +71,7 @@ fun TrackBar(
                     .weight(1f)
                     .fillMaxHeight()
                     .clip(RoundedCornerShape(3.dp))
-                    .background(if (filled) accent else c.line)
+                    .background(if (filled) accent else scheme.outlineVariant)
             )
         }
     }
@@ -82,6 +81,6 @@ fun TrackBar(
  * Mała mono-etykieta nagłówka w CAPS — np. „OSTATNIO // KONTYNUUJ".
  */
 @Composable
-fun CapsLabel(text: String, color: Color = LocalFiszkiColors.current.mute) {
+fun CapsLabel(text: String, color: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
     Text(text, style = capsMono().copy(color = color))
 }
