@@ -4,7 +4,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::auth::AuthUser;
-use crate::models::{Collection, CollectionRequest};
+use crate::models::{Collection, CollectionRequest, LearningCompleteRequest};
 
 const VALID_LANGUAGES: &[&str] = &["pl", "en", "de", "es", "fr", "it"];
 
@@ -14,7 +14,8 @@ fn validate_languages(src: &str, tgt: &str) -> bool {
 
 pub async fn list(pool: web::Data<PgPool>, user: AuthUser) -> impl Responder {
     let result = sqlx::query_as::<_, Collection>(
-        "SELECT id, user_id, name, description, source_language, target_language, created_at FROM collections WHERE user_id = $1 ORDER BY created_at DESC",
+        "SELECT id, user_id, name, description, source_language, target_language, created_at, last_studied, progress \
+         FROM collections WHERE user_id = $1 ORDER BY created_at DESC",
     )
     .bind(user.id)
     .fetch_all(pool.get_ref())
@@ -44,7 +45,9 @@ pub async fn create(
     }
 
     let result = sqlx::query_as::<_, Collection>(
-        "INSERT INTO collections (user_id, name, description, source_language, target_language) VALUES ($1, $2, $3, $4, $5) RETURNING id, user_id, name, description, source_language, target_language, created_at",
+        "INSERT INTO collections (user_id, name, description, source_language, target_language) \
+         VALUES ($1, $2, $3, $4, $5) \
+         RETURNING id, user_id, name, description, source_language, target_language, created_at, last_studied, progress",
     )
     .bind(user.id)
     .bind(&body.name)
@@ -80,7 +83,9 @@ pub async fn update(
 
     let id = path.into_inner();
     let result = sqlx::query_as::<_, Collection>(
-        "UPDATE collections SET name = $1, description = $2, source_language = $3, target_language = $4 WHERE id = $5 AND user_id = $6 RETURNING id, user_id, name, description, source_language, target_language, created_at",
+        "UPDATE collections SET name = $1, description = $2, source_language = $3, target_language = $4 \
+         WHERE id = $5 AND user_id = $6 \
+         RETURNING id, user_id, name, description, source_language, target_language, created_at, last_studied, progress",
     )
     .bind(&body.name)
     .bind(&body.description)
@@ -120,6 +125,40 @@ pub async fn delete(
         Ok(_) => HttpResponse::NoContent().finish(),
         Err(e) => {
             eprintln!("DB error deleting collection: {e}");
+            HttpResponse::InternalServerError().json(json!({"error": "Database error"}))
+        }
+    }
+}
+
+pub async fn learning_complete(
+    pool: web::Data<PgPool>,
+    user: AuthUser,
+    path: web::Path<Uuid>,
+    body: web::Json<LearningCompleteRequest>,
+) -> impl Responder {
+    let id = path.into_inner();
+    let progress = if body.total_cards > 0 {
+        (body.cards_heard as f32 / body.total_cards as f32).clamp(0.0, 1.0)
+    } else {
+        0.0f32
+    };
+
+    let result = sqlx::query(
+        "UPDATE collections SET last_studied = NOW(), progress = $1 WHERE id = $2 AND user_id = $3",
+    )
+    .bind(progress)
+    .bind(id)
+    .bind(user.id)
+    .execute(pool.get_ref())
+    .await;
+
+    match result {
+        Ok(r) if r.rows_affected() == 0 => {
+            HttpResponse::NotFound().json(json!({"error": "Collection not found"}))
+        }
+        Ok(_) => HttpResponse::NoContent().finish(),
+        Err(e) => {
+            eprintln!("DB error updating learning progress: {e}");
             HttpResponse::InternalServerError().json(json!({"error": "Database error"}))
         }
     }

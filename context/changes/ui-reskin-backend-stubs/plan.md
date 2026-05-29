@@ -275,22 +275,22 @@ cd frontend && ./gradlew :androidApp:assembleDebug 2>&1 | tail -20
 
 ### Phase 1: DB Migrations
 #### Automated
-- [x] 1.1 Utwórz backend/migrations/005_add_user_profile.sql
-- [x] 1.2 Utwórz backend/migrations/006_add_collection_tracking.sql
-- [x] 1.3 cargo build — migracje kompilują się
+- [x] 1.1 Utwórz backend/migrations/005_add_user_profile.sql — b077af7
+- [x] 1.2 Utwórz backend/migrations/006_add_collection_tracking.sql — b077af7
+- [x] 1.3 cargo build — migracje kompilują się — b077af7
 
 #### Manual
-- [x] 1.4 cargo run — brak błędów migracji, kolumny widoczne w DB
+- [x] 1.4 cargo run — brak błędów migracji, kolumny widoczne w DB — b077af7
 
 ### Phase 2: Backend — modele, handlery, routing
 #### Automated
-- [ ] 2.1 models.rs — User: dodaj display_name, streak_days
-- [ ] 2.2 models.rs — Collection: dodaj last_studied, progress
-- [ ] 2.3 models.rs — dodaj LearningCompleteRequest
-- [ ] 2.4 handlers/auth.rs — GoogleTokenInfo: dodaj name; login: zapisz display_name; dodaj me()
-- [ ] 2.5 handlers/collections.rs — zaktualizuj list/create/update RETURNING; dodaj learning_complete()
-- [ ] 2.6 main.rs — zarejestruj GET /auth/me i POST /collections/{id}/learning/complete
-- [ ] 2.7 cargo test — wszystkie testy przechodzą
+- [x] 2.1 models.rs — User: dodaj display_name, streak_days
+- [x] 2.2 models.rs — Collection: dodaj last_studied, progress
+- [x] 2.3 models.rs — dodaj LearningCompleteRequest
+- [x] 2.4 handlers/auth.rs — GoogleTokenInfo: dodaj name; login: zapisz display_name; dodaj me()
+- [x] 2.5 handlers/collections.rs — zaktualizuj list/create/update RETURNING; dodaj learning_complete()
+- [x] 2.6 main.rs — zarejestruj GET /auth/me i POST /collections/{id}/learning/complete
+- [x] 2.7 cargo test — wszystkie testy przechodzą
 
 #### Manual
 - [ ] 2.8 GET /auth/me zwraca display_name

@@ -8,6 +8,8 @@ pub struct User {
     pub id: Uuid,
     pub google_id: String,
     pub email: String,
+    pub display_name: Option<String>,
+    pub streak_days: i32,
     pub created_at: DateTime<Utc>,
 }
 
@@ -25,6 +27,8 @@ pub struct Collection {
     pub source_language: String,
     pub target_language: String,
     pub created_at: DateTime<Utc>,
+    pub last_studied: Option<DateTime<Utc>>,
+    pub progress: f32,
 }
 
 #[derive(Debug, Deserialize)]
@@ -33,6 +37,12 @@ pub struct CollectionRequest {
     pub description: String,
     pub source_language: String,
     pub target_language: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct LearningCompleteRequest {
+    pub cards_heard: i32,
+    pub total_cards: i32,
 }
 
 #[derive(Debug, Serialize, FromRow)]

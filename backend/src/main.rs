@@ -53,7 +53,8 @@ async fn main() -> std::io::Result<()> {
             .service(health)
             .service(
                 web::scope("/auth")
-                    .route("/login", web::post().to(handlers::auth::login)),
+                    .route("/login", web::post().to(handlers::auth::login))
+                    .route("/me", web::get().to(handlers::auth::me)),
             )
             .service(
                 web::scope("/collections")
@@ -63,7 +64,8 @@ async fn main() -> std::io::Result<()> {
                     .route("/{id}", web::delete().to(handlers::collections::delete))
                     .route("/{id}/flashcards", web::get().to(handlers::flashcards::list))
                     .route("/{id}/flashcards", web::post().to(handlers::flashcards::create))
-                    .route("/{id}/learning", web::get().to(handlers::learning::get_session)),
+                    .route("/{id}/learning", web::get().to(handlers::learning::get_session))
+                    .route("/{id}/learning/complete", web::post().to(handlers::collections::learning_complete)),
             )
             .service(
                 web::scope("/flashcards")
