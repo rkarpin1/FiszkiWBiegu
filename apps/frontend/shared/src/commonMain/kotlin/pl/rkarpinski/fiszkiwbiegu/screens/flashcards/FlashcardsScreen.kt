@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
@@ -144,11 +145,11 @@ fun FlashcardsScreenContent(
                     modifier = Modifier
                         .size(60.dp)
                         .clip(CircleShape)
-                        .background(scheme.onBackground)
+                        .background(scheme.inverseSurface.copy(alpha = 0.5f))
                         .clickable { actions.onAddCard() },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text("+", style = MaterialTheme.typography.titleLarge, color = scheme.background)
+                    Icon(Icons.Default.Add, contentDescription = "Dodaj", tint = scheme.inverseOnSurface)
                 }
             },
         ) { paddingValues ->

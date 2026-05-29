@@ -31,7 +31,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
-import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
 
 @Composable
@@ -42,7 +41,6 @@ fun ProfileScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     FiszkiThemedScreen(naturalDark = true) {
-        val c = LocalFiszkiColors.current
         val scheme = MaterialTheme.colorScheme
         Column(
             modifier = Modifier
@@ -75,7 +73,7 @@ fun ProfileScreen(
                         .size(88.dp)
                         .clip(CircleShape)
                         .background(
-                            Brush.linearGradient(listOf(scheme.primary, c.accentSoft)),
+                            Brush.linearGradient(listOf(scheme.primary, scheme.secondary)),
                         ),
                     contentAlignment = Alignment.Center,
                 ) {

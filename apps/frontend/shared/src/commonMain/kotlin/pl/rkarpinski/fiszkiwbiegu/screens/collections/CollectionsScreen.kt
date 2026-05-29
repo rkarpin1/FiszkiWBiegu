@@ -98,11 +98,11 @@ fun CollectionsScreenContent(
                     modifier = Modifier
                         .size(60.dp)
                         .clip(CircleShape)
-                        .background(scheme.onBackground)
+                        .background(scheme.inverseSurface.copy(alpha = 0.5f))
                         .clickable { onAddClick() },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Dodaj", tint = scheme.background)
+                    Icon(Icons.Default.Add, contentDescription = "Dodaj", tint = scheme.inverseOnSurface)
                 }
             },
         ) { paddingValues ->

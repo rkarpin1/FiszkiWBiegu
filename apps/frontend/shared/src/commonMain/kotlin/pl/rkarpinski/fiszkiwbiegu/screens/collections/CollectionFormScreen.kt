@@ -138,7 +138,7 @@ fun CollectionFormContent(
                 Text(
                     text = if (isEdit) "Edytuj kolekcję" else "Nowa kolekcja",
                     style = MaterialTheme.typography.titleMedium,
-                    color = scheme.onBackground,
+                    color = scheme.onSurface,
                 )
                 Spacer(Modifier.weight(1f))
                 if (isEdit) {
@@ -154,7 +154,7 @@ fun CollectionFormContent(
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = "Usuń",
-                            tint = scheme.primary,
+                            tint = scheme.error,
                             modifier = Modifier.size(20.dp),
                         )
                     }
@@ -277,7 +277,7 @@ fun CollectionFormContent(
                             .background(c.accentSoft),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Icon(Icons.Default.Delete, contentDescription = null, tint = scheme.primary)
+                        Icon(Icons.Default.Delete, contentDescription = null, tint = scheme.error)
                     }
                     Spacer(Modifier.height(12.dp))
                     Text(
@@ -308,9 +308,9 @@ fun CollectionFormContent(
                                 collection?.let { actions.onDelete(it.id) }
                             },
                             modifier = Modifier.weight(1.2f),
-                            colors = ButtonDefaults.buttonColors(containerColor = scheme.primary),
+                            colors = ButtonDefaults.buttonColors(containerColor = scheme.error),
                         ) {
-                            Text("Usuń kolekcję", color = scheme.onPrimary)
+                            Text("Usuń kolekcję", color = scheme.onError)
                         }
                     }
                     Spacer(Modifier.height(16.dp))

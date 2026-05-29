@@ -33,7 +33,6 @@ fun LoginScreen(
     onSignInClick: () -> Unit,
 ) {
     FiszkiThemedScreen(naturalDark = true) {
-        val c = LocalFiszkiColors.current
         val scheme = MaterialTheme.colorScheme
         Column(
             modifier = Modifier
@@ -72,7 +71,7 @@ fun LoginScreen(
             Spacer(Modifier.height(48.dp))
 
             // Hero copy
-            CapsLabel("// ZACZNIJ W 5 SEKUND", color = c.accentSoft)
+            CapsLabel("// ZACZNIJ W 5 SEKUND", color = scheme.secondary)
             Spacer(Modifier.height(12.dp))
             Text(
                 "Wejdź\ni ruszaj.",

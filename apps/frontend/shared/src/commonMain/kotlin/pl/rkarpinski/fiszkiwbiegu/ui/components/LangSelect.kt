@@ -54,7 +54,7 @@ fun LangSelect(
         Text(
             LanguageNames[code] ?: code,
             style = MaterialTheme.typography.bodyLarge,
-            color = scheme.onBackground,
+            color = scheme.onSurface,
             modifier = Modifier.weight(1f),
         )
         Icon(
@@ -84,7 +84,7 @@ fun LangSelect(
                     Text(
                         langName,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = scheme.onBackground,
+                        color = scheme.onSurface,
                         modifier = Modifier.weight(1f),
                     )
                     if (langCode == code) {

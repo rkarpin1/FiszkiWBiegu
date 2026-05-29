@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -43,7 +44,7 @@ import pl.rkarpinski.fiszkiwbiegu.screens.login.LoginScreen
 import pl.rkarpinski.fiszkiwbiegu.screens.profile.ProfileScreen
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiAppTheme
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
-import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
+
 
 private sealed interface Route {
     data object Login : Route
@@ -81,12 +82,11 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
 
     FiszkiAppTheme(override = null) {
         FiszkiThemedScreen(naturalDark = true) {
-            val c = LocalFiszkiColors.current
             val currentRoute = backStack.lastOrNull()
             val showTabBar = currentRoute is Route.Collections || currentRoute is Route.Profile
 
             Scaffold(
-                containerColor = c.surface,
+                containerColor = MaterialTheme.colorScheme.background,
                 bottomBar = {
                     if (showTabBar) {
                         AppBottomBar(
@@ -205,8 +205,7 @@ private fun AppBottomBar(
     onCollections: () -> Unit,
     onProfile: () -> Unit,
 ) {
-    val c = LocalFiszkiColors.current
-    NavigationBar(containerColor = c.surface2) {
+    NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
         NavigationBarItem(
             selected = current is Route.Collections,
             onClick = onCollections,

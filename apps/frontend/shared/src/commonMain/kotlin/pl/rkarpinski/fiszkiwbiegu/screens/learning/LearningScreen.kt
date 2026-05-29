@@ -179,7 +179,7 @@ fun LearningContent(
                     },
                     fontFamily = mono(),
                     style = MaterialTheme.typography.labelLarge,
-                    color = c.accentSoft,
+                    color = scheme.secondary,
                 )
 
                 Spacer(Modifier.height(12.dp))
@@ -208,7 +208,7 @@ fun LearningContent(
                             LearningPhase.SPEAKING_SOURCE -> CardStageData(
                                 card.sourceText,
                                 MaterialTheme.typography.headlineLarge,
-                                scheme.onBackground,
+                                scheme.onSurface,
                             )
 
                             else ->
@@ -224,7 +224,7 @@ fun LearningContent(
                             LearningPhase.SPEAKING_TARGET -> CardStageData(
                                 card.targetText,
                                 MaterialTheme.typography.headlineLarge,
-                                scheme.onBackground
+                                scheme.onSurface,
                             )
 
                             LearningPhase.REPEATING -> CardStageData(

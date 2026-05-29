@@ -181,7 +181,7 @@ fun CardFormContent(
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = "Usuń",
-                            tint = scheme.primary,
+                            tint = scheme.error,
                             modifier = Modifier.size(20.dp),
                         )
                     }

@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,9 +31,9 @@ fun StudyChip(label: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .height(32.dp)
-            .clip(RoundedCornerShape(10.dp))
+            .clip(MaterialTheme.shapes.small)
             .background(scheme.surface)
-            .border(1.dp, scheme.outlineVariant, RoundedCornerShape(10.dp))
+            .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.small)
             .padding(horizontal = 12.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -41,7 +41,7 @@ fun StudyChip(label: String, modifier: Modifier = Modifier) {
             label,
             style = MaterialTheme.typography.labelSmall.copy(
                 fontFamily = mono(),
-                color      = scheme.onBackground,
+                color      = scheme.onSurface,
             ),
         )
     }
@@ -70,7 +70,7 @@ fun TrackBar(
                 Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .clip(RoundedCornerShape(3.dp))
+                    .clip(MaterialTheme.shapes.extraSmall)
                     .background(if (filled) accent else scheme.outlineVariant)
             )
         }
