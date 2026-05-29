@@ -4,7 +4,7 @@ services:
     runtime: rust
     region: frankfurt
     plan: starter
-    rootDir: backend
+    rootDir: apps/backend
     buildCommand: cargo build --release
     startCommand: ./target/release/fiszki-w-biegu
     healthCheckPath: /health

@@ -11,7 +11,7 @@
 
 ## Nigdy nie twórz pliku .env.example w repozytorium
 
-- **Context**: Każdy moduł projektu (backend/, frontend/) — pliki konfiguracji środowiskowej
+- **Context**: Każdy moduł projektu (apps/backend/, apps/frontend/) — pliki konfiguracji środowiskowej
 - **Problem**: Plik .env.example może przypadkowo zawierać prawdziwe sekrety lub ich fragmenty; wprowadza też zamieszanie co do tego, gdzie dokumentować zmienne środowiskowe i skłania do kopiowania go jako .env z błędnymi wartościami.
 - **Rule**: Nigdy nie twórz pliku .env.example w repozytorium. Wymagane zmienne środowiskowe dokumentuj w render.yaml (jako `sync: false`) lub w README. Sekretów nie przechowuj nigdzie w repozytorium.
 - **Applies to**: `implement`, `impl-review`

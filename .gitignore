@@ -3,22 +3,22 @@
 .tmp/**
 
 # Rust
-backend/target/
+apps/backend/target/
 
 # Kotlin / Android / Gradle
-frontend/.gradle/
-frontend/build/
-frontend/androidApp/build/
-frontend/webApp/build/
-frontend/shared/build/
-frontend/iosApp/Pods/
+apps/frontend/.gradle/
+apps/frontend/build/
+apps/frontend/androidApp/build/
+apps/frontend/webApp/build/
+apps/frontend/shared/build/
+apps/frontend/iosApp/Pods/
 *.class
 *.jar
 *.aar
 
 # Environment
 .env
-backend/.env
+apps/backend/.env
 
 # OS
 .DS_Store

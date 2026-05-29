@@ -131,10 +131,10 @@ Fundamenty poniżej zakładają, że te elementy są obecne i NIE tworzą ich po
 **Wynik:** moduł shared kompiluje się z nową paletą i typografią; stare ekrany nadal działają (bez reskinowania).
 
 Zakres:
-1. Skopiuj `theme/Color.kt`, `theme/Theme.kt`, `theme/Type.kt` → `frontend/shared/src/commonMain/kotlin/pl/rkarpinski/fiszkiwbiegu/theme/`
-2. Pobierz fonty (Bricolage Grotesque: Regular/SemiBold/Bold; JetBrains Mono: Regular/Bold) z Google Fonts → `frontend/shared/src/commonMain/composeResources/font/`
-3. Skopiuj `ui/components/Flag.kt`, `Components.kt`, `MediaControls.kt` → `frontend/shared/src/commonMain/kotlin/pl/rkarpinski/fiszkiwbiegu/ui/components/`
-4. Zaktualizuj `frontend/shared/build.gradle.kts`: dodaj `compose.components.resources`, `material-icons-extended`
+1. Skopiuj `theme/Color.kt`, `theme/Theme.kt`, `theme/Type.kt` → `apps/frontend/shared/src/commonMain/kotlin/pl/rkarpinski/fiszkiwbiegu/theme/`
+2. Pobierz fonty (Bricolage Grotesque: Regular/SemiBold/Bold; JetBrains Mono: Regular/Bold) z Google Fonts → `apps/frontend/shared/src/commonMain/composeResources/font/`
+3. Skopiuj `ui/components/Flag.kt`, `Components.kt`, `MediaControls.kt` → `apps/frontend/shared/src/commonMain/kotlin/pl/rkarpinski/fiszkiwbiegu/ui/components/`
+4. Zaktualizuj `apps/frontend/shared/build.gradle.kts`: dodaj `compose.components.resources`, `material-icons-extended`
 5. Weryfikacja: `./gradlew :shared:compileDebugKotlinAndroid` bez błędów
 
 #### S-04-B: Reskin istniejących ekranów
