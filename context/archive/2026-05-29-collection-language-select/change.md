@@ -1,10 +1,10 @@
 ---
 change_id: collection-language-select
 title: Wybór języka źródłowego i docelowego przy tworzeniu kolekcji
-status: impl_reviewed
+status: archived
 created: 2026-05-29
 updated: 2026-05-29
-archived_at: null
+archived_at: 2026-05-29T00:19:37Z
 ---
 
 ## Notes
