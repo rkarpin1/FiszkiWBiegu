@@ -175,7 +175,7 @@ fun FlashcardsScreenContent(
                                 Icon(
                                     Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = "Wróć",
-                                    tint = scheme.onBackground,
+                                    tint = scheme.onSurface,
                                     modifier = Modifier.size(20.dp),
                                 )
                             }
@@ -396,7 +396,7 @@ private fun StatTile(label: String, value: String, modifier: Modifier = Modifier
         Text(
             value,
             style = bigNumber().copy(fontSize = bigNumber().fontSize * 0.30f),
-            color = scheme.onBackground
+            color = scheme.onSurface
         )
     }
 }

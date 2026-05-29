@@ -136,7 +136,7 @@ fun CollectionsScreenContent(
                                         .padding(22.dp),
                                 ) {
                                     Column {
-                                        CapsLabel("DODAJ NOWĄ KOLEKCJĘ", color = scheme.onBackground)
+                                        CapsLabel("DODAJ NOWĄ KOLEKCJĘ", color = scheme.onSurface)
                                         Spacer(Modifier.height(6.dp))
                                         Text(
                                             "Zacznij od utworzenia nowej kolekcji",
@@ -330,7 +330,7 @@ private fun LastUsedHero(
         Spacer(Modifier.height(6.dp))
         Text(
             collection.name,
-            style = MaterialTheme.typography.headlineLarge.copy(color = scheme.onBackground),
+            style = MaterialTheme.typography.headlineLarge.copy(color = scheme.onSurface),
         )
 
         Spacer(Modifier.height(14.dp))

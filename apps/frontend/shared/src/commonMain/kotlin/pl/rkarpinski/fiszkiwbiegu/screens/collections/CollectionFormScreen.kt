@@ -130,7 +130,7 @@ fun CollectionFormContent(
                     Icon(
                         if (isEdit) Icons.AutoMirrored.Filled.ArrowBack else Icons.Default.Close,
                         contentDescription = "Wróć",
-                        tint = scheme.onBackground,
+                        tint = scheme.onSurface,
                         modifier = Modifier.size(20.dp),
                     )
                 }
@@ -274,10 +274,10 @@ fun CollectionFormContent(
                         modifier = Modifier
                             .size(44.dp)
                             .clip(MaterialTheme.shapes.large)
-                            .background(c.accentSoft),
+                            .background(scheme.errorContainer),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Icon(Icons.Default.Delete, contentDescription = null, tint = scheme.error)
+                        Icon(Icons.Default.Delete, contentDescription = null, tint = scheme.onErrorContainer)
                     }
                     Spacer(Modifier.height(12.dp))
                     Text(

@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
@@ -45,7 +44,7 @@ fun CtrlButton(
         Icon(
             imageVector      = icon,
             contentDescription = null,
-            tint             = if (primary) Color.White else scheme.onBackground,
+            tint             = if (primary) scheme.onPrimary else scheme.onSurface,
             modifier         = Modifier.size(if (primary) 30.dp else 22.dp),
         )
     }

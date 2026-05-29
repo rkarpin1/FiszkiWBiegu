@@ -119,7 +119,7 @@ fun LearningContent(
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Wróć",
-                        tint = scheme.onBackground,
+                        tint = scheme.onSurface,
                         modifier = Modifier.size(20.dp),
                     )
                 }

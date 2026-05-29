@@ -26,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
@@ -81,7 +80,7 @@ fun ProfileScreen(
                         initial,
                         style = MaterialTheme.typography.displaySmall.copy(
                             fontWeight = FontWeight.Bold,
-                            color = Color.White,
+                            color = scheme.onPrimary,
                         ),
                     )
                 }
@@ -119,7 +118,7 @@ fun ProfileScreen(
                     ) {
                         Text(
                             "G",
-                            style = MaterialTheme.typography.labelSmall.copy(color = Color.White),
+                            style = MaterialTheme.typography.labelSmall.copy(color = scheme.onPrimary),
                         )
                     }
                     Spacer(Modifier.width(6.dp))

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -157,7 +156,7 @@ fun CardFormContent(
                     Icon(
                         if (isEdit) Icons.AutoMirrored.Filled.ArrowBack else Icons.Default.Close,
                         contentDescription = "Wróć",
-                        tint = scheme.onBackground,
+                        tint = scheme.onSurface,
                         modifier = Modifier.size(20.dp),
                     )
                 }
