@@ -41,30 +41,52 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
 import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
 import pl.rkarpinski.fiszkiwbiegu.ui.components.LangSelect
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CollectionFormScreen(
-    collectionId: String? = null,
-    collectionName: String = "",
-    collectionDescription: String = "",
-    sourceLanguage: String = "pl",
-    targetLanguage: String = "en",
+    collection: CollectionDto? = null,
     viewModel: CollectionsViewModel = koinViewModel(),
     onBack: () -> Unit,
 ) {
-    val isEdit = collectionId != null
-    var name by remember { mutableStateOf(collectionName) }
-    var description by remember { mutableStateOf(collectionDescription) }
-    var sourceLang by remember { mutableStateOf(sourceLanguage) }
-    var targetLang by remember { mutableStateOf(targetLanguage) }
+    CollectionFormContent(
+        collection = collection,
+        onBack = onBack,
+        onSave = { dto ->
+            if (collection != null) {
+                viewModel.updateCollection(dto.copy(id = collection.id))
+            } else {
+                viewModel.createCollection(dto)
+            }
+            onBack()
+        },
+        onDelete = { id ->
+            viewModel.deleteCollection(id)
+            onBack()
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CollectionFormContent(
+    collection: CollectionDto? = null,
+    onBack: () -> Unit,
+    onSave: (CollectionDto) -> Unit,
+    onDelete: (id: String) -> Unit = {},
+) {
+    val isEdit = collection != null
+    var draft by remember {
+        mutableStateOf(collection ?: CollectionDto(id = "", userId = "", name = "", description = "", sourceLanguage = "pl", targetLanguage = "en", createdAt = ""))
+    }
     var showDeleteSheet by remember { mutableStateOf(false) }
-    val isValid = name.isNotBlank() && sourceLang != targetLang
+    val isValid = draft.name.isNotBlank() && draft.sourceLanguage != draft.targetLanguage
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
@@ -141,8 +163,8 @@ fun CollectionFormScreen(
                 CapsLabel("NAZWA")
                 Spacer(Modifier.height(6.dp))
                 OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
+                    value = draft.name,
+                    onValueChange = { draft = draft.copy(name = it) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -150,26 +172,26 @@ fun CollectionFormScreen(
                 CapsLabel("OPIS")
                 Spacer(Modifier.height(6.dp))
                 OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
+                    value = draft.description,
+                    onValueChange = { draft = draft.copy(description = it) },
                     minLines = 3,
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text("Krótka podpowiedź, np. tematyka albo poziom.", color = c.mute) },
                 )
                 Spacer(Modifier.height(16.dp))
-                CapsLabel("J. OJCZYSTY")
+                CapsLabel("JĘZYK OJCZYSTY")
                 Spacer(Modifier.height(6.dp))
                 LangSelect(
-                    code = sourceLang,
-                    onSelect = { sourceLang = it },
+                    code = draft.sourceLanguage,
+                    onSelect = { draft = draft.copy(sourceLanguage = it) },
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(Modifier.height(16.dp))
-                CapsLabel("J. DO NAUKI")
+                CapsLabel("JĘZYK DO NAUKI")
                 Spacer(Modifier.height(6.dp))
                 LangSelect(
-                    code = targetLang,
-                    onSelect = { targetLang = it },
+                    code = draft.targetLanguage,
+                    onSelect = { draft = draft.copy(targetLanguage = it) },
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(Modifier.height(16.dp))
@@ -189,9 +211,7 @@ fun CollectionFormScreen(
                         .background(if (isValid) c.accent else c.surface3)
                         .then(
                             if (isValid) Modifier.clickable {
-                                if (isEdit) viewModel.updateCollection(collectionId!!, name.trim(), description.trim(), sourceLang, targetLang)
-                                else viewModel.createCollection(name.trim(), description.trim(), sourceLang, targetLang)
-                                onBack()
+                                onSave(draft.copy(name = draft.name.trim(), description = draft.description.trim()))
                             } else Modifier,
                         ),
                     contentAlignment = Alignment.Center,
@@ -236,7 +256,7 @@ fun CollectionFormScreen(
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        "\"$collectionName\" zostanie trwale usunięta. Tej akcji nie można cofnąć.",
+                        "\"${collection?.name}\" zostanie trwale usunięta. Tej akcji nie można cofnąć.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = c.mute,
                     )
@@ -254,10 +274,7 @@ fun CollectionFormScreen(
                         Button(
                             onClick = {
                                 showDeleteSheet = false
-                                collectionId?.let { id ->
-                                    viewModel.deleteCollection(id)
-                                    onBack()
-                                }
+                                collection?.let { onDelete(it.id) }
                             },
                             modifier = Modifier.weight(1.2f),
                             colors = ButtonDefaults.buttonColors(containerColor = c.accent),
@@ -270,4 +287,32 @@ fun CollectionFormScreen(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun CollectionFormNewPreview() {
+    CollectionFormContent(
+        onBack = {},
+        onSave = {}
+    )
+}
+
+@Preview
+@Composable
+fun CollectionFormEditPreview() {
+    CollectionFormContent(
+        collection = CollectionDto(
+            id = "123",
+            userId = "",
+            name = "Moja kolekcja",
+            description = "Opis kolekcji",
+            sourceLanguage = "pl",
+            targetLanguage = "en",
+            createdAt = "",
+        ),
+        onBack = {},
+        onSave = {},
+        onDelete = {}
+    )
 }

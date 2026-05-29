@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,13 +50,7 @@ private sealed interface Route {
     data class Flashcards(val collection: CollectionDto) : Route
     data class Learning(val collection: CollectionDto) : Route
     data object Profile : Route
-    data class CollectionForm(
-        val collectionId: String? = null,
-        val collectionName: String = "",
-        val collectionDescription: String = "",
-        val sourceLanguage: String = "pl",
-        val targetLanguage: String = "en",
-    ) : Route
+    data class CollectionForm(val collection: CollectionDto? = null) : Route
     data class CardForm(
         val collectionId: String,
         val collectionName: String,
@@ -146,31 +141,27 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
                         }
                         entry<Route.Flashcards> { route ->
                             val collectionsVm: CollectionsViewModel = koinViewModel()
+                            val collectionsState by collectionsVm.uiState.collectAsState()
+                            val collection = collectionsState.collections.find { it.id == route.collection.id }
+                                ?: route.collection
                             FlashcardsScreen(
-                                collection = route.collection,
+                                collection = collection,
                                 onBack = { backStack.removeLastOrNull() },
-                                onStartLearning = { backStack.add(Route.Learning(route.collection)) },
-                                onAddCard = { backStack.add(Route.CardForm(route.collection.id, route.collection.name)) },
-                                onEditCard = { flashcard -> backStack.add(Route.CardForm(route.collection.id, route.collection.name, flashcard)) },
+                                onStartLearning = { backStack.add(Route.Learning(collection)) },
+                                onAddCard = { backStack.add(Route.CardForm(collection.id, collection.name)) },
+                                onEditCard = { flashcard -> backStack.add(Route.CardForm(collection.id, collection.name, flashcard)) },
                                 onEditCollection = {
-                                    backStack.add(Route.CollectionForm(
-                                        route.collection.id, route.collection.name,
-                                        route.collection.description, route.collection.sourceLanguage, route.collection.targetLanguage,
-                                    ))
+                                    backStack.add(Route.CollectionForm(collection))
                                 },
                                 onDeleteCollection = {
-                                    collectionsVm.deleteCollection(route.collection.id)
+                                    collectionsVm.deleteCollection(collection.id)
                                     backStack.removeLastOrNull()
                                 },
                             )
                         }
                         entry<Route.CollectionForm> { route ->
                             CollectionFormScreen(
-                                collectionId = route.collectionId,
-                                collectionName = route.collectionName,
-                                collectionDescription = route.collectionDescription,
-                                sourceLanguage = route.sourceLanguage,
-                                targetLanguage = route.targetLanguage,
+                                collection = route.collection,
                                 onBack = { backStack.removeLastOrNull() },
                             )
                         }

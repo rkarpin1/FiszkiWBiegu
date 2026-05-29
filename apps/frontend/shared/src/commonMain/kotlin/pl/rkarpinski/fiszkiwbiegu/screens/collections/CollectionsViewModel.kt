@@ -41,9 +41,9 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
 
     fun hideAddDialog() = _uiState.update { it.copy(showAddDialog = false) }
 
-    fun createCollection(name: String, description: String, sourceLanguage: String, targetLanguage: String) {
+    fun createCollection(dto: CollectionDto) {
         viewModelScope.launch {
-            repo.create(name, description, sourceLanguage, targetLanguage).fold(
+            repo.create(dto).fold(
                 onSuccess = { loadCollections() },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
             )
@@ -66,9 +66,9 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
         }
     }
 
-    fun updateCollection(id: String, name: String, description: String, sourceLanguage: String, targetLanguage: String) {
+    fun updateCollection(dto: CollectionDto) {
         viewModelScope.launch {
-            repo.rename(id, name, description, sourceLanguage, targetLanguage).fold(
+            repo.rename(dto).fold(
                 onSuccess = { loadCollections() },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
             )
