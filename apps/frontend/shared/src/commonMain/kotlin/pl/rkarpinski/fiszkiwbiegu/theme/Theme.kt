@@ -1,12 +1,15 @@
 package pl.rkarpinski.fiszkiwbiegu.theme
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 
 /**
  * Semantyczne tokeny kolorów. Każdy ekran używa LocalFiszkiColors.current
@@ -85,21 +88,49 @@ fun FiszkiThemedScreen(
     val colors = if (effectiveDark) DarkColors else LightColors
     val scheme = if (effectiveDark) {
         darkColorScheme(
-            primary       = Ember,
-            onPrimary     = Color.White,
-            background    = Bg,
-            onBackground  = Cream,
-            surface       = Bg2,
-            onSurface     = Cream,
+            primary                = Ember,
+            onPrimary              = Color.White,
+            background             = Bg,
+            onBackground           = Cream,
+            surface                = Bg2,
+            onSurface              = Cream,
+            secondary              = Peach,
+            onSecondary            = Ink,
+            secondaryContainer     = Bg3,
+            onSecondaryContainer   = Cream,
+            tertiary               = Color(0xFF7B68EE),
+            onTertiary             = Color.White,
+            error                  = Color(0xFFCF6679),
+            onError                = Color.Black,
+            surfaceVariant         = Bg3,
+            onSurfaceVariant       = MuteD,
+            outline                = LineD,
+            outlineVariant         = LineD,
+            inverseSurface         = Cream,
+            inverseOnSurface       = Ink,
         )
     } else {
         lightColorScheme(
-            primary       = Ember,
-            onPrimary     = Color.White,
-            background    = Cream,
-            onBackground  = Ink,
-            surface       = Color.White,
-            onSurface     = Ink,
+            primary                = Ember,
+            onPrimary              = Color.White,
+            background             = Cream,
+            onBackground           = Ink,
+            surface                = Color.White,
+            onSurface              = Ink,
+            secondary              = Ember2,
+            onSecondary            = Ink,
+            secondaryContainer     = Cream2,
+            onSecondaryContainer   = Ink,
+            tertiary               = Color(0xFF7B68EE),
+            onTertiary             = Color.White,
+            error                  = Color(0xFFB00020),
+            onError                = Color.White,
+            surfaceVariant         = Cream2,
+            onSurfaceVariant       = MuteL,
+            outline                = LineL,
+            outlineVariant         = LineL,
+            inverseSurface         = Bg,
+            inverseOnSurface       = Cream,
         )
     }
 
@@ -107,7 +138,14 @@ fun FiszkiThemedScreen(
         MaterialTheme(
             colorScheme = scheme,
             typography  = fiszkiTypography(),
-            content     = content,
+            shapes = Shapes(
+                extraSmall = RoundedCornerShape(4.dp),
+                small      = RoundedCornerShape(8.dp),
+                medium     = RoundedCornerShape(12.dp),
+                large      = RoundedCornerShape(18.dp),
+                extraLarge = RoundedCornerShape(28.dp),
+            ),
+            content = content,
         )
     }
 }

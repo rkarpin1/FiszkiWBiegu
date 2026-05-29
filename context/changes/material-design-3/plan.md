@@ -199,12 +199,12 @@ Dla każdego ekranu ta sama zasada:
 
 #### Automatyczne
 
-- [ ] 1.1 `./gradlew :shared:compileDebugKotlinAndroid` bez błędów po rozszerzeniu ColorScheme i shapes
+- [x] 1.1 `./gradlew :shared:compileDebugKotlinAndroid` bez błędów po rozszerzeniu ColorScheme i shapes
 
 #### Ręczne
 
-- [ ] 1.2 Theme.kt zawiera kompletne ColorScheme (dark + light) z wszystkimi wymaganymi tokenami
-- [ ] 1.3 `MaterialTheme.shapes` zdefiniowany w FiszkiThemedScreen
+- [x] 1.2 Theme.kt zawiera kompletne ColorScheme (dark + light) z wszystkimi wymaganymi tokenami
+- [x] 1.3 `MaterialTheme.shapes` zdefiniowany w FiszkiThemedScreen
 
 ### Faza 2: Migracja komponentów
 
