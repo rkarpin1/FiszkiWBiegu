@@ -40,6 +40,7 @@ Biegacze tracą dziesiątki godzin miesięcznie, które mogłyby być poświęco
 | S-05   | ui-tweaks                  | lista kolekcji bez menu + subtitle "N fiszek · X dni temu"; edycja/usuń kolekcji w widoku szczegółów; formularze nie zasłaniane przez klawiaturę | S-04-D | — | done |
 | S-06   | rename-flashcard-fields    | przemianowanie pól fiszki: `polish_text`→`source_text`, `english_text`→`target_text` w DB, API i całym frontendzie | S-05 | — | done |
 | S-07   | frontend-improvements      | zmiany i optymalizacje w UI lub kodzie frontendu; realizowane etapami, zamknięte przez impl-review | S-06 | — | done |
+| S-08   | material-design-3          | kompatybilność aplikacji z Material Design 3 — przegląd i dostosowanie komponentów UI              | S-07 | — | planned |
 
 ## Strumienie
 
@@ -199,6 +200,18 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 - **Ryzyko:** —
 - **Status:** done
 
+### S-08: Kompatybilność z Material Design 3
+
+- **Wynik:** komponenty UI aplikacji zgodne z Material Design 3; przegląd i dostosowanie kolorów, typografii, kształtów i komponentów do specyfikacji MD3.
+- **ID zmiany:** material-design-3
+- **Odniesienia do PRD:** —
+- **Wymagania wstępne:** S-07
+- **Równolegle z:** —
+- **Blokady:** —
+- **Niewiadome:** zakres konkretnych niezgodności do ustalenia podczas przeglądu
+- **Ryzyko:** —
+- **Status:** planned
+
 ### S-07: Zmiany w kodzie frontend
 
 - **Wynik:** zmiany i optymalizacje w UI lub kodzie frontendu; każda zmiana realizowana etapem przez prompt i weryfikowana impl-review na końcu.
@@ -238,6 +251,7 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 | S-05             | ui-tweaks                           | Poprawki UI — menu, subtitle, klawiatura                      | done                  | Zrealizowane                                  |
 | S-06             | rename-flashcard-fields             | Przemianowanie pól fiszki: polish_text→source_text, english_text→target_text | done          | Zrealizowane                                  |
 | S-07             | frontend-improvements               | Zmiany i optymalizacje w UI lub kodzie frontendu                              | done          | Zrealizowane                                  |
+| S-08             | material-design-3                   | Kompatybilność aplikacji z Material Design 3                                  | nie           | Zakres do ustalenia podczas przeglądu         |
 
 ## Otwarte pytania dotyczące mapy drogowej
 
