@@ -65,7 +65,8 @@ class LearningService : MediaSessionService() {
         mediaSession = MediaSession.Builder(this, player).build()
     }
 
-    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession = mediaSession
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession =
+        mediaSession
 
     private fun initTts() {
         tts = TextToSpeech(this) { status -> ttsReady = status == TextToSpeech.SUCCESS }
@@ -84,6 +85,7 @@ class LearningService : MediaSessionService() {
                 ttsPlayer.setPlaying(true)
                 startPlayJob()
             }
+
             ACTION_PLAY -> resume()
             ACTION_PAUSE -> pause()
             ACTION_NEXT -> next()
@@ -112,28 +114,38 @@ class LearningService : MediaSessionService() {
 
     private suspend fun CoroutineScope.playLoop() {
         while (isActive && flashcards.isNotEmpty()) {
-            if (!isPlaying) { delay(200); continue }
+            if (!isPlaying) {
+                delay(200); continue
+            }
 
+            publishState(LearningPhase.IDLE)
             val card = flashcards[currentIndex]
-            publishState(LearningPhase.SPEAKING_POLISH)
+
+            publishState(LearningPhase.SPEAKING_SOURCE)
             ttsPlayer.updateCurrentItem(card.toMediaItem())
 
             speakAndWait(card.sourceText, Locale.forLanguageTag("pl-PL"))
             if (!isActive || !isPlaying) continue
 
+            publishState(LearningPhase.ANSWER)
             val timeForTargetText = speakAndWait(card.targetText, Locale.ENGLISH, 0f)
             if (!isActive || !isPlaying) continue
             delay(800)
             if (!isActive || !isPlaying) continue
 
-            publishState(LearningPhase.SPEAKING_ENGLISH)
             repeat(3) {
                 if (isActive && isPlaying) {
+                    publishState(LearningPhase.SPEAKING_TARGET)
                     speakAndWait(card.targetText, Locale.ENGLISH)
-                    if (isActive && isPlaying) delay(timeForTargetText + 500)
+                    if (isActive && isPlaying) {
+                        publishState(LearningPhase.REPEATING)
+                        delay(timeForTargetText + 500)
+                    }
                 }
             }
             if (!isActive || !isPlaying) continue
+
+            publishState(LearningPhase.IDLE)
             delay(1000)
             if (!isActive || !isPlaying) continue
 
@@ -146,13 +158,22 @@ class LearningService : MediaSessionService() {
             val id = UUID.randomUUID().toString()
             val startTime = LongArray(1)
             tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-                override fun onStart(utteranceId: String?) { startTime[0] = System.currentTimeMillis() }
+                override fun onStart(utteranceId: String?) {
+                    startTime[0] = System.currentTimeMillis()
+                }
+
                 override fun onDone(utteranceId: String?) {
                     if (cont.isActive) cont.resume(System.currentTimeMillis() - startTime[0])
                 }
+
                 @Suppress("OVERRIDE_DEPRECATION")
-                override fun onError(utteranceId: String?) { if (cont.isActive) cont.resume(0L) }
-                override fun onError(utteranceId: String?, errorCode: Int) { if (cont.isActive) cont.resume(0L) }
+                override fun onError(utteranceId: String?) {
+                    if (cont.isActive) cont.resume(0L)
+                }
+
+                override fun onError(utteranceId: String?, errorCode: Int) {
+                    if (cont.isActive) cont.resume(0L)
+                }
             })
             tts?.language = locale
             val params = Bundle().apply { putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, volume) }

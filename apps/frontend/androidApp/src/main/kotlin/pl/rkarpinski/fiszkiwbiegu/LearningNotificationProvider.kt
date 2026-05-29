@@ -36,7 +36,7 @@ class LearningNotificationProvider(private val context: Context) : MediaNotifica
     ): MediaNotification {
         val learningState = LearningService.state.value
         val card = learningState.flashcards.getOrNull(learningState.currentIndex)
-        val isEnglish = learningState.phase == LearningPhase.SPEAKING_ENGLISH
+        val isEnglish = learningState.phase == LearningPhase.SPEAKING_TARGET
 
         val views = RemoteViews(context.packageName, R.layout.notification_learning).apply {
             setTextViewText(R.id.notification_title, card?.sourceText ?: "")
@@ -84,7 +84,7 @@ class LearningNotificationProvider(private val context: Context) : MediaNotifica
     fun buildForegroundNotification(): android.app.Notification {
         val learningState = LearningService.state.value
         val card = learningState.flashcards.getOrNull(learningState.currentIndex)
-        val isEnglish = learningState.phase == LearningPhase.SPEAKING_ENGLISH
+        val isEnglish = learningState.phase == LearningPhase.SPEAKING_TARGET
         val views = RemoteViews(context.packageName, R.layout.notification_learning).apply {
             setTextViewText(R.id.notification_title, card?.sourceText ?: "")
             setTextViewText(R.id.notification_subtitle, card?.targetText ?: "")

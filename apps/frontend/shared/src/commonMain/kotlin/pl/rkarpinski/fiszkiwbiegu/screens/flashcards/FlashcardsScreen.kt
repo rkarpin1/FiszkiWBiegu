@@ -26,6 +26,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -224,12 +225,12 @@ fun FlashcardsScreenContent(
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                "${collection.sourceLanguage.uppercase()} → ${collection.targetLanguage.uppercase()}",
+                                collection.description,
                                 style = MaterialTheme.typography.bodyMedium.copy(fontFamily = mono()),
                                 color = c.mute,
                             )
                         }
-                        Spacer(Modifier.height(20.dp))
+                        Spacer(Modifier.height(24.dp))
                     }
 
                     // Stats row
@@ -293,8 +294,12 @@ fun FlashcardsScreenContent(
                                     color = c.mute,
                                 )
                             }
+
                         }
+
                         Spacer(Modifier.height(20.dp))
+                        HorizontalDivider()
+
                     }
 
                     // Language pair
@@ -302,32 +307,30 @@ fun FlashcardsScreenContent(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 22.dp),
+                                .padding(horizontal = 22.dp)
+                                .padding(top=16.dp)
+                            ,
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            Flag(collection.sourceLanguage, 26.dp)
+                            Spacer(Modifier.weight(1f))
+                            Flag(collection.sourceLanguage, 16.dp)
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowForward,
                                 contentDescription = null,
                                 tint = c.mute,
                                 modifier = Modifier.size(16.dp),
                             )
-                            Flag(collection.targetLanguage, 26.dp)
+                            Flag(collection.targetLanguage, 16.dp)
                             Spacer(Modifier.width(8.dp))
                             CapsLabel(
                                 "${LanguageNames[collection.sourceLanguage]?.uppercase() ?: collection.sourceLanguage.uppercase()} → ${LanguageNames[collection.targetLanguage]?.uppercase() ?: collection.targetLanguage.uppercase()}"
                             )
+                            Spacer(Modifier.weight(1f))
                         }
-                        Spacer(Modifier.height(16.dp))
+                        Spacer(Modifier.height(12.dp))
                     }
 
-                    // Flashcards header
-                    item {
-                        Box(modifier = Modifier.padding(horizontal = 22.dp, vertical = 6.dp)) {
-                            CapsLabel("FISZKI · ${uiState.flashcards.size}")
-                        }
-                    }
 
                     // Flashcard items
                     if (uiState.isLoading) {
@@ -390,7 +393,7 @@ private fun StatTile(label: String, value: String, modifier: Modifier = Modifier
         Spacer(Modifier.height(4.dp))
         Text(
             value,
-            style = bigNumber().copy(fontSize = bigNumber().fontSize * 0.45f),
+            style = bigNumber().copy(fontSize = bigNumber().fontSize * 0.30f),
             color = c.text
         )
     }

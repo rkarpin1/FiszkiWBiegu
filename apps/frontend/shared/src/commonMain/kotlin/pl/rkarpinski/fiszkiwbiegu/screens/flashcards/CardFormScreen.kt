@@ -218,7 +218,7 @@ fun CardFormContent(
                 Spacer(Modifier.height(16.dp))
                 Column {
                     Text(
-                        text = if (isEdit) "Zmień co\nchcesz." else "Para słów.\nPolski i angielski.",
+                        text = if (isEdit) "Zmień co\nchcesz" else "Wpisz czego\nchcesz się nauczyć",
                         style = MaterialTheme.typography.headlineLarge,
                         color = c.text,
                     )

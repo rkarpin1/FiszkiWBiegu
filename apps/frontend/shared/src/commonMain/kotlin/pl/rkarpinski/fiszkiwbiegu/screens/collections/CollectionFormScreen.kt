@@ -173,7 +173,7 @@ fun CollectionFormContent(
             ) {
                 Column {
                     Text(
-                        text = if (isEdit) "Co\nzmieniamy?" else "Co dziś\ndo worka?",
+                        text = if (isEdit) "Co\nzmieniamy?" else "Co dziś\ndo nauki?",
                         style = MaterialTheme.typography.displayMedium,
                         color = c.text,
                     )

@@ -3,7 +3,7 @@ package pl.rkarpinski.fiszkiwbiegu.screens.learning
 import kotlinx.coroutines.flow.StateFlow
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 
-enum class LearningPhase { IDLE, SPEAKING_POLISH, SPEAKING_ENGLISH }
+enum class LearningPhase { IDLE, SPEAKING_SOURCE, ANSWER, SPEAKING_TARGET, REPEATING }
 
 data class LearningState(
     val isActive: Boolean = false,

@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import kotlin.time.Clock
 import kotlin.time.Instant
 import org.koin.compose.viewmodel.koinViewModel
@@ -55,6 +56,25 @@ fun CollectionsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    CollectionsScreenContent(
+        uiState = uiState,
+        onCollectionClick = onCollectionClick,
+        onAddClick = onAddClick,
+        onConfirmDelete = { viewModel.confirmDelete() },
+        onCancelDelete = { viewModel.cancelDelete() },
+        onRetry = { viewModel.loadCollections() },
+    )
+}
+
+@Composable
+fun CollectionsScreenContent(
+    uiState: CollectionsUiState,
+    onCollectionClick: (CollectionDto) -> Unit,
+    onAddClick: () -> Unit,
+    onConfirmDelete: () -> Unit,
+    onCancelDelete: () -> Unit,
+    onRetry: () -> Unit,
+) {
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
 
@@ -62,8 +82,8 @@ fun CollectionsScreen(
             val name = uiState.collections.find { it.id == id }?.name.orEmpty()
             DeleteConfirmationDialog(
                 name = name,
-                onConfirm = { viewModel.confirmDelete() },
-                onDismiss = { viewModel.cancelDelete() },
+                onConfirm = onConfirmDelete,
+                onDismiss = onCancelDelete,
             )
         }
 
@@ -107,11 +127,11 @@ fun CollectionsScreen(
                                         .padding(22.dp),
                                 ) {
                                     Column {
-                                        CapsLabel("WYBIERZ KOLEKCJĘ")
+                                        CapsLabel("DODAJ NOWĄ KOLEKCJĘ", color = c.text)
                                         Spacer(Modifier.height(6.dp))
                                         Text(
-                                            "Zacznij od wybrania kolekcji.",
-                                            style = MaterialTheme.typography.bodyMedium,
+                                            "Zacznij od utworzenia nowej kolekcji",
+                                            style = MaterialTheme.typography.bodySmall,
                                             color = c.mute,
                                         )
                                     }
@@ -164,7 +184,7 @@ fun CollectionsScreen(
                     Snackbar(
                         modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
                         action = {
-                            TextButton(onClick = { viewModel.loadCollections() }) { Text("Ponów") }
+                            TextButton(onClick = onRetry) { Text("Ponów") }
                         },
                     ) { Text(err) }
                 }
@@ -272,3 +292,80 @@ private fun DeleteConfirmationDialog(
         },
     )
 }
+
+@Preview
+@Composable
+fun CollectionsScreenPreview() {
+    val sampleCollections = listOf(
+        CollectionDto(
+            id = "1",
+            userId = "u1",
+            name = "Angielski - Podstawy",
+            description = "Najważniejsze zwroty",
+            sourceLanguage = "pl",
+            targetLanguage = "en",
+            createdAt = "2023-01-01",
+            lastStudied = "2023-10-25T10:00:00Z",
+            progress = 0.65f,
+            flashcardCount = 120
+        ),
+        CollectionDto(
+            id = "2",
+            userId = "u1",
+            name = "Niemiecki - Podróże",
+            description = "Słówka przydatne w podróży",
+            sourceLanguage = "pl",
+            targetLanguage = "de",
+            createdAt = "2023-02-15",
+            lastStudied = "2023-11-10T15:30:00Z",
+            progress = 0.3f,
+            flashcardCount = 50
+        ),
+        CollectionDto(
+            id = "3",
+            userId = "u1",
+            name = "Hiszpański - Jedzenie",
+            description = "W restauracji i sklepie",
+            sourceLanguage = "pl",
+            targetLanguage = "es",
+            createdAt = "2023-03-20",
+            lastStudied = null,
+            progress = 0.0f,
+            flashcardCount = 85
+        )
+    )
+
+    val uiState = CollectionsUiState(
+        collections = sampleCollections,
+        isLoading = false
+    )
+
+    CollectionsScreenContent(
+        uiState = uiState,
+        onCollectionClick = {},
+        onAddClick = {},
+        onConfirmDelete = {},
+        onCancelDelete = {},
+        onRetry = {}
+    )
+}
+
+@Preview
+@Composable
+fun CollectionsScreenPreview2() {
+    val sampleCollections = listOf<CollectionDto>()
+    val uiState = CollectionsUiState(
+        collections = sampleCollections,
+        isLoading = false
+    )
+
+    CollectionsScreenContent(
+        uiState = uiState,
+        onCollectionClick = {},
+        onAddClick = {},
+        onConfirmDelete = {},
+        onCancelDelete = {},
+        onRetry = {}
+    )
+}
+
