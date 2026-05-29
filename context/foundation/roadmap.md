@@ -37,6 +37,7 @@ Biegacze tracą dziesiątki godzin miesięcznie, które mogłyby być poświęco
 | S-04-B | ui-reskin-screens          | (faza B) 4 istniejące ekrany reskinowane; aplikacja wygląda jak projekt graficzny | S-04-A            | —                                                 | done     |
 | S-04-C | ui-reskin-new-screens      | (faza C) 3 nowe ekrany (stub dane) + nawigacja bottom-tab                         | S-04-B            | —                                                 | done     |
 | S-04-D | ui-reskin-backend-stubs    | (faza D) realne dane zamiast zaślepek: /me, lastStudied, progress, translate      | S-04-C            | —                                                 | done     |
+| S-05   | ui-tweaks                  | lista kolekcji bez menu + subtitle "N fiszek · X dni temu"; edycja/usuń kolekcji w widoku szczegółów; formularze nie zasłaniane przez klawiaturę | S-04-D | — | done |
 
 ## Strumienie
 
@@ -184,6 +185,18 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 | Apple Sign-In | button disabled + Toast "Wkrótce" | poza MVP |
 | Facebook Sign-In | button disabled + Toast "Wkrótce" | poza MVP |
 
+### S-05: Poprawki UI
+
+- **Wynik:** lista kolekcji bez menu MoreVert przy każdej pozycji; subtitle „N fiszek · X dni temu" widoczny pod nazwą kolekcji; edycja i usuwanie kolekcji dostępne z widoku szczegółów (MoreVert w top barze FlashcardsScreen); fiszki mają MoreVert zamiast TextButton; formularze kolekcji i fiszek nie są zasłaniane przez klawiaturę.
+- **ID zmiany:** ui-tweaks
+- **Odniesienia do PRD:** —
+- **Wymagania wstępne:** S-04-D
+- **Równolegle z:** —
+- **Blokady:** —
+- **Niewiadome:** —
+- **Ryzyko:** —
+- **Status:** done
+
 ## Przekazanie do backlogu
 
 | ID mapy drogowej | ID zmiany                           | Sugerowany tytuł problemu                                     | Gotowe do `/10x-plan` | Uwagi                                         |
@@ -196,6 +209,7 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 | S-04-B           | ui-reskin-screens                   | Reskin UI — faza B: reskin istniejących ekranów               | done                  | Zrealizowane                                  |
 | S-04-C           | ui-reskin-new-screens               | Reskin UI — faza C: nowe ekrany + nawigacja                   | done                  | Zrealizowane                                  |
 | S-04-D           | ui-reskin-backend-stubs             | Reskin UI — faza D: backend dla zaślepek                      | done                  | Zrealizowane                                  |
+| S-05             | ui-tweaks                           | Poprawki UI — menu, subtitle, klawiatura                      | done                  | Zrealizowane                                  |
 
 ## Otwarte pytania dotyczące mapy drogowej
 
@@ -225,3 +239,4 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 - **S-03: użytkownik instaluje APK, aplikacja łączy się z backendem na Render.com, Rafał przeprowadza pierwszą pełną sesję nauki podczas rzeczywistego biegu (30-60 min, ekran wyłączony, słuchawki Bluetooth)** — Zarchiwizowano 2026-05-27 → `context/archive/2026-05-27-s-03/`. Lekcja: —.
 - **S-04 (A+B+C): aplikacja wygląda jak projekt graficzny z `.tmp/UI` — paleta Dawn Run, czcionki Bricolage + JetBrains Mono, layout tor biegowy; CollectionFormScreen, CardFormScreen, ProfileScreen, nawigacja bottom-tab** — Zrealizowano 2026-05-29. Faza D (backend dla zaślepek) pozostaje w backlogu. Lekcja: —.
 - **S-04-D: (faza D) realne dane zamiast zaślepek: /me, lastStudied, progress, translate** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-reskin-backend-stubs/`. Lekcja: —.
+- **S-05: lista kolekcji bez menu + subtitle "N fiszek · X dni temu"; edycja/usuń kolekcji w widoku szczegółów; formularze nie zasłaniane przez klawiaturę** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-tweaks/`. Lekcja: —.
