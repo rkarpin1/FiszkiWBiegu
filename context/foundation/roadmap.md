@@ -36,7 +36,7 @@ Biegacze tracą dziesiątki godzin miesięcznie, które mogłyby być poświęco
 | S-04-A | ui-reskin-design-system    | (faza A) design system i komponenty wgrane, projekt kompiluje się z nową paletą   | S-03              | —                                                 | done     |
 | S-04-B | ui-reskin-screens          | (faza B) 4 istniejące ekrany reskinowane; aplikacja wygląda jak projekt graficzny | S-04-A            | —                                                 | done     |
 | S-04-C | ui-reskin-new-screens      | (faza C) 3 nowe ekrany (stub dane) + nawigacja bottom-tab                         | S-04-B            | —                                                 | done     |
-| S-04-D | ui-reskin-backend-stubs    | (faza D) realne dane zamiast zaślepek: /me, lastStudied, progress, translate      | S-04-C            | —                                                 | backlog  |
+| S-04-D | ui-reskin-backend-stubs    | (faza D) realne dane zamiast zaślepek: /me, lastStudied, progress, translate      | S-04-C            | —                                                 | done     |
 
 ## Strumienie
 
@@ -195,7 +195,7 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 | S-04-A           | ui-reskin-design-system             | Reskin UI — faza A: design system                             | done                  | Zrealizowane                                  |
 | S-04-B           | ui-reskin-screens                   | Reskin UI — faza B: reskin istniejących ekranów               | done                  | Zrealizowane                                  |
 | S-04-C           | ui-reskin-new-screens               | Reskin UI — faza C: nowe ekrany + nawigacja                   | done                  | Zrealizowane                                  |
-| S-04-D           | ui-reskin-backend-stubs             | Reskin UI — faza D: backend dla zaślepek                      | no                    | Czeka na S-04-C; każda zaślepka = osobny plan |
+| S-04-D           | ui-reskin-backend-stubs             | Reskin UI — faza D: backend dla zaślepek                      | done                  | Zrealizowane                                  |
 
 ## Otwarte pytania dotyczące mapy drogowej
 
@@ -224,3 +224,4 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 - **S-02: użytkownik może wybrać kolekcję, uruchomić tryb nauki i słyszeć fiszki przez TTS podczas biegu z ekranem wyłączonym, sterując przyciskami słuchawek (PLAY/PAUSE/NEXT/PREV), bez dostępu do internetu** — Zarchiwizowano 2026-05-27 → `context/archive/2026-05-27-s-02/`. Lekcja: —.
 - **S-03: użytkownik instaluje APK, aplikacja łączy się z backendem na Render.com, Rafał przeprowadza pierwszą pełną sesję nauki podczas rzeczywistego biegu (30-60 min, ekran wyłączony, słuchawki Bluetooth)** — Zarchiwizowano 2026-05-27 → `context/archive/2026-05-27-s-03/`. Lekcja: —.
 - **S-04 (A+B+C): aplikacja wygląda jak projekt graficzny z `.tmp/UI` — paleta Dawn Run, czcionki Bricolage + JetBrains Mono, layout tor biegowy; CollectionFormScreen, CardFormScreen, ProfileScreen, nawigacja bottom-tab** — Zrealizowano 2026-05-29. Faza D (backend dla zaślepek) pozostaje w backlogu. Lekcja: —.
+- **S-04-D: (faza D) realne dane zamiast zaślepek: /me, lastStudied, progress, translate** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-reskin-backend-stubs/`. Lekcja: —.
