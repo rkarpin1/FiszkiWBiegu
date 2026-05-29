@@ -33,6 +33,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +51,13 @@ import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
 import pl.rkarpinski.fiszkiwbiegu.ui.components.LangSelect
 
+@Stable
+interface CollectionFormActions {
+    fun onBack()
+    fun onSave(newCollection: CollectionDto)
+    fun onDelete(id: String) {}
+}
+
 @Composable
 fun CollectionFormScreen(
     collection: CollectionDto? = null,
@@ -60,16 +68,16 @@ fun CollectionFormScreen(
     CollectionFormContent(
         collection = collection,
         isSubmitting = uiState.isSubmitting,
-        onBack = onBack,
-        onSave = { dto ->
-            if (collection != null) {
-                viewModel.updateCollection(dto.copy(id = collection.id), onSuccess = onBack)
-            } else {
-                viewModel.createCollection(dto, onSuccess = onBack)
+        actions = object : CollectionFormActions {
+            override fun onBack() = onBack()
+            override fun onSave(newCollection: CollectionDto) {
+
+                if (collection != null)
+                    viewModel.updateCollection(newCollection, onSuccess = onBack)
+                else viewModel.createCollection(newCollection, onSuccess = onBack)
             }
-        },
-        onDelete = { id ->
-            viewModel.deleteCollection(id, onSuccess = onBack)
+
+            override fun onDelete(id: String) = viewModel.deleteCollection(id, onSuccess = onBack)
         }
     )
 }
@@ -79,9 +87,7 @@ fun CollectionFormScreen(
 fun CollectionFormContent(
     collection: CollectionDto? = null,
     isSubmitting: Boolean = false,
-    onBack: () -> Unit,
-    onSave: (CollectionDto) -> Unit,
-    onDelete: (id: String) -> Unit = {},
+    actions: CollectionFormActions,
 ) {
     val isEdit = collection != null
     var draft by remember(collection) {
@@ -98,7 +104,8 @@ fun CollectionFormContent(
         )
     }
     var showDeleteSheet by remember { mutableStateOf(false) }
-    val isValid = draft.name.isNotBlank() && draft.sourceLanguage != draft.targetLanguage && !isSubmitting
+    val isValid =
+        draft.name.isNotBlank() && draft.sourceLanguage != draft.targetLanguage && !isSubmitting
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
@@ -117,7 +124,7 @@ fun CollectionFormContent(
                         .clip(RoundedCornerShape(12.dp))
                         .background(c.surface2)
                         .border(1.dp, c.line, RoundedCornerShape(12.dp))
-                        .clickable(onClick = onBack),
+                        .clickable(onClick = actions::onBack),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -166,7 +173,7 @@ fun CollectionFormContent(
             ) {
                 Column {
                     Text(
-                        text = if (isEdit) "Co\nzmieniamy?" else "Co dziś\ndo worka?",
+                        text = if (isEdit) "Co\nzmieniamy?" else "Co dziś\ndo nauki?",
                         style = MaterialTheme.typography.displayMedium,
                         color = c.text,
                     )
@@ -211,48 +218,50 @@ fun CollectionFormContent(
                     onSelect = { draft = draft.copy(targetLanguage = it) },
                     modifier = Modifier.fillMaxWidth(),
                 )
-                Spacer(Modifier.height(16.dp))
-            }
 
-            // Sticky CTA
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 22.dp, vertical = 16.dp),
-            ) {
+                Spacer(Modifier.weight(1f))
+
+
+                // Sticky CTA
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp)
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(if (isValid) c.accent else c.surface3)
-                        .then(
-                            if (isValid) Modifier.clickable {
-                                onSave(
-                                    draft.copy(
-                                        name = draft.name.trim(),
-                                        description = draft.description.trim()
-                                    )
-                                )
-                            } else Modifier,
-                        ),
-                    contentAlignment = Alignment.Center,
+                        .padding(horizontal = 22.dp, vertical = 16.dp),
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .clip(RoundedCornerShape(18.dp))
+                            .background(if (isValid) c.accent else c.surface3)
+                            .then(
+                                if (isValid) Modifier.clickable {
+                                    actions.onSave(
+                                        draft.copy(
+                                            name = draft.name.trim(),
+                                            description = draft.description.trim()
+                                        )
+                                    )
+                                } else Modifier,
+                            ),
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Icon(
-                            Icons.Default.Check,
-                            contentDescription = null,
-                            tint = if (isValid) c.onAccent else c.mute2,
-                            modifier = Modifier.size(18.dp),
-                        )
-                        Text(
-                            text = if (isEdit) "Zapisz zmiany" else "Dodaj kolekcję",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = if (isValid) c.onAccent else c.mute2,
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Icon(
+                                Icons.Default.Check,
+                                contentDescription = null,
+                                tint = if (isValid) c.onAccent else c.mute2,
+                                modifier = Modifier.size(18.dp),
+                            )
+                            Text(
+                                text = if (isEdit) "Zapisz zmiany" else "Dodaj kolekcję",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = if (isValid) c.onAccent else c.mute2,
+                            )
+                        }
                     }
                 }
             }
@@ -296,7 +305,7 @@ fun CollectionFormContent(
                         Button(
                             onClick = {
                                 showDeleteSheet = false
-                                collection?.let { onDelete(it.id) }
+                                collection?.let { actions.onDelete(it.id) }
                             },
                             modifier = Modifier.weight(1.2f),
                             colors = ButtonDefaults.buttonColors(containerColor = c.accent),
@@ -311,13 +320,15 @@ fun CollectionFormContent(
     }
 }
 
+private object NoOpCollectionFormActions : CollectionFormActions {
+    override fun onBack() {}
+    override fun onSave(newCollection: CollectionDto) {}
+}
+
 @Preview
 @Composable
 fun CollectionFormNewPreview() {
-    CollectionFormContent(
-        onBack = {},
-        onSave = {}
-    )
+    CollectionFormContent(actions = NoOpCollectionFormActions)
 }
 
 @Preview
@@ -333,8 +344,6 @@ fun CollectionFormEditPreview() {
             targetLanguage = "en",
             createdAt = "",
         ),
-        onBack = {},
-        onSave = {},
-        onDelete = {}
+        actions = NoOpCollectionFormActions,
     )
 }

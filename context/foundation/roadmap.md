@@ -39,6 +39,7 @@ Biegacze tracą dziesiątki godzin miesięcznie, które mogłyby być poświęco
 | S-04-D | ui-reskin-backend-stubs    | (faza D) realne dane zamiast zaślepek: /me, lastStudied, progress, translate      | S-04-C            | —                                                 | done     |
 | S-05   | ui-tweaks                  | lista kolekcji bez menu + subtitle "N fiszek · X dni temu"; edycja/usuń kolekcji w widoku szczegółów; formularze nie zasłaniane przez klawiaturę | S-04-D | — | done |
 | S-06   | rename-flashcard-fields    | przemianowanie pól fiszki: `polish_text`→`source_text`, `english_text`→`target_text` w DB, API i całym frontendzie | S-05 | — | done |
+| S-07   | frontend-improvements      | zmiany i optymalizacje w UI lub kodzie frontendu; realizowane etapami, zamknięte przez impl-review | S-06 | — | in progress |
 
 ## Strumienie
 
@@ -198,6 +199,18 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 - **Ryzyko:** —
 - **Status:** done
 
+### S-07: Zmiany w kodzie frontend
+
+- **Wynik:** zmiany i optymalizacje w UI lub kodzie frontendu; każda zmiana realizowana etapem przez prompt i weryfikowana impl-review na końcu.
+- **ID zmiany:** frontend-improvements
+- **Odniesienia do PRD:** —
+- **Wymagania wstępne:** S-06
+- **Równolegle z:** —
+- **Blokady:** —
+- **Niewiadome:** zakres konkretnych zmian definiowany iteracyjnie przez prompty
+- **Ryzyko:** —
+- **Status:** in progress
+
 ### S-06: Przemianowanie pól fiszki
 
 - **Wynik:** kolumny DB `polish_text`/`english_text` przemianowane na `source_text`/`target_text`; odpowiednie zmiany w modelach Rust, zapytaniach SQL, serializacji JSON (backend i frontend) oraz wszystkich warstwach frontendu (Repository, ViewModel, ekrany, LearningService).
@@ -224,6 +237,7 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 | S-04-D           | ui-reskin-backend-stubs             | Reskin UI — faza D: backend dla zaślepek                      | done                  | Zrealizowane                                  |
 | S-05             | ui-tweaks                           | Poprawki UI — menu, subtitle, klawiatura                      | done                  | Zrealizowane                                  |
 | S-06             | rename-flashcard-fields             | Przemianowanie pól fiszki: polish_text→source_text, english_text→target_text | done          | Zrealizowane                                  |
+| S-07             | frontend-improvements               | Zmiany i optymalizacje w UI lub kodzie frontendu                              | nie           | Zakres definiowany iteracyjnie                |
 
 ## Otwarte pytania dotyczące mapy drogowej
 
@@ -256,4 +270,4 @@ _(brak aktywnych pytań — wszystkie zablokowane przez F-01/S-02 zostały rozwi
 - **S-04-C: (faza C) 3 nowe ekrany (stub dane) + nawigacja bottom-tab** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-reskin-new-screens/`. Lekcja: —.
 - **S-04-D: (faza D) realne dane zamiast zaślepek: /me, lastStudied, progress, translate** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-reskin-backend-stubs/`. Lekcja: —.
 - **S-05: lista kolekcji bez menu + subtitle "N fiszek · X dni temu"; edycja/usuń kolekcji w widoku szczegółów; formularze nie zasłaniane przez klawiaturę** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-tweaks/`. Lekcja: —.
-- **S-06: przemianowanie pól fiszki — `polish_text`→`source_text`, `english_text`→`target_text` w DB, API i całym frontendzie** — Zrealizowano 2026-05-29. Migracja `007_rename_flashcard_columns.sql` wymaga uruchomienia na środowisku produkcyjnym. Lekcja: —.
+- **S-06: przemianowanie pól fiszki — `polish_text`→`source_text`, `english_text`→`target_text` w DB, API i całym frontendzie** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-rename-flashcard-fields/`. Lekcja: —.

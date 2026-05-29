@@ -53,8 +53,7 @@ private sealed interface Route {
     data object Profile : Route
     data class CollectionForm(val collection: CollectionDto? = null) : Route
     data class CardForm(
-        val collectionId: String,
-        val collectionName: String,
+        val collection: CollectionDto,
         val flashcard: FlashcardDto? = null,
     ) : Route
 }
@@ -151,8 +150,8 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
                                 actions = object : FlashcardsActions {
                                     override fun onBack() { backStack.removeLastOrNull() }
                                     override fun onStartLearning() { backStack.add(Route.Learning(collection)) }
-                                    override fun onAddCard() { backStack.add(Route.CardForm(collection.id, collection.name)) }
-                                    override fun onEditCard(flashcard: FlashcardDto) { backStack.add(Route.CardForm(collection.id, collection.name, flashcard)) }
+                                    override fun onAddCard() { backStack.add(Route.CardForm(collection)) }
+                                    override fun onEditCard(flashcard: FlashcardDto) { backStack.add(Route.CardForm(collection, flashcard)) }
                                     override fun onEditCollection() { backStack.add(Route.CollectionForm(collection)) }
                                     override fun onDeleteCollection() {
                                         collectionsVm.deleteCollection(collection.id)
@@ -170,8 +169,7 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
                         }
                         entry<Route.CardForm> { route ->
                             CardFormScreen(
-                                collectionId = route.collectionId,
-                                collectionName = route.collectionName,
+                                collection = route.collection,
                                 flashcard = route.flashcard,
                                 onBack = { backStack.removeLastOrNull() },
                             )

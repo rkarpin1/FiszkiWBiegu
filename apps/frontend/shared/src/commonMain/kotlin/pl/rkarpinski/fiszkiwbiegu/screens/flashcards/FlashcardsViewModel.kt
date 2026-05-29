@@ -75,18 +75,18 @@ class FlashcardsViewModel(
         }
     }
 
-    fun createCard(sourceText: String, targetText: String) {
+    fun createCard(flashcard: FlashcardDto) {
         viewModelScope.launch {
-            repo.create(collectionId, sourceText, targetText).fold(
+            repo.create(collectionId, flashcard.sourceText, flashcard.targetText).fold(
                 onSuccess = { loadFlashcards() },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
             )
         }
     }
 
-    fun updateCard(id: String, sourceText: String, targetText: String) {
+    fun updateCard(flashcard: FlashcardDto) {
         viewModelScope.launch {
-            repo.update(id, sourceText, targetText).fold(
+            repo.update(flashcard.id, flashcard.sourceText, flashcard.targetText).fold(
                 onSuccess = { loadFlashcards() },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
             )

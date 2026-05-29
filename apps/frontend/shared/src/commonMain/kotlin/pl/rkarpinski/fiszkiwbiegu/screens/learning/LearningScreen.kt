@@ -13,11 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,17 +30,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
+import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
 import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.theme.mono
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
-import pl.rkarpinski.fiszkiwbiegu.ui.components.MediaControls
 
 @Composable
 fun LearningScreen(
@@ -54,8 +55,26 @@ fun LearningScreen(
     DisposableEffect(Unit) { onDispose { viewModel.stop() } }
 
     val state by viewModel.state.collectAsState()
-    val card = state.flashcards.getOrNull(state.currentIndex)
 
+    LearningContent(
+        collection = collection,
+        state = state,
+        onBack = { viewModel.stop(); onBack() },
+        onPlayPause = { if (state.isPlaying) viewModel.pause() else viewModel.play() },
+        onNext = viewModel::next,
+        onPrev = viewModel::previous,
+    )
+}
+
+@Composable
+fun LearningContent(
+    collection: CollectionDto,
+    state: LearningState,
+    onBack: () -> Unit,
+    onPlayPause: () -> Unit,
+    onNext: () -> Unit,
+    onPrev: () -> Unit,
+) {
     var elapsedSec by remember { mutableStateOf(0) }
     LaunchedEffect(state.isPlaying) {
         if (state.isPlaying) {
@@ -68,6 +87,8 @@ fun LearningScreen(
 
     var speed by remember { mutableStateOf(1.0f) }
     val speeds = listOf(0.75f to "0.75×", 1.0f to "1.0×", 1.25f to "1.25×", 1.5f to "1.5×")
+
+    val card = state.flashcards.getOrNull(state.currentIndex)
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
@@ -92,7 +113,7 @@ fun LearningScreen(
                         .clip(RoundedCornerShape(12.dp))
                         .background(c.surface2)
                         .border(1.dp, c.line, RoundedCornerShape(12.dp))
-                        .clickable { viewModel.stop(); onBack() },
+                        .clickable { onBack() },
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -122,18 +143,16 @@ fun LearningScreen(
                 style = MaterialTheme.typography.headlineLarge,
                 color = c.text,
             )
-            Spacer(Modifier.height(4.dp))
-            if (state.flashcards.isNotEmpty()) {
-                Text(
-                    text = "${
-                        (state.currentIndex + 1).toString().padStart(2, '0')
-                    } / ${state.flashcards.size}",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = mono()),
-                    color = c.mute,
-                )
-            }
+//            Spacer(Modifier.height(4.dp))
+//            if (state.flashcards.isNotEmpty()) {
+//                Text(
+//                    text = "${(state.currentIndex + 1)} / ${state.flashcards.size}",
+//                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = mono()),
+//                    color = c.mute,
+//                )
+//            }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
             // Card stage
             Column(
@@ -144,45 +163,126 @@ fun LearningScreen(
                     .background(c.surface2)
                     .border(1.dp, c.line, RoundedCornerShape(28.dp))
                     .padding(28.dp),
-                verticalArrangement = Arrangement.Center,
+
                 horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                if (card != null) {
-                    Text(
-                        text = card.targetText,
-                        style = MaterialTheme.typography.displayLarge,
-                        color = c.text,
-                        textAlign = TextAlign.Center,
+
+                ) {
+
+
+                Text(
+                    text = when (state.phase) {
+                        LearningPhase.SPEAKING_SOURCE -> "SŁUCHAJ"
+                        LearningPhase.SPEAKING_TARGET -> "SŁUCHAJ"
+                        LearningPhase.IDLE -> "UWAGA"
+                        LearningPhase.ANSWER -> "ODPOWIEDZ"
+                        LearningPhase.REPEATING -> "POWTÓRZ"
+                    },
+                    fontFamily = mono(),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = c.accentSoft,
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                Column(
+                    Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+
+                    data class CardStageData(
+                        val text: String,
+                        val style: TextStyle,
+                        val color: Color,
                     )
-                    Spacer(Modifier.height(16.dp))
-                    Box(Modifier.fillMaxWidth().height(1.dp).background(c.line))
-                    Spacer(Modifier.height(16.dp))
-                    Text(
-                        text = card.sourceText,
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = c.mute,
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    Text(
-                        text = when (state.phase) {
-                            LearningPhase.SPEAKING_POLISH -> "Wymawiam po polsku..."
-                            LearningPhase.SPEAKING_ENGLISH -> "Wymawiam po angielsku..."
-                            LearningPhase.IDLE -> ""
-                        },
-                        style = MaterialTheme.typography.labelSmall,
-                        color = c.accentSoft,
-                    )
+
+                    if (card != null) {
+
+                        val stageOnTop = when (state.phase) {
+                            LearningPhase.IDLE -> CardStageData(
+                                "",
+                                MaterialTheme.typography.headlineLarge,
+                                c.mute,
+                            )
+
+                            LearningPhase.SPEAKING_SOURCE -> CardStageData(
+                                card.sourceText,
+                                MaterialTheme.typography.headlineLarge,
+                                c.text,
+                            )
+
+                            else ->
+                                CardStageData(
+                                    card.sourceText,
+                                    MaterialTheme.typography.headlineLarge,
+                                    c.mute,
+                                )
+                        }
+
+                        val stageOnBottom = when (state.phase) {
+
+                            LearningPhase.SPEAKING_TARGET -> CardStageData(
+                                card.targetText,
+                                MaterialTheme.typography.headlineLarge,
+                                c.text
+                            )
+
+                            LearningPhase.REPEATING -> CardStageData(
+                                card.targetText,
+                                MaterialTheme.typography.headlineLarge,
+                                c.mute,
+                            )
+
+                            else ->
+                                CardStageData(
+                                    "",
+                                    MaterialTheme.typography.headlineLarge,
+                                    c.mute,
+                                )
+
+                        }
+
+                        Text(
+                            text = stageOnTop.text,
+                            style = stageOnTop.style,
+                            color = stageOnTop.color,
+                            textAlign = TextAlign.Center,
+                        )
+
+                        Spacer(Modifier.height(16.dp))
+
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .background(c.line)
+                        )
+
+                        Spacer(Modifier.height(16.dp))
+
+                        Text(
+                            text = stageOnBottom.text,
+                            style = stageOnBottom.style,
+                            color = stageOnBottom.color,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+
                 }
+
+                Spacer(Modifier.height(32.dp))
+
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
             // Speed chips
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                Spacer(Modifier.weight(1f))
+
                 speeds.forEach { (value, label) ->
                     val active = speed == value
                     Box(
@@ -204,22 +304,26 @@ fun LearningScreen(
                             color = if (active) c.onAccent else c.mute,
                         )
                     }
+
                 }
+
+                Spacer(Modifier.weight(1f))
+
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
-            // Media controls (centred)
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                MediaControls(
-                    isPlaying = state.isPlaying,
-                    onPrev = viewModel::previous,
-                    onPlayPause = { if (state.isPlaying) viewModel.pause() else viewModel.play() },
-                    onNext = viewModel::next,
-                )
-            }
+//            // Media controls (centred)
+//            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+//                MediaControls(
+//                    isPlaying = state.isPlaying,
+//                    onPrev = onPrev,
+//                    onPlayPause = onPlayPause,
+//                    onNext = onNext,
+//                )
+//            }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
             // Wiem / Nie wiem — disabled stubs
             Row(
@@ -253,4 +357,52 @@ fun LearningScreen(
             Spacer(Modifier.height(24.dp))
         }
     }
+}
+
+@Preview
+@Composable
+private fun LearningScreenPreview() {
+    val sampleCollection = CollectionDto(
+        id = "1",
+        userId = "u1",
+        name = "Angielski w podróży",
+        description = "Podstawowe zwroty",
+        sourceLanguage = "pl",
+        targetLanguage = "en",
+        createdAt = "2023-01-01",
+        flashcardCount = 10
+    )
+
+    val sampleFlashcards = listOf(
+        FlashcardDto(
+            id = "c1",
+            collectionId = "1",
+            sourceText = "Dzień dobry",
+            targetText = "Good morning",
+            position = 1,
+            createdAt = "2023-01-01"
+        ),
+        FlashcardDto(
+            id = "c2",
+            collectionId = "1",
+            sourceText = "Dziękuję",
+            targetText = "Thank you",
+            position = 2,
+            createdAt = "2023-01-01"
+        )
+    )
+
+    LearningContent(
+        collection = sampleCollection,
+        state = LearningState(
+            isPlaying = true,
+            flashcards = sampleFlashcards,
+            currentIndex = 0,
+            phase = LearningPhase.SPEAKING_TARGET
+        ),
+        onBack = {},
+        onPlayPause = {},
+        onNext = {},
+        onPrev = {}
+    )
 }

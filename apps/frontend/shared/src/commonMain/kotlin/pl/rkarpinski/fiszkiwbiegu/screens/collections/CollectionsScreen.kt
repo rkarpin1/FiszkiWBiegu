@@ -19,8 +19,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -35,7 +37,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import kotlin.time.Clock
 import kotlin.time.Instant
 import org.koin.compose.viewmodel.koinViewModel
@@ -43,8 +47,11 @@ import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
 import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.theme.accentColorForId
+import pl.rkarpinski.fiszkiwbiegu.theme.capsMono
 import pl.rkarpinski.fiszkiwbiegu.theme.mono
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
+import pl.rkarpinski.fiszkiwbiegu.ui.components.Flag
+import pl.rkarpinski.fiszkiwbiegu.ui.components.LanguageNames
 import pl.rkarpinski.fiszkiwbiegu.ui.components.TrackBar
 
 @Composable
@@ -55,6 +62,25 @@ fun CollectionsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    CollectionsScreenContent(
+        uiState = uiState,
+        onCollectionClick = onCollectionClick,
+        onAddClick = onAddClick,
+        onConfirmDelete = { viewModel.confirmDelete() },
+        onCancelDelete = { viewModel.cancelDelete() },
+        onRetry = { viewModel.loadCollections() },
+    )
+}
+
+@Composable
+fun CollectionsScreenContent(
+    uiState: CollectionsUiState,
+    onCollectionClick: (CollectionDto) -> Unit,
+    onAddClick: () -> Unit,
+    onConfirmDelete: () -> Unit,
+    onCancelDelete: () -> Unit,
+    onRetry: () -> Unit,
+) {
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
 
@@ -62,8 +88,8 @@ fun CollectionsScreen(
             val name = uiState.collections.find { it.id == id }?.name.orEmpty()
             DeleteConfirmationDialog(
                 name = name,
-                onConfirm = { viewModel.confirmDelete() },
-                onDismiss = { viewModel.cancelDelete() },
+                onConfirm = onConfirmDelete,
+                onDismiss = onCancelDelete,
             )
         }
 
@@ -82,7 +108,11 @@ fun CollectionsScreen(
                 }
             },
         ) { paddingValues ->
-            Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                // .padding(paddingValues)
+            ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     Column(modifier = Modifier.padding(horizontal = 22.dp, vertical = 22.dp)) {
                         CapsLabel("CZEŚĆ!")
@@ -95,6 +125,7 @@ fun CollectionsScreen(
                     }
 
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
+
                         if (uiState.collections.isEmpty() && !uiState.isLoading) {
                             item {
                                 Box(
@@ -107,11 +138,11 @@ fun CollectionsScreen(
                                         .padding(22.dp),
                                 ) {
                                     Column {
-                                        CapsLabel("WYBIERZ KOLEKCJĘ")
+                                        CapsLabel("DODAJ NOWĄ KOLEKCJĘ", color = c.text)
                                         Spacer(Modifier.height(6.dp))
                                         Text(
-                                            "Zacznij od wybrania kolekcji.",
-                                            style = MaterialTheme.typography.bodyMedium,
+                                            "Zacznij od utworzenia nowej kolekcji",
+                                            style = MaterialTheme.typography.bodySmall,
                                             color = c.mute,
                                         )
                                     }
@@ -120,6 +151,15 @@ fun CollectionsScreen(
                         }
 
                         if (uiState.collections.isNotEmpty()) {
+
+                            item {
+                                LastUsedHero(
+                                    uiState.collections.first(),
+                                    onResume = { onCollectionClick(uiState.collections.first()) },
+                                    onOpen = { onCollectionClick(uiState.collections.first()) })
+                            }
+
+
                             item {
                                 Spacer(Modifier.height(4.dp))
                                 Box(
@@ -164,7 +204,7 @@ fun CollectionsScreen(
                     Snackbar(
                         modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
                         action = {
-                            TextButton(onClick = { viewModel.loadCollections() }) { Text("Ponów") }
+                            TextButton(onClick = onRetry) { Text("Ponów") }
                         },
                     ) { Text(err) }
                 }
@@ -235,6 +275,109 @@ private fun LaneRow(
     }
 }
 
+
+@Composable
+private fun LastUsedHero(
+    collection: CollectionDto,
+    onResume: () -> Unit,
+    onOpen: () -> Unit
+) {
+    val c = LocalFiszkiColors.current
+
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 22.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .background(c.surface2)
+            .border(1.dp, c.line, RoundedCornerShape(24.dp))
+            .padding(22.dp)
+            .clickable(onClick = onOpen),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(6.dp).clip(CircleShape).background(c.accent))
+            Spacer(Modifier.width(8.dp))
+            Text(
+                "OSTATNIO  //  KONTYNUUJ",
+                style = capsMono().copy(color = accentColorForId(collection.id)),
+            )
+        }
+        Spacer(Modifier.height(14.dp))
+
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 22.dp)
+                .padding(top = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Spacer(Modifier.weight(1f))
+            Flag(collection.sourceLanguage, 16.dp)
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = null,
+                tint = c.mute,
+                modifier = Modifier.size(16.dp),
+            )
+            Flag(collection.targetLanguage, 16.dp)
+            Spacer(Modifier.width(8.dp))
+            CapsLabel(
+                "${LanguageNames[collection.sourceLanguage]?.uppercase() ?: collection.sourceLanguage.uppercase()} → ${LanguageNames[collection.targetLanguage]?.uppercase() ?: collection.targetLanguage.uppercase()}"
+            )
+            Spacer(Modifier.weight(1f))
+        }
+
+        Spacer(Modifier.height(6.dp))
+        Text(
+            collection.name,
+            style = MaterialTheme.typography.headlineLarge.copy(color = c.text),
+        )
+
+        Spacer(Modifier.height(14.dp))
+        TrackBar(
+            progress = collection.progress,
+            accent = c.accent,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(14.dp))
+
+
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.TopEnd
+            ) {
+            Row(
+                Modifier
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(c.accent)
+                    .clickable(onClick = onResume)
+                    .padding(horizontal = 22.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Icon(
+                    Icons.Default.PlayArrow,
+                    null,
+                    tint = c.onAccent,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    "Wznów",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = c.onAccent,
+                        fontWeight = FontWeight.Bold,
+                    ),
+                )
+            }
+        }
+
+    }
+}
+
+
 private fun formatLastStudied(lastStudied: String?): String {
     lastStudied ?: return "nie ćwiczono"
     return try {
@@ -272,3 +415,80 @@ private fun DeleteConfirmationDialog(
         },
     )
 }
+
+@Preview
+@Composable
+fun CollectionsScreenPreview() {
+    val sampleCollections = listOf(
+        CollectionDto(
+            id = "1",
+            userId = "u1",
+            name = "Angielski - Podstawy",
+            description = "Najważniejsze zwroty",
+            sourceLanguage = "pl",
+            targetLanguage = "en",
+            createdAt = "2023-01-01",
+            lastStudied = "2023-10-25T10:00:00Z",
+            progress = 0.65f,
+            flashcardCount = 120
+        ),
+        CollectionDto(
+            id = "2",
+            userId = "u1",
+            name = "Niemiecki - Podróże",
+            description = "Słówka przydatne w podróży",
+            sourceLanguage = "pl",
+            targetLanguage = "de",
+            createdAt = "2023-02-15",
+            lastStudied = "2023-11-10T15:30:00Z",
+            progress = 0.3f,
+            flashcardCount = 50
+        ),
+        CollectionDto(
+            id = "3",
+            userId = "u1",
+            name = "Hiszpański - Jedzenie",
+            description = "W restauracji i sklepie",
+            sourceLanguage = "pl",
+            targetLanguage = "es",
+            createdAt = "2023-03-20",
+            lastStudied = null,
+            progress = 0.0f,
+            flashcardCount = 85
+        )
+    )
+
+    val uiState = CollectionsUiState(
+        collections = sampleCollections,
+        isLoading = false
+    )
+
+    CollectionsScreenContent(
+        uiState = uiState,
+        onCollectionClick = {},
+        onAddClick = {},
+        onConfirmDelete = {},
+        onCancelDelete = {},
+        onRetry = {}
+    )
+}
+
+@Preview
+@Composable
+fun CollectionsScreenPreview2() {
+    val sampleCollections = listOf<CollectionDto>()
+    val uiState = CollectionsUiState(
+        collections = sampleCollections,
+        isLoading = false
+    )
+
+    CollectionsScreenContent(
+        uiState = uiState,
+        onCollectionClick = {},
+        onAddClick = {},
+        onConfirmDelete = {},
+        onCancelDelete = {},
+        onRetry = {}
+    )
+}
+
