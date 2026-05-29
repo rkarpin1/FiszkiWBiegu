@@ -256,4 +256,4 @@ _(brak aktywnych pytań — wszystkie zablokowane przez F-01/S-02 zostały rozwi
 - **S-04-C: (faza C) 3 nowe ekrany (stub dane) + nawigacja bottom-tab** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-reskin-new-screens/`. Lekcja: —.
 - **S-04-D: (faza D) realne dane zamiast zaślepek: /me, lastStudied, progress, translate** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-reskin-backend-stubs/`. Lekcja: —.
 - **S-05: lista kolekcji bez menu + subtitle "N fiszek · X dni temu"; edycja/usuń kolekcji w widoku szczegółów; formularze nie zasłaniane przez klawiaturę** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-tweaks/`. Lekcja: —.
-- **S-06: przemianowanie pól fiszki — `polish_text`→`source_text`, `english_text`→`target_text` w DB, API i całym frontendzie** — Zrealizowano 2026-05-29. Migracja `007_rename_flashcard_columns.sql` wymaga uruchomienia na środowisku produkcyjnym. Lekcja: —.
+- **S-06: przemianowanie pól fiszki — `polish_text`→`source_text`, `english_text`→`target_text` w DB, API i całym frontendzie** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-rename-flashcard-fields/`. Lekcja: —.
