@@ -15,7 +15,6 @@ data class CollectionsUiState(
     val isLoading: Boolean = false,
     val isSubmitting: Boolean = false,
     val error: String? = null,
-    val showAddDialog: Boolean = false,
     val pendingDeleteId: String? = null,
 )
 
@@ -52,10 +51,6 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
         }
     }
 
-    fun showAddDialog() = _uiState.update { it.copy(showAddDialog = true) }
-
-    fun hideAddDialog() = _uiState.update { it.copy(showAddDialog = false) }
-
     fun createCollection(dto: CollectionDto, onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
             _uiState.update { it.copy(isSubmitting = true, error = null) }
@@ -63,7 +58,7 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
                 onSuccess = { loadCollections(); onSuccess() },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
             )
-            _uiState.update { it.copy(isSubmitting = false, showAddDialog = false) }
+            _uiState.update { it.copy(isSubmitting = false) }
         }
     }
 

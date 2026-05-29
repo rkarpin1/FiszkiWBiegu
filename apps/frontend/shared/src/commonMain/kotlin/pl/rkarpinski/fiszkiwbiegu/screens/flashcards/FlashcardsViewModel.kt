@@ -14,8 +14,6 @@ data class FlashcardsUiState(
     val flashcards: List<FlashcardDto> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val showFormDialog: Boolean = false,
-    val editingFlashcard: FlashcardDto? = null,
     val pendingDeleteId: String? = null,
 )
 
@@ -52,33 +50,6 @@ class FlashcardsViewModel(
                     }
                 },
             )
-        }
-    }
-
-    fun showAddDialog() =
-        _uiState.update { it.copy(showFormDialog = true, editingFlashcard = null) }
-
-    fun showEditDialog(flashcard: FlashcardDto) =
-        _uiState.update { it.copy(showFormDialog = true, editingFlashcard = flashcard) }
-
-    fun hideFormDialog() =
-        _uiState.update { it.copy(showFormDialog = false, editingFlashcard = null) }
-
-    fun saveFlashcard(polishText: String, englishText: String) {
-        viewModelScope.launch {
-            val editing = _uiState.value.editingFlashcard
-            _uiState.update { it.copy(showFormDialog = false, editingFlashcard = null) }
-            if (editing == null) {
-                repo.create(collectionId, polishText, englishText).fold(
-                    onSuccess = { loadFlashcards() },
-                    onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
-                )
-            } else {
-                repo.update(editing.id, polishText, englishText).fold(
-                    onSuccess = { loadFlashcards() },
-                    onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
-                )
-            }
         }
     }
 
