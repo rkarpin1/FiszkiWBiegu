@@ -19,7 +19,7 @@ class LearningViewModel(
     fun startSession() {
         viewModelScope.launch {
             repo.getAll(collectionId).onSuccess { flashcards ->
-                controller.start(flashcards)
+                if (flashcards.isNotEmpty()) controller.start(flashcards)
             }
         }
     }

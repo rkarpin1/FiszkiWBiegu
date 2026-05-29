@@ -75,6 +75,7 @@ class LearningService : MediaSessionService() {
             ACTION_START -> {
                 val json = intent.getStringExtra(EXTRA_FLASHCARDS_JSON) ?: return START_STICKY
                 flashcards = Json.decodeFromString(json)
+                if (flashcards.isEmpty()) return START_NOT_STICKY
                 currentIndex = 0
                 isPlaying = true
                 ttsPlayer.updateCurrentItem(flashcards[0].toMediaItem())
