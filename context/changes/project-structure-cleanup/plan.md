@@ -201,13 +201,13 @@ Usunięcie trzech pozostałych artefaktów: dwóch scaffoldowych plików KMP (`G
 
 #### Automatyczne
 
-- [x] 1.1 context/changes/ nie zawiera 5 zarchiwizowanych folderów
-- [x] 1.2 context/archive/ zawiera 5 nowych folderów (daty zgodne z created)
-- [ ] 1.3 git status czysty po commicie fazy 1
+- [x] 1.1 context/changes/ nie zawiera 5 zarchiwizowanych folderów — bb1869f
+- [x] 1.2 context/archive/ zawiera 5 nowych folderów (daty zgodne z created) — bb1869f
+- [x] 1.3 git status czysty po commicie fazy 1 — bb1869f
 
 #### Ręczne
 
-- [x] 1.4 roadmap.md ## Done ma nowe wpisy dla S-04-A, S-04-B, S-04-C
+- [x] 1.4 roadmap.md ## Done ma nowe wpisy dla S-04-A, S-04-B, S-04-C — bb1869f
 
 ### Faza 2: Usuń .tmp/UI/
 
@@ -220,6 +220,6 @@ Usunięcie trzech pozostałych artefaktów: dwóch scaffoldowych plików KMP (`G
 
 #### Automatyczne
 
-- [ ] 3.1 ./gradlew :shared:compileDebugKotlinAndroid przechodzi
-- [ ] 3.2 Greeting.kt i GreetingUtil.kt nie istnieją w commonMain
-- [ ] 3.3 context/changes/bootstrap-verification/ nie istnieje
+- [x] 3.1 ./gradlew :shared:compileDebugKotlinAndroid przechodzi
+- [x] 3.2 Greeting.kt i GreetingUtil.kt nie istnieją w commonMain
+- [x] 3.3 context/changes/bootstrap-verification/ nie istnieje
