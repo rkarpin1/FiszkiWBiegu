@@ -220,6 +220,6 @@ Usunięcie trzech pozostałych artefaktów: dwóch scaffoldowych plików KMP (`G
 
 #### Automatyczne
 
-- [x] 3.1 ./gradlew :shared:compileDebugKotlinAndroid przechodzi
-- [x] 3.2 Greeting.kt i GreetingUtil.kt nie istnieją w commonMain
-- [x] 3.3 context/changes/bootstrap-verification/ nie istnieje
+- [x] 3.1 ./gradlew :shared:compileDebugKotlinAndroid przechodzi — 6661f2a
+- [x] 3.2 Greeting.kt i GreetingUtil.kt nie istnieją w commonMain — 6661f2a
+- [x] 3.3 context/changes/bootstrap-verification/ nie istnieje — 6661f2a
