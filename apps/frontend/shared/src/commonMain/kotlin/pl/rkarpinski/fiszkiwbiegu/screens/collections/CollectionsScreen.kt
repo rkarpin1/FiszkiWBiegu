@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
@@ -45,7 +44,6 @@ import kotlin.time.Instant
 import org.koin.compose.viewmodel.koinViewModel
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
-import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.theme.accentColorForId
 import pl.rkarpinski.fiszkiwbiegu.theme.capsMono
 import pl.rkarpinski.fiszkiwbiegu.theme.mono
@@ -132,9 +130,9 @@ fun CollectionsScreenContent(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 22.dp)
-                                        .clip(RoundedCornerShape(24.dp))
+                                        .clip(MaterialTheme.shapes.extraLarge)
                                         .background(scheme.surface)
-                                        .border(1.dp, scheme.outlineVariant, RoundedCornerShape(24.dp))
+                                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.extraLarge)
                                         .padding(22.dp),
                                 ) {
                                     Column {
@@ -219,7 +217,6 @@ private fun LaneRow(
     collection: CollectionDto,
     onClick: () -> Unit,
 ) {
-    val c = LocalFiszkiColors.current
     val scheme = MaterialTheme.colorScheme
     val accent = accentColorForId(collection.id)
 
@@ -256,7 +253,7 @@ private fun LaneRow(
                         color = accent
                     ),
                 )
-                Text("·", style = MaterialTheme.typography.labelMedium, color = c.mute2)
+                Text("·", style = MaterialTheme.typography.labelMedium, color = scheme.onSurfaceVariant)
                 Text(
                     formatLastStudied(collection.lastStudied),
                     style = MaterialTheme.typography.labelMedium.copy(color = scheme.onSurfaceVariant),
@@ -289,10 +286,10 @@ private fun LastUsedHero(
         Modifier
             .fillMaxWidth()
             .padding(horizontal = 22.dp)
-            .clip(RoundedCornerShape(24.dp))
+            .clip(MaterialTheme.shapes.extraLarge)
             .background(scheme.surface)
+            .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.extraLarge)
             .clickable(onClick = onOpen)
-            .border(1.dp, scheme.outlineVariant, RoundedCornerShape(24.dp))
             .padding(22.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {

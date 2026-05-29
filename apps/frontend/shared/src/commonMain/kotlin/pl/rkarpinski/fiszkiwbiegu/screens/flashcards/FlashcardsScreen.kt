@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -143,7 +143,7 @@ fun FlashcardsScreenContent(
                 Box(
                     modifier = Modifier
                         .size(60.dp)
-                        .clip(RoundedCornerShape(30.dp))
+                        .clip(CircleShape)
                         .background(scheme.onBackground)
                         .clickable { actions.onAddCard() },
                     contentAlignment = Alignment.Center,
@@ -384,9 +384,9 @@ private fun StatTile(label: String, value: String, modifier: Modifier = Modifier
     val scheme = MaterialTheme.colorScheme
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(MaterialTheme.shapes.large)
             .background(scheme.surface)
-            .border(1.dp, scheme.outlineVariant, RoundedCornerShape(16.dp))
+            .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

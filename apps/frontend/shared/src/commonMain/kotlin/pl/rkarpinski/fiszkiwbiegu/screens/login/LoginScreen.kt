@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -93,7 +92,7 @@ fun LoginScreen(
                 Text(
                     text = error,
                     style = MaterialTheme.typography.bodySmall,
-                    color = scheme.primary,
+                    color = scheme.error,
                 )
                 Spacer(Modifier.height(12.dp))
             }
@@ -126,9 +125,9 @@ private fun AuthButton(label: String, enabled: Boolean, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .height(60.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .clip(MaterialTheme.shapes.large)
             .background(if (enabled) scheme.surface else scheme.surfaceVariant)
-            .border(1.dp, scheme.outlineVariant, RoundedCornerShape(16.dp))
+            .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large)
             .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier),
         contentAlignment = Alignment.Center,
     ) {

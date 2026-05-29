@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -335,9 +334,9 @@ fun LearningContent(
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .clip(MaterialTheme.shapes.large)
                         .background(scheme.surfaceVariant)
-                        .border(1.dp, scheme.outlineVariant, RoundedCornerShape(16.dp)),
+                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text("Nie wiem", style = MaterialTheme.typography.titleMedium, color = c.mute2)
@@ -346,9 +345,9 @@ fun LearningContent(
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .clip(MaterialTheme.shapes.large)
                         .background(scheme.surfaceVariant)
-                        .border(1.dp, scheme.outlineVariant, RoundedCornerShape(16.dp)),
+                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text("Wiem!", style = MaterialTheme.typography.titleMedium, color = c.mute2)

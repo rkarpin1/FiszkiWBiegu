@@ -257,9 +257,9 @@ fun CardFormContent(
                     Box(
                         modifier = Modifier
                             .padding(horizontal = 12.dp)
-                            .clip(RoundedCornerShape(19.dp))
+                            .clip(MaterialTheme.shapes.large)
                             .background(scheme.surface)
-                            .border(1.dp, scheme.outlineVariant, RoundedCornerShape(19.dp))
+                            .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large)
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                     ) {
                         Row(
