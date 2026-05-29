@@ -294,8 +294,8 @@ cd frontend && ./gradlew :androidApp:assembleDebug 2>&1 | tail -20
 
 #### Manual
 - [x] 2.8 GET /auth/me zwraca display_name
-- [ ] 2.9 GET /collections zawiera last_studied i progress
-- [ ] 2.10 POST .../learning/complete zwraca 204
+- [x] 2.9 GET /collections zawiera last_studied i progress
+- [x] 2.10 POST .../learning/complete zwraca 204
 
 ### Phase 3: Frontend — DTOs, ViewModel, UI
 #### Automated
@@ -312,5 +312,5 @@ cd frontend && ./gradlew :androidApp:assembleDebug 2>&1 | tail -20
 - [x] 3.11 ./gradlew :androidApp:assembleDebug — kompiluje się bez błędów — eae3612
 
 #### Manual
-- [ ] 3.12 ProfileScreen: displayName z Google + email widoczne
-- [ ] 3.13 Po sesji nauki: TrackBar i POSTĘP aktualizują się
+- [x] 3.12 ProfileScreen: displayName z Google + email widoczne
+- [x] 3.13 Po sesji nauki: TrackBar i POSTĘP aktualizują się
