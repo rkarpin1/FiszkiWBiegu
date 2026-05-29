@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -64,6 +63,7 @@ private sealed interface Route {
 fun App(onGoogleSignIn: suspend () -> Result<String>) {
     val authRepository: AuthRepository = koinInject()
     val authEventBus: AuthEventBus = koinInject()
+    val collectionsVm: CollectionsViewModel = koinViewModel()
     val scope = rememberCoroutineScope()
 
     val initial: Route = if (authRepository.isLoggedIn()) Route.Collections else Route.Login
@@ -137,12 +137,12 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
                         }
                         entry<Route.Collections> {
                             CollectionsScreen(
+                                viewModel = collectionsVm,
                                 onCollectionClick = { backStack.add(Route.Flashcards(it)) },
                                 onAddClick = { backStack.add(Route.CollectionForm()) },
                             )
                         }
                         entry<Route.Flashcards> { route ->
-                            val collectionsVm: CollectionsViewModel = koinViewModel()
                             val collectionsState by collectionsVm.uiState.collectAsState()
                             val collection = collectionsState.collections.find { it.id == route.collection.id }
                                 ?: route.collection
@@ -164,6 +164,7 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
                         entry<Route.CollectionForm> { route ->
                             CollectionFormScreen(
                                 collection = route.collection,
+                                viewModel = collectionsVm,
                                 onBack = { backStack.removeLastOrNull() },
                             )
                         }

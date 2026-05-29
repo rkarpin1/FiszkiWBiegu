@@ -33,6 +33,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +58,7 @@ import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
 import pl.rkarpinski.fiszkiwbiegu.ui.components.Flag
 import pl.rkarpinski.fiszkiwbiegu.ui.components.LanguageNames
 
+@Stable
 interface FlashcardsActions {
     fun onBack() {}
     fun onStartLearning() {}

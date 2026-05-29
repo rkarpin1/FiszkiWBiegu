@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -43,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.collectAsState
 import org.koin.compose.viewmodel.koinViewModel
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
@@ -56,20 +56,20 @@ fun CollectionFormScreen(
     viewModel: CollectionsViewModel = koinViewModel(),
     onBack: () -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     CollectionFormContent(
         collection = collection,
+        isSubmitting = uiState.isSubmitting,
         onBack = onBack,
         onSave = { dto ->
             if (collection != null) {
-                viewModel.updateCollection(dto.copy(id = collection.id))
+                viewModel.updateCollection(dto.copy(id = collection.id), onSuccess = onBack)
             } else {
-                viewModel.createCollection(dto)
+                viewModel.createCollection(dto, onSuccess = onBack)
             }
-            onBack()
         },
         onDelete = { id ->
-            viewModel.deleteCollection(id)
-            onBack()
+            viewModel.deleteCollection(id, onSuccess = onBack)
         }
     )
 }
@@ -78,12 +78,13 @@ fun CollectionFormScreen(
 @Composable
 fun CollectionFormContent(
     collection: CollectionDto? = null,
+    isSubmitting: Boolean = false,
     onBack: () -> Unit,
     onSave: (CollectionDto) -> Unit,
     onDelete: (id: String) -> Unit = {},
 ) {
     val isEdit = collection != null
-    var draft by remember {
+    var draft by remember(collection) {
         mutableStateOf(
             collection ?: CollectionDto(
                 id = "",
@@ -97,7 +98,7 @@ fun CollectionFormContent(
         )
     }
     var showDeleteSheet by remember { mutableStateOf(false) }
-    val isValid = draft.name.isNotBlank() && draft.sourceLanguage != draft.targetLanguage
+    val isValid = draft.name.isNotBlank() && draft.sourceLanguage != draft.targetLanguage && !isSubmitting
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
