@@ -225,6 +225,6 @@ Dla każdego ekranu ta sama zasada:
 
 #### Ręczne
 
-- [ ] 3.3 Wszystkie 7 ekranów — brak regresji wizualnych (przegląd APK na urządzeniu)
-- [ ] 3.4 Dark mode działa poprawnie na wszystkich ekranach
-- [ ] 3.5 Formularze, dialogi, listy — brak artefaktów wizualnych
+- [x] 3.3 Wszystkie 7 ekranów — brak regresji wizualnych (przegląd APK na urządzeniu) — 8d0d089
+- [x] 3.4 Dark mode działa poprawnie na wszystkich ekranach — 8d0d089
+- [x] 3.5 Formularze, dialogi, listy — brak artefaktów wizualnych — 8d0d089
