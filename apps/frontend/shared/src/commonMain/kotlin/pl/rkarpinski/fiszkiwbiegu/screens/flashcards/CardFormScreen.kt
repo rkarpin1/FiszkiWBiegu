@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -104,7 +105,7 @@ fun CardFormScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        if (isEdit) Icons.Default.ArrowBack else Icons.Default.Close,
+                        if (isEdit) Icons.AutoMirrored.Filled.ArrowBack else Icons.Default.Close,
                         contentDescription = "Wróć",
                         tint = c.text,
                         modifier = Modifier.size(20.dp),
@@ -272,7 +273,11 @@ fun CardFormScreen(
                         .background(if (isValid) c.accent else c.surface3)
                         .then(
                             if (isValid) Modifier.clickable {
-                                if (isEdit) viewModel.updateCard(flashcard!!.id, polishText.trim(), englishText.trim())
+                                if (isEdit) viewModel.updateCard(
+                                    flashcard.id,
+                                    polishText.trim(),
+                                    englishText.trim()
+                                )
                                 else viewModel.createCard(polishText.trim(), englishText.trim())
                                 onBack()
                             } else Modifier,

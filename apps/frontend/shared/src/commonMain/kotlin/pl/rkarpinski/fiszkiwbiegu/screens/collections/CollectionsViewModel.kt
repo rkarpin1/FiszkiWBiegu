@@ -31,8 +31,22 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             repo.getAll().fold(
-                onSuccess = { list -> _uiState.update { it.copy(collections = list, isLoading = false) } },
-                onFailure = { e -> _uiState.update { it.copy(error = e.message, isLoading = false) } },
+                onSuccess = { list ->
+                    _uiState.update {
+                        it.copy(
+                            collections = list,
+                            isLoading = false
+                        )
+                    }
+                },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(
+                            error = e.message,
+                            isLoading = false
+                        )
+                    }
+                },
             )
         }
     }
@@ -61,7 +75,14 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
             _uiState.update { it.copy(pendingDeleteId = null, isLoading = true) }
             repo.delete(id).fold(
                 onSuccess = { loadCollections() },
-                onFailure = { e -> _uiState.update { it.copy(error = e.message, isLoading = false) } },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(
+                            error = e.message,
+                            isLoading = false
+                        )
+                    }
+                },
             )
         }
     }
@@ -80,7 +101,14 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
             _uiState.update { it.copy(isLoading = true) }
             repo.delete(id).fold(
                 onSuccess = { loadCollections() },
-                onFailure = { e -> _uiState.update { it.copy(error = e.message, isLoading = false) } },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(
+                            error = e.message,
+                            isLoading = false
+                        )
+                    }
+                },
             )
         }
     }

@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -83,7 +84,17 @@ fun CollectionFormContent(
 ) {
     val isEdit = collection != null
     var draft by remember {
-        mutableStateOf(collection ?: CollectionDto(id = "", userId = "", name = "", description = "", sourceLanguage = "pl", targetLanguage = "en", createdAt = ""))
+        mutableStateOf(
+            collection ?: CollectionDto(
+                id = "",
+                userId = "",
+                name = "",
+                description = "",
+                sourceLanguage = "pl",
+                targetLanguage = "en",
+                createdAt = ""
+            )
+        )
     }
     var showDeleteSheet by remember { mutableStateOf(false) }
     val isValid = draft.name.isNotBlank() && draft.sourceLanguage != draft.targetLanguage
@@ -109,7 +120,7 @@ fun CollectionFormContent(
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        if (isEdit) Icons.Default.ArrowBack else Icons.Default.Close,
+                        if (isEdit) Icons.AutoMirrored.Filled.ArrowBack else Icons.Default.Close,
                         contentDescription = "Wróć",
                         tint = c.text,
                         modifier = Modifier.size(20.dp),
@@ -176,7 +187,12 @@ fun CollectionFormContent(
                     onValueChange = { draft = draft.copy(description = it) },
                     minLines = 3,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Krótka podpowiedź, np. tematyka albo poziom.", color = c.mute) },
+                    placeholder = {
+                        Text(
+                            "Krótka podpowiedź, np. tematyka albo poziom.",
+                            color = c.mute
+                        )
+                    },
                 )
                 Spacer(Modifier.height(16.dp))
                 CapsLabel("JĘZYK OJCZYSTY")
@@ -211,7 +227,12 @@ fun CollectionFormContent(
                         .background(if (isValid) c.accent else c.surface3)
                         .then(
                             if (isValid) Modifier.clickable {
-                                onSave(draft.copy(name = draft.name.trim(), description = draft.description.trim()))
+                                onSave(
+                                    draft.copy(
+                                        name = draft.name.trim(),
+                                        description = draft.description.trim()
+                                    )
+                                )
                             } else Modifier,
                         ),
                     contentAlignment = Alignment.Center,

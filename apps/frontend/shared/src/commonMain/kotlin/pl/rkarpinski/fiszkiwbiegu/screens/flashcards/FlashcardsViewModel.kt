@@ -35,17 +35,34 @@ class FlashcardsViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             repo.getAll(collectionId).fold(
-                onSuccess = { list -> _uiState.update { it.copy(flashcards = list, isLoading = false) } },
-                onFailure = { e -> _uiState.update { it.copy(error = e.message, isLoading = false) } },
+                onSuccess = { list ->
+                    _uiState.update {
+                        it.copy(
+                            flashcards = list,
+                            isLoading = false
+                        )
+                    }
+                },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(
+                            error = e.message,
+                            isLoading = false
+                        )
+                    }
+                },
             )
         }
     }
 
-    fun showAddDialog() = _uiState.update { it.copy(showFormDialog = true, editingFlashcard = null) }
+    fun showAddDialog() =
+        _uiState.update { it.copy(showFormDialog = true, editingFlashcard = null) }
 
-    fun showEditDialog(flashcard: FlashcardDto) = _uiState.update { it.copy(showFormDialog = true, editingFlashcard = flashcard) }
+    fun showEditDialog(flashcard: FlashcardDto) =
+        _uiState.update { it.copy(showFormDialog = true, editingFlashcard = flashcard) }
 
-    fun hideFormDialog() = _uiState.update { it.copy(showFormDialog = false, editingFlashcard = null) }
+    fun hideFormDialog() =
+        _uiState.update { it.copy(showFormDialog = false, editingFlashcard = null) }
 
     fun saveFlashcard(polishText: String, englishText: String) {
         viewModelScope.launch {
@@ -75,7 +92,14 @@ class FlashcardsViewModel(
             _uiState.update { it.copy(pendingDeleteId = null, isLoading = true) }
             repo.delete(id).fold(
                 onSuccess = { loadFlashcards() },
-                onFailure = { e -> _uiState.update { it.copy(error = e.message, isLoading = false) } },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(
+                            error = e.message,
+                            isLoading = false
+                        )
+                    }
+                },
             )
         }
     }
@@ -103,7 +127,14 @@ class FlashcardsViewModel(
             _uiState.update { it.copy(isLoading = true) }
             repo.delete(id).fold(
                 onSuccess = { loadFlashcards() },
-                onFailure = { e -> _uiState.update { it.copy(error = e.message, isLoading = false) } },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(
+                            error = e.message,
+                            isLoading = false
+                        )
+                    }
+                },
             )
         }
     }

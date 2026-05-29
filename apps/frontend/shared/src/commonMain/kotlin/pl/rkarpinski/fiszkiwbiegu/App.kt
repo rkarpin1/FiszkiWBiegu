@@ -6,6 +6,7 @@ package pl.rkarpinski.fiszkiwbiegu
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material3.Icon
@@ -36,6 +37,7 @@ import pl.rkarpinski.fiszkiwbiegu.screens.collections.CollectionFormScreen
 import pl.rkarpinski.fiszkiwbiegu.screens.collections.CollectionsScreen
 import pl.rkarpinski.fiszkiwbiegu.screens.collections.CollectionsViewModel
 import pl.rkarpinski.fiszkiwbiegu.screens.flashcards.CardFormScreen
+import pl.rkarpinski.fiszkiwbiegu.screens.flashcards.FlashcardsActions
 import pl.rkarpinski.fiszkiwbiegu.screens.flashcards.FlashcardsScreen
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningScreen
 import pl.rkarpinski.fiszkiwbiegu.screens.login.LoginScreen
@@ -146,16 +148,16 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
                                 ?: route.collection
                             FlashcardsScreen(
                                 collection = collection,
-                                onBack = { backStack.removeLastOrNull() },
-                                onStartLearning = { backStack.add(Route.Learning(collection)) },
-                                onAddCard = { backStack.add(Route.CardForm(collection.id, collection.name)) },
-                                onEditCard = { flashcard -> backStack.add(Route.CardForm(collection.id, collection.name, flashcard)) },
-                                onEditCollection = {
-                                    backStack.add(Route.CollectionForm(collection))
-                                },
-                                onDeleteCollection = {
-                                    collectionsVm.deleteCollection(collection.id)
-                                    backStack.removeLastOrNull()
+                                actions = object : FlashcardsActions {
+                                    override fun onBack() = backStack.removeLastOrNull()
+                                    override fun onStartLearning() = backStack.add(Route.Learning(collection))
+                                    override fun onAddCard() = backStack.add(Route.CardForm(collection.id, collection.name))
+                                    override fun onEditCard(flashcard: FlashcardDto) = backStack.add(Route.CardForm(collection.id, collection.name, flashcard))
+                                    override fun onEditCollection() = backStack.add(Route.CollectionForm(collection))
+                                    override fun onDeleteCollection() {
+                                        collectionsVm.deleteCollection(collection.id)
+                                        backStack.removeLastOrNull()
+                                    }
                                 },
                             )
                         }
@@ -209,7 +211,7 @@ private fun AppBottomBar(
         NavigationBarItem(
             selected = current is Route.Collections,
             onClick = onCollections,
-            icon = { Icon(Icons.Default.LibraryBooks, contentDescription = null) },
+            icon = { Icon(Icons.AutoMirrored.Filled.LibraryBooks, contentDescription = null) },
             label = { Text("Kolekcje") },
         )
         NavigationBarItem(
