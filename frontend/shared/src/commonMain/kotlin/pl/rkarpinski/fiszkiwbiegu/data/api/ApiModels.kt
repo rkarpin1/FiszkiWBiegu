@@ -12,6 +12,8 @@ data class CollectionDto(
     @SerialName("source_language") val sourceLanguage: String,
     @SerialName("target_language") val targetLanguage: String,
     @SerialName("created_at") val createdAt: String,
+    @SerialName("last_studied") val lastStudied: String? = null,
+    val progress: Float = 0f,
 )
 
 @Serializable
@@ -52,4 +54,18 @@ data class LoginRequest(
 @Serializable
 data class LoginResponse(
     val token: String,
+)
+
+@Serializable
+data class UserDto(
+    val id: String,
+    val email: String,
+    @SerialName("display_name") val displayName: String?,
+    @SerialName("streak_days") val streakDays: Int,
+)
+
+@Serializable
+data class LearningCompleteRequest(
+    @SerialName("cards_heard") val cardsHeard: Int,
+    @SerialName("total_cards") val totalCards: Int,
 )

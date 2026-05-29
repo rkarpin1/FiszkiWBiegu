@@ -149,7 +149,7 @@ fun FlashcardsScreen(
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
                             StatTile(label = "FISZEK", value = uiState.flashcards.size.toString(), modifier = Modifier.weight(1f))
-                            StatTile(label = "POSTĘP", value = "0%", modifier = Modifier.weight(1f))
+                            StatTile(label = "POSTĘP", value = "${(collection.progress * 100).toInt()}%", modifier = Modifier.weight(1f))
                             StatTile(label = "CZAS", value = "—", modifier = Modifier.weight(1f))
                         }
                         Spacer(Modifier.height(16.dp))

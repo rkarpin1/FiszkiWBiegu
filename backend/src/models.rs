@@ -28,7 +28,7 @@ pub struct Collection {
     pub target_language: String,
     pub created_at: DateTime<Utc>,
     pub last_studied: Option<DateTime<Utc>>,
-    pub progress: f32,
+    pub progress: f64,
 }
 
 #[derive(Debug, Deserialize)]

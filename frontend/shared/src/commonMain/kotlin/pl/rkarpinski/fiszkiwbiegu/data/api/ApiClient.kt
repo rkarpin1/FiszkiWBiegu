@@ -83,6 +83,16 @@ class ApiClient(
             setBody(LoginRequest(googleIdToken))
         }
 
+    suspend fun getMe(): HttpResponse =
+        client.get("$API_BASE_URL/auth/me") { bearerAuth(requireToken()) }
+
+    suspend fun patchLearningComplete(collectionId: String, cardsHeard: Int, totalCards: Int): HttpResponse =
+        client.post("$API_BASE_URL/collections/$collectionId/learning/complete") {
+            bearerAuth(requireToken())
+            contentType(ContentType.Application.Json)
+            setBody(LearningCompleteRequest(cardsHeard, totalCards))
+        }
+
     private fun requireToken(): String =
         tokenStorage.getToken() ?: throw IllegalStateException("Not authenticated")
 }

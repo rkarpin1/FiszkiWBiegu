@@ -299,17 +299,17 @@ cd frontend && ./gradlew :androidApp:assembleDebug 2>&1 | tail -20
 
 ### Phase 3: Frontend — DTOs, ViewModel, UI
 #### Automated
-- [ ] 3.1 ApiModels.kt — zaktualizuj CollectionDto; dodaj UserDto, LearningCompleteRequest
-- [ ] 3.2 ApiClient.kt — dodaj getMe(), patchLearningComplete()
-- [ ] 3.3 CollectionRepository.kt — dodaj markStudied()
-- [ ] 3.4 Utwórz ProfileRepository.kt
-- [ ] 3.5 Utwórz ProfileViewModel.kt
-- [ ] 3.6 AppModule.kt — zarejestruj ProfileRepository, ProfileViewModel; zaktualizuj LearningViewModel DI
-- [ ] 3.7 ProfileScreen.kt — podepnij ProfileViewModel; pokaż displayName, email
-- [ ] 3.8 CollectionsScreen.kt — TrackBar: progress = collection.progress
-- [ ] 3.9 FlashcardsScreen.kt — POSTĘP stat z collection.progress
-- [ ] 3.10 LearningViewModel.kt — stop() wywołuje markStudied; dodaj collectionRepo param
-- [ ] 3.11 ./gradlew :androidApp:assembleDebug — kompiluje się bez błędów
+- [x] 3.1 ApiModels.kt — zaktualizuj CollectionDto; dodaj UserDto, LearningCompleteRequest
+- [x] 3.2 ApiClient.kt — dodaj getMe(), patchLearningComplete()
+- [x] 3.3 CollectionRepository.kt — dodaj markStudied()
+- [x] 3.4 Utwórz ProfileRepository.kt
+- [x] 3.5 Utwórz ProfileViewModel.kt
+- [x] 3.6 AppModule.kt — zarejestruj ProfileRepository, ProfileViewModel; zaktualizuj LearningViewModel DI
+- [x] 3.7 ProfileScreen.kt — podepnij ProfileViewModel; pokaż displayName, email
+- [x] 3.8 CollectionsScreen.kt — TrackBar: progress = collection.progress
+- [x] 3.9 FlashcardsScreen.kt — POSTĘP stat z collection.progress
+- [x] 3.10 LearningViewModel.kt — stop() wywołuje markStudied; dodaj collectionRepo param
+- [x] 3.11 ./gradlew :androidApp:assembleDebug — kompiluje się bez błędów
 
 #### Manual
 - [ ] 3.12 ProfileScreen: displayName z Google + email widoczne

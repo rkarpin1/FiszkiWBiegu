@@ -211,7 +211,7 @@ private fun LaneRow(
             )
             Spacer(Modifier.height(8.dp))
             TrackBar(
-                progress = 0f,
+                progress = collection.progress,
                 accent = accent,
                 segments = 12,
                 height = 3.dp,

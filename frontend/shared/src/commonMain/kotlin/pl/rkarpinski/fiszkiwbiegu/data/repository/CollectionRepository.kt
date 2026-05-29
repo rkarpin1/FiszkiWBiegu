@@ -29,4 +29,9 @@ class CollectionRepository(private val api: ApiClient) {
         val response = api.deleteCollection(id)
         if (!response.status.isSuccess()) error("HTTP ${response.status.value}")
     }
+
+    suspend fun markStudied(id: String, cardsHeard: Int, totalCards: Int): Result<Unit> = runCatching {
+        val response = api.patchLearningComplete(id, cardsHeard, totalCards)
+        if (!response.status.isSuccess()) error("HTTP ${response.status.value}")
+    }
 }

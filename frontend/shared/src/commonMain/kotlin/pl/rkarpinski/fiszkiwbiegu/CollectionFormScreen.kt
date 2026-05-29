@@ -258,9 +258,10 @@ fun CollectionFormScreen(
                         Button(
                             onClick = {
                                 showDeleteSheet = false
-                                val id = collectionId ?: return@onClick
-                                viewModel.deleteCollection(id)
-                                onBack()
+                                collectionId?.let { id ->
+                                    viewModel.deleteCollection(id)
+                                    onBack()
+                                }
                             },
                             modifier = Modifier.weight(1.2f),
                             colors = ButtonDefaults.buttonColors(containerColor = c.accent),

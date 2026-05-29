@@ -138,9 +138,9 @@ pub async fn learning_complete(
 ) -> impl Responder {
     let id = path.into_inner();
     let progress = if body.total_cards > 0 {
-        (body.cards_heard as f32 / body.total_cards as f32).clamp(0.0, 1.0)
+        (body.cards_heard as f64 / body.total_cards as f64).clamp(0.0, 1.0)
     } else {
-        0.0f32
+        0.0f64
     };
 
     let result = sqlx::query(

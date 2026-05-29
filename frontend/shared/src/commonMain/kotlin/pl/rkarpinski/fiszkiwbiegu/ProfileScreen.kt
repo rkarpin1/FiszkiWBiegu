@@ -21,6 +21,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,12 +30,18 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.koin.compose.viewmodel.koinViewModel
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
 import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
 
 @Composable
-fun ProfileScreen(onLogout: () -> Unit) {
+fun ProfileScreen(
+    viewModel: ProfileViewModel = koinViewModel(),
+    onLogout: () -> Unit,
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
         Column(
@@ -61,6 +69,7 @@ fun ProfileScreen(onLogout: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Avatar
+                val initial = uiState.displayName.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
                 Box(
                     modifier = Modifier
                         .size(88.dp)
@@ -71,7 +80,7 @@ fun ProfileScreen(onLogout: () -> Unit) {
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        "T",
+                        initial,
                         style = MaterialTheme.typography.displaySmall.copy(
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
@@ -79,7 +88,19 @@ fun ProfileScreen(onLogout: () -> Unit) {
                     )
                 }
                 Spacer(Modifier.height(12.dp))
-                Text("Ty", style = MaterialTheme.typography.headlineMedium, color = c.text)
+                Text(
+                    uiState.displayName.ifBlank { "…" },
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = c.text,
+                )
+                if (uiState.email.isNotBlank()) {
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        uiState.email,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = c.mute,
+                    )
+                }
                 Spacer(Modifier.height(8.dp))
 
                 // Provider badge
