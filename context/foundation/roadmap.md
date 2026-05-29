@@ -3,7 +3,7 @@ project: "FiszkiWBiegu"
 version: 1
 status: draft
 created: 2026-05-27
-updated: 2026-05-28
+updated: 2026-05-29
 prd_version: 1
 main_goal: market-feedback
 top_blocker: decisions
@@ -33,9 +33,9 @@ Biegacze tracą dziesiątki godzin miesięcznie, które mogłyby być poświęco
 | S-01 | collections-flashcards-e2e    | zalogować się, tworzyć/przeglądać/edytować/usuwać kolekcje i fiszki               | —                 | US-02, FR-001–FR-009                              | done     |
 | S-02 | audio-learning-session-offline | uruchomić tryb nauki i słyszeć fiszki offline podczas biegu z ekranem wyłączonym  | F-01, S-01        | US-01, FR-010–FR-014, NFR (offline, audio, latency) | done     |
 | S-03 | production-run-validation      | zainstalować APK i przeprowadzić pełną sesję nauki podczas rzeczywistego biegu    | S-02              | US-01, FR-012                                     | done     |
-| S-04-A | ui-reskin-design-system    | (faza A) design system i komponenty wgrane, projekt kompiluje się z nową paletą   | S-03              | —                                                 | planned  |
-| S-04-B | ui-reskin-screens          | (faza B) 4 istniejące ekrany reskinowane; aplikacja wygląda jak projekt graficzny | S-04-A            | —                                                 | planned  |
-| S-04-C | ui-reskin-new-screens      | (faza C) 3 nowe ekrany (stub dane) + nawigacja bottom-tab                         | S-04-B            | —                                                 | planned  |
+| S-04-A | ui-reskin-design-system    | (faza A) design system i komponenty wgrane, projekt kompiluje się z nową paletą   | S-03              | —                                                 | done     |
+| S-04-B | ui-reskin-screens          | (faza B) 4 istniejące ekrany reskinowane; aplikacja wygląda jak projekt graficzny | S-04-A            | —                                                 | done     |
+| S-04-C | ui-reskin-new-screens      | (faza C) 3 nowe ekrany (stub dane) + nawigacja bottom-tab                         | S-04-B            | —                                                 | done     |
 | S-04-D | ui-reskin-backend-stubs    | (faza D) realne dane zamiast zaślepek: /me, lastStudied, progress, translate      | S-04-C            | —                                                 | backlog  |
 
 ## Strumienie
@@ -49,15 +49,15 @@ Pomoc nawigacyjna — grupuje elementy, które dzielą łańcuch wymagań wstęp
 
 ## Baza
 
-Co już jest na miejscu w bazie kodu na dzień 2026-05-27 (automatycznie zbadane + potwierdzone przez użytkownika).
+Co już jest na miejscu w bazie kodu na dzień 2026-05-29 (automatycznie zbadane + potwierdzone przez użytkownika).
 Fundamenty poniżej zakładają, że te elementy są obecne i NIE tworzą ich ponownie.
 
-- **Frontend:** obecny — Compose Multiplatform + Material3; routing (App.kt:19-24); wszystkie 4 ekrany: LoginScreen, CollectionsScreen, FlashcardsScreen, LearningScreen; moduły androidApp i webApp
-- **Backend / API:** obecny — Actix-web 4.13; pełne CRUD dla kolekcji i fiszek; POST /auth/login, GET /collections, PUT/DELETE /flashcards/{id}; auth JWT
-- **Dane:** częściowy — sqlx + PostgreSQL (backend), migracje 001_init + 002_add_users, tabele: users/collections/flashcards; BRAK lokalnego cache fiszek we frontendzie (dane sieciowe); token persistowany przez multiplatform-settings
-- **Autoryzacja:** obecna — Google OAuth 2.0 (auth.rs:16), JWT create/verify (auth.rs:31-82), AuthUser extractor na trasach; LoginScreen + GoogleSignInHelper.kt (Android Credential Manager)
-- **Wdrożenie / infra:** częściowe — GitHub Actions CI (wyłącznie budowanie APK Android); backend: auto-deploy via Render.com (render.yaml); BRAK Dockerfile
-- **Obserwowalność:** częściowa — brak ujednoliconego systemu logowania; ad-hoc eprintln w backend; brak Sentry / Crashlytics
+- **Frontend:** obecny — Compose Multiplatform + Material3 + design system Dawn Run (paleta, czcionki Bricolage/JetBrains Mono); routing navigation3-compose (App.kt, mutableStateListOf backstack); 7 ekranów: LoginScreen, CollectionsScreen, FlashcardsScreen, LearningScreen, ProfileScreen, CollectionFormScreen, CardFormScreen; bottom-tab bar (Kolekcje / Konto); moduły androidApp i webApp
+- **Backend / API:** obecny — Actix-web 4.13; auth JWT (Google OAuth); endpointy: POST /auth/login; GET|POST /collections, PUT|DELETE /collections/{id}; GET|POST /collections/{id}/flashcards, GET /collections/{id}/learning; PUT|DELETE /flashcards/{id}; walidacja: kody języka (pl/en/de/es/fr/it), source ≠ target, nazwa niepusta (422)
+- **Dane:** częściowy — sqlx + PostgreSQL (backend); migracje: `001_init` (collections + flashcards, indeksy), `002_add_users` (tabela users + FK collections→users; S-01), `003_add_languages` (source/target_language w collections; collection-language-select), `004_add_description` (description w collections; collection-language-select); schemat: `users(google_id, email)`, `collections(user_id, name, description, source_language, target_language)`, `flashcards(collection_id, polish_text, english_text, position)`; BRAK lokalnego cache fiszek we frontendzie (dane sieciowe); token JWT persistowany przez multiplatform-settings
+- **Autoryzacja:** obecna — backend: Google id_token validation (`auth.rs`), JWT issue/verify, `AuthUser` extractor na trasach; frontend: `GoogleSignInHelper.kt` (Android Credential Manager), `AuthRepository.kt` (login/logout/isLoggedIn + token storage), `AuthEventBus.kt` (unauthorizedEvents → auto-logout), `LoginScreen.kt`
+- **Wdrożenie / infra:** częściowe — GitHub Actions CI: backend (`cargo build --release` + `cargo test` na push/PR do master); BRAK pipeline CI dla frontendu (APK budowany lokalnie); backend: auto-deploy via Render.com (`render.yaml`, Frankfurt, starter plan, `healthCheckPath: /health`); env vars w panelu Render: DATABASE_URL, JWT_SECRET, GOOGLE_CLIENT_ID; BRAK Dockerfile (Render używa natywnego runtime Rust)
+- **Obserwowalność:** minimalna — backend: wyłącznie `eprintln!` na błędach DB/JWT (13 miejsc w handlerach); brak `tracing`/`log`; logi dostępne w panelu Render.com; frontend: brak Crashlytics / Sentry; brak metryk, alertów ani dashboardu
 
 ## Fundamenty
 
@@ -85,7 +85,7 @@ Fundamenty poniżej zakładają, że te elementy są obecne i NIE tworzą ich po
 - **Równolegle z:** F-01
 - **Blokady:** —
 - **Niewiadome:** —
-- **Ryzyko:** Kod warstw auth + CRUD + UI jest obecny (GoogleSignInHelper.kt, CollectionsScreen, FlashcardsScreen), ale E2E integracja mogła nie być testowana kompleksowo; problemy z wiringiem mogą się ujawnić przy pierwszym pełnym przejściu przepływu.
+- **Ryzyko:** ~~Kod warstw auth + CRUD + UI jest obecny, ale E2E integracja mogła nie być testowana kompleksowo~~ — zweryfikowane E2E; S-03 potwierdził stabilność na urządzeniu produkcyjnym. Formularze kolekcji i fiszek przeniesione do dedykowanych ekranów (CollectionFormScreen, CardFormScreen) w ramach S-04-C. Kolekcje rozszerzone o `description`, `source_language`, `target_language` (collection-language-select).
 - **Status:** done
 
 ### S-02: Kompletna sesja nauki audio offline
@@ -123,7 +123,7 @@ Fundamenty poniżej zakładają, że te elementy są obecne i NIE tworzą ich po
 - **Blokady:** —
 - **Niewiadome:** —
 - **Ryzyko:** Prototyp używa pakietu `pl.fiszki.wbiegu`; istniejący kod używa `pl.rkarpinski.fiszkiwbiegu` — pełna adaptacja package names przy kopiowaniu plików.
-- **Status:** planned
+- **Status:** done
 
 #### S-04-A: Design system + komponenty bazowe
 
@@ -186,16 +186,16 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 
 ## Przekazanie do backlogu
 
-| ID mapy drogowej | ID zmiany                      | Sugerowany tytuł problemu                                     | Gotowe do `/10x-plan` | Uwagi                                                              |
-| ---------------- | ------------------------------ | ------------------------------------------------------------- |-----------------------| ------------------------------------------------------------------ |
-| F-01             | offline-flashcard-cache        | Cache i synchronizacja fiszek offline (Android Room/SQLite)  | done                  | Uruchom `/10x-plan offline-flashcard-cache`                        |
-| S-01             | collections-flashcards-e2e    | Zarządzanie kolekcjami i fiszkami — weryfikacja E2E           | done                  | Zrealizowane                                                       |
-| S-02             | audio-learning-session-offline | Tryb nauki audio offline — integracja i testy                 | done                  | Czeka na ukończenie F-01 + S-01                                    |
-| S-03             | production-run-validation      | Wdrożenie produkcyjne + pierwsza sesja na żywo                | done                  | Zrealizowane                                                       |
-| S-04-A           | ui-reskin-design-system        | Reskin UI — faza A: design system                             | yes                   | Uruchom `/10x-plan ui-reskin-design-system`                        |
-| S-04-B           | ui-reskin-screens              | Reskin UI — faza B: reskin istniejących ekranów               | no                    | Czeka na S-04-A                                                    |
-| S-04-C           | ui-reskin-new-screens          | Reskin UI — faza C: nowe ekrany + nawigacja                   | no                    | Czeka na S-04-B                                                    |
-| S-04-D           | ui-reskin-backend-stubs        | Reskin UI — faza D: backend dla zaślepek                      | no                    | Czeka na S-04-C; każda zaślepka = osobny plan                      |
+| ID mapy drogowej | ID zmiany                           | Sugerowany tytuł problemu                                     | Gotowe do `/10x-plan` | Uwagi                                                              |
+| ---------------- |-------------------------------------| ------------------------------------------------------------- |-----------------------| ------------------------------------------------------------------ |
+| F-01             | offline-flashcard-cache             | Cache i synchronizacja fiszek offline (Android Room/SQLite)  | done                  | Uruchom `/10x-plan offline-flashcard-cache`                        |
+| S-01             | collections-flashcards-e2e          | Zarządzanie kolekcjami i fiszkami — weryfikacja E2E           | done                  | Zrealizowane                                                       |
+| S-02             | audio-learning-session-offline      | Tryb nauki audio offline — integracja i testy                 | done                  | Czeka na ukończenie F-01 + S-01                                    |
+| S-03             | production-run-validation           | Wdrożenie produkcyjne + pierwsza sesja na żywo                | done                  | Zrealizowane                                                       |
+| S-04-A           | ui-reskin-design-system             | Reskin UI — faza A: design system                             | done                  | Zrealizowane                                                       |
+| S-04-B           | ui-reskin-screens                   | Reskin UI — faza B: reskin istniejących ekranów               | done                  | Zrealizowane                                                       |
+| S-04-C           | ui-reskin-new-screens               | Reskin UI — faza C: nowe ekrany + nawigacja                   | done                  | Zrealizowane                                                       |
+| S-04-D           | ui-reskin-backend-stubs             | Reskin UI — faza D: backend dla zaślepek                      | no                    | Czeka na S-04-C; każda zaślepka = osobny plan                      |
 
 ## Otwarte pytania dotyczące mapy drogowej
 
@@ -223,3 +223,4 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 - **F-01: (fundament) fiszki zsynchronizowane lokalnie; tryb nauki nie wymaga internetu** — Zarchiwizowano 2026-05-27 → `context/archive/2026-05-27-f-01/`. Lekcja: —.
 - **S-02: użytkownik może wybrać kolekcję, uruchomić tryb nauki i słyszeć fiszki przez TTS podczas biegu z ekranem wyłączonym, sterując przyciskami słuchawek (PLAY/PAUSE/NEXT/PREV), bez dostępu do internetu** — Zarchiwizowano 2026-05-27 → `context/archive/2026-05-27-s-02/`. Lekcja: —.
 - **S-03: użytkownik instaluje APK, aplikacja łączy się z backendem na Render.com, Rafał przeprowadza pierwszą pełną sesję nauki podczas rzeczywistego biegu (30-60 min, ekran wyłączony, słuchawki Bluetooth)** — Zarchiwizowano 2026-05-27 → `context/archive/2026-05-27-s-03/`. Lekcja: —.
+- **S-04 (A+B+C): aplikacja wygląda jak projekt graficzny z `.tmp/UI` — paleta Dawn Run, czcionki Bricolage + JetBrains Mono, layout tor biegowy; CollectionFormScreen, CardFormScreen, ProfileScreen, nawigacja bottom-tab** — Zrealizowano 2026-05-29. Faza D (backend dla zaślepek) pozostaje w backlogu. Lekcja: —.
