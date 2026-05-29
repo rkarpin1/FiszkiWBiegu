@@ -39,7 +39,7 @@ Biegacze tracą dziesiątki godzin miesięcznie, które mogłyby być poświęco
 | S-04-D | ui-reskin-backend-stubs    | (faza D) realne dane zamiast zaślepek: /me, lastStudied, progress, translate      | S-04-C            | —                                                 | done     |
 | S-05   | ui-tweaks                  | lista kolekcji bez menu + subtitle "N fiszek · X dni temu"; edycja/usuń kolekcji w widoku szczegółów; formularze nie zasłaniane przez klawiaturę | S-04-D | — | done |
 | S-06   | rename-flashcard-fields    | przemianowanie pól fiszki: `polish_text`→`source_text`, `english_text`→`target_text` w DB, API i całym frontendzie | S-05 | — | done |
-| S-07   | frontend-improvements      | zmiany i optymalizacje w UI lub kodzie frontendu; realizowane etapami, zamknięte przez impl-review | S-06 | — | in progress |
+| S-07   | frontend-improvements      | zmiany i optymalizacje w UI lub kodzie frontendu; realizowane etapami, zamknięte przez impl-review | S-06 | — | done |
 
 ## Strumienie
 
@@ -207,9 +207,9 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 - **Wymagania wstępne:** S-06
 - **Równolegle z:** —
 - **Blokady:** —
-- **Niewiadome:** zakres konkretnych zmian definiowany iteracyjnie przez prompty
+- **Niewiadome:** —
 - **Ryzyko:** —
-- **Status:** in progress
+- **Status:** done
 
 ### S-06: Przemianowanie pól fiszki
 
@@ -237,7 +237,7 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 | S-04-D           | ui-reskin-backend-stubs             | Reskin UI — faza D: backend dla zaślepek                      | done                  | Zrealizowane                                  |
 | S-05             | ui-tweaks                           | Poprawki UI — menu, subtitle, klawiatura                      | done                  | Zrealizowane                                  |
 | S-06             | rename-flashcard-fields             | Przemianowanie pól fiszki: polish_text→source_text, english_text→target_text | done          | Zrealizowane                                  |
-| S-07             | frontend-improvements               | Zmiany i optymalizacje w UI lub kodzie frontendu                              | nie           | Zakres definiowany iteracyjnie                |
+| S-07             | frontend-improvements               | Zmiany i optymalizacje w UI lub kodzie frontendu                              | done          | Zrealizowane                                  |
 
 ## Otwarte pytania dotyczące mapy drogowej
 
@@ -271,3 +271,4 @@ _(brak aktywnych pytań — wszystkie zablokowane przez F-01/S-02 zostały rozwi
 - **S-04-D: (faza D) realne dane zamiast zaślepek: /me, lastStudied, progress, translate** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-reskin-backend-stubs/`. Lekcja: —.
 - **S-05: lista kolekcji bez menu + subtitle "N fiszek · X dni temu"; edycja/usuń kolekcji w widoku szczegółów; formularze nie zasłaniane przez klawiaturę** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-tweaks/`. Lekcja: —.
 - **S-06: przemianowanie pól fiszki — `polish_text`→`source_text`, `english_text`→`target_text` w DB, API i całym frontendzie** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-rename-flashcard-fields/`. Lekcja: —.
+- **S-07: zmiany i optymalizacje w UI lub kodzie frontendu** — Zrealizowano 2026-05-29. Lekcja: —.
