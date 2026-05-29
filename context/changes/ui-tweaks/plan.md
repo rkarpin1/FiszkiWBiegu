@@ -236,7 +236,7 @@ cd frontend && ./gradlew :androidApp:assembleDebug 2>&1 | tail -20
 - [x] 1.4 cargo build — kompiluje się — 050d846
 
 #### Manual
-- [ ] 1.5 GET /collections zwraca flashcard_count
+- [x] 1.5 GET /collections zwraca flashcard_count
 
 ### Phase 2: Frontend — UI tweaks
 #### Automated
@@ -250,8 +250,8 @@ cd frontend && ./gradlew :androidApp:assembleDebug 2>&1 | tail -20
 - [x] 2.8 ./gradlew :androidApp:assembleDebug — BUILD SUCCESSFUL — 293b2c5
 
 #### Manual
-- [ ] 2.9 Lista kolekcji: brak MoreVert, widoczny subtitle "N fiszek · X dni temu"
-- [ ] 2.10 FlashcardsScreen: MoreVert kolekcji działa (Edytuj + Usuń z potwierdzeniem)
-- [ ] 2.11 FlashcardsScreen: MoreVert fiszek działa (Edytuj + Usuń)
-- [ ] 2.12 CollectionFormScreen: klawiatura nie zasłania pól
-- [ ] 2.13 CardFormScreen: klawiatura nie zasłania pól
+- [x] 2.9 Lista kolekcji: brak MoreVert, widoczny subtitle "N fiszek · X dni temu"
+- [x] 2.10 FlashcardsScreen: MoreVert kolekcji działa (Edytuj + Usuń z potwierdzeniem)
+- [x] 2.11 FlashcardsScreen: MoreVert fiszek działa (Edytuj + Usuń)
+- [x] 2.12 CollectionFormScreen: klawiatura nie zasłania pól
+- [x] 2.13 CardFormScreen: klawiatura nie zasłania pól
