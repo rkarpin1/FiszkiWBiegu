@@ -1,10 +1,10 @@
 ---
 change_id: material-design-3
 title: Material design 3 compatibility
-status: impl_reviewed
+status: archived
 created: 2026-05-29
-updated: 2026-05-29
-archived_at: null
+updated: 2026-05-30
+archived_at: 2026-05-29T22:58:40Z
 ---
 
 ## Notes

@@ -3,7 +3,7 @@ project: "FiszkiWBiegu"
 version: 1
 status: draft
 created: 2026-05-27
-updated: 2026-05-29
+updated: 2026-05-30
 prd_version: 1
 main_goal: market-feedback
 top_blocker: decisions
@@ -40,7 +40,7 @@ Biegacze tracą dziesiątki godzin miesięcznie, które mogłyby być poświęco
 | S-05   | ui-tweaks                  | lista kolekcji bez menu + subtitle "N fiszek · X dni temu"; edycja/usuń kolekcji w widoku szczegółów; formularze nie zasłaniane przez klawiaturę | S-04-D | — | done |
 | S-06   | rename-flashcard-fields    | przemianowanie pól fiszki: `polish_text`→`source_text`, `english_text`→`target_text` w DB, API i całym frontendzie | S-05 | — | done |
 | S-07   | frontend-improvements      | zmiany i optymalizacje w UI lub kodzie frontendu; realizowane etapami, zamknięte przez impl-review | S-06 | — | done |
-| S-08   | material-design-3          | kompatybilność aplikacji z Material Design 3 — przegląd i dostosowanie komponentów UI              | S-07 | — | planned |
+| S-08   | material-design-3          | kompatybilność aplikacji z Material Design 3 — przegląd i dostosowanie komponentów UI              | S-07 | — | done    |
 
 ## Strumienie
 
@@ -210,7 +210,7 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 - **Blokady:** —
 - **Niewiadome:** zakres konkretnych niezgodności do ustalenia podczas przeglądu
 - **Ryzyko:** —
-- **Status:** planned
+- **Status:** done
 
 ### S-07: Zmiany w kodzie frontend
 
@@ -251,7 +251,7 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 | S-05             | ui-tweaks                           | Poprawki UI — menu, subtitle, klawiatura                      | done                  | Zrealizowane                                  |
 | S-06             | rename-flashcard-fields             | Przemianowanie pól fiszki: polish_text→source_text, english_text→target_text | done          | Zrealizowane                                  |
 | S-07             | frontend-improvements               | Zmiany i optymalizacje w UI lub kodzie frontendu                              | done          | Zrealizowane                                  |
-| S-08             | material-design-3                   | Kompatybilność aplikacji z Material Design 3                                  | nie           | Zakres do ustalenia podczas przeglądu         |
+| S-08             | material-design-3                   | Kompatybilność aplikacji z Material Design 3                                  | done          | Zrealizowane                                  |
 
 ## Otwarte pytania dotyczące mapy drogowej
 
@@ -268,6 +268,10 @@ _(brak aktywnych pytań — wszystkie zablokowane przez F-01/S-02 zostały rozwi
 - **Konto administratora** — Dlaczego zaparkowane: PRD §Non-Goals — jeden typ użytkownika w MVP.
 - **Konfiguracja liczby powtórzeń EN** — Dlaczego zaparkowane: zdecydowano w PRD — hardkodowane 3 w MVP; konfiguracja w v2.
 - **#1: Obsługa kolekcji i fiszek z przeglądarki Web** — Dlaczego zaparkowane: AGENTS.md §Hard Rules — MVP scope is Android only; webApp istnieje jako cel KMP, ale pełna funkcjonalność CRUD w przeglądarce planowana w v2.
+
+## Done
+
+- **S-08: Kompatybilność z Material Design 3** — Zarchiwizowano 2026-05-30 → `context/archive/2026-05-29-material-design-3/`. Lekcja: —.
 - **#3: Okno opcji przed przystąpieniem do nauki** — Dlaczego zaparkowane: zawiera funkcje z Non-Goals — tryb nauki z algorytmem powtórkowym, tryb EN→PL (PRD §Non-Goals, p. „FR-015: Tryb EN→PL"), konfigurowalna liczba powtórzeń (PRD §Non-Goals, p. „Konfiguracja liczby powtórzeń EN"); implementacja możliwa w v2 równolegle z algorytmem powtórkowym.
 - **#4: Zmiany UI okna nauki** — Dlaczego zaparkowane: przyciski „Wiem"/„Nie wiem" wymagają algorytmu powtórkowego (PRD §Non-Goals, p. „Spaced repetition"); wizualne wyświetlanie tekstu pytania/odpowiedzi jest sprzeczne z założeniem „wyłącznie audio" (PRD §Sokrates); w v2 razem z trybem wizualnym.
 - **#6: Automatyczne tłumaczenie przy wprowadzaniu fiszki** — Dlaczego zaparkowane: wymaga integracji z zewnętrznym API tłumaczącym (np. DeepL/Google Translate) — nowa zależność zewnętrzna poza zakresem MVP; w v2 razem z rozszerzeniem edytora fiszek.
