@@ -13,14 +13,14 @@ class CollectionRepository(private val api: ApiClient) {
         else error("HTTP ${response.status.value}")
     }
 
-    suspend fun create(name: String, sourceLanguage: String, targetLanguage: String): Result<CollectionDto> = runCatching {
-        val response = api.createCollection(CollectionRequest(name, sourceLanguage, targetLanguage))
+    suspend fun create(name: String, description: String, sourceLanguage: String, targetLanguage: String): Result<CollectionDto> = runCatching {
+        val response = api.createCollection(CollectionRequest(name, description, sourceLanguage, targetLanguage))
         if (response.status.isSuccess()) response.body()
         else error("HTTP ${response.status.value}")
     }
 
-    suspend fun rename(id: String, name: String, sourceLanguage: String, targetLanguage: String): Result<CollectionDto> = runCatching {
-        val response = api.updateCollection(id, CollectionRequest(name, sourceLanguage, targetLanguage))
+    suspend fun rename(id: String, name: String, description: String, sourceLanguage: String, targetLanguage: String): Result<CollectionDto> = runCatching {
+        val response = api.updateCollection(id, CollectionRequest(name, description, sourceLanguage, targetLanguage))
         if (response.status.isSuccess()) response.body()
         else error("HTTP ${response.status.value}")
     }

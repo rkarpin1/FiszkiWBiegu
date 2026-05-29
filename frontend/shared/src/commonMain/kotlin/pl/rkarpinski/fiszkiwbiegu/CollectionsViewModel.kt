@@ -16,8 +16,6 @@ data class CollectionsUiState(
     val error: String? = null,
     val showAddDialog: Boolean = false,
     val pendingDeleteId: String? = null,
-    val editingCollectionId: String? = null,
-    val editingCollectionName: String = "",
 )
 
 class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel() {
@@ -43,30 +41,13 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
 
     fun hideAddDialog() = _uiState.update { it.copy(showAddDialog = false) }
 
-    fun createCollection(name: String, sourceLanguage: String, targetLanguage: String) {
+    fun createCollection(name: String, description: String, sourceLanguage: String, targetLanguage: String) {
         viewModelScope.launch {
-            repo.create(name, sourceLanguage, targetLanguage).fold(
+            repo.create(name, description, sourceLanguage, targetLanguage).fold(
                 onSuccess = { loadCollections() },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
             )
             _uiState.update { it.copy(showAddDialog = false) }
-        }
-    }
-
-    fun requestEdit(id: String, currentName: String) =
-        _uiState.update { it.copy(editingCollectionId = id, editingCollectionName = currentName) }
-
-    fun cancelEdit() =
-        _uiState.update { it.copy(editingCollectionId = null, editingCollectionName = "") }
-
-    fun confirmEdit(newName: String) {
-        val id = _uiState.value.editingCollectionId ?: return
-        viewModelScope.launch {
-            _uiState.update { it.copy(editingCollectionId = null, editingCollectionName = "") }
-            repo.rename(id, newName, "pl", "en").fold(
-                onSuccess = { loadCollections() },
-                onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
-            )
         }
     }
 
@@ -85,9 +66,9 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
         }
     }
 
-    fun updateCollection(id: String, name: String, sourceLanguage: String, targetLanguage: String) {
+    fun updateCollection(id: String, name: String, description: String, sourceLanguage: String, targetLanguage: String) {
         viewModelScope.launch {
-            repo.rename(id, name, sourceLanguage, targetLanguage).fold(
+            repo.rename(id, name, description, sourceLanguage, targetLanguage).fold(
                 onSuccess = { loadCollections() },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
             )

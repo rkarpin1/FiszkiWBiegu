@@ -95,7 +95,7 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawUnionJack(w: Fl
     drawRect(red, topLeft = Offset(w / 2f - ch2 / 2f, 0f), size = Size(ch2, h))
 }
 
-/** Kod języka → wyświetlana nazwa. */
+/** Kod języka → wyświetlana nazwa. Kolejność wpisów = kolejność na liście wyboru. */
 val LanguageNames = mapOf(
     "pl" to "Polski",
     "en" to "Angielski",

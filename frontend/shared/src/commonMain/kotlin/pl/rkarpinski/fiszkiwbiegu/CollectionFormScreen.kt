@@ -52,6 +52,7 @@ import pl.rkarpinski.fiszkiwbiegu.ui.components.LangSelect
 fun CollectionFormScreen(
     collectionId: String? = null,
     collectionName: String = "",
+    collectionDescription: String = "",
     sourceLanguage: String = "pl",
     targetLanguage: String = "en",
     viewModel: CollectionsViewModel = koinViewModel(),
@@ -59,7 +60,7 @@ fun CollectionFormScreen(
 ) {
     val isEdit = collectionId != null
     var name by remember { mutableStateOf(collectionName) }
-    var description by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf(collectionDescription) }
     var sourceLang by remember { mutableStateOf(sourceLanguage) }
     var targetLang by remember { mutableStateOf(targetLanguage) }
     var showDeleteSheet by remember { mutableStateOf(false) }
@@ -192,8 +193,8 @@ fun CollectionFormScreen(
                         .background(if (isValid) c.accent else c.surface3)
                         .then(
                             if (isValid) Modifier.clickable {
-                                if (isEdit) viewModel.updateCollection(collectionId!!, name.trim(), sourceLang, targetLang)
-                                else viewModel.createCollection(name.trim(), sourceLang, targetLang)
+                                if (isEdit) viewModel.updateCollection(collectionId!!, name.trim(), description.trim(), sourceLang, targetLang)
+                                else viewModel.createCollection(name.trim(), description.trim(), sourceLang, targetLang)
                                 onBack()
                             } else Modifier,
                         ),
@@ -257,7 +258,8 @@ fun CollectionFormScreen(
                         Button(
                             onClick = {
                                 showDeleteSheet = false
-                                viewModel.deleteCollection(collectionId!!)
+                                val id = collectionId ?: return@onClick
+                                viewModel.deleteCollection(id)
                                 onBack()
                             },
                             modifier = Modifier.weight(1.2f),
