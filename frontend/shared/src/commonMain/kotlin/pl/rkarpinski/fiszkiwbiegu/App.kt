@@ -26,6 +26,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import pl.rkarpinski.fiszkiwbiegu.data.api.AuthEventBus
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
@@ -133,18 +134,26 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
                             CollectionsScreen(
                                 onCollectionClick = { backStack.add(Route.Flashcards(it)) },
                                 onAddClick = { backStack.add(Route.CollectionForm()) },
-                                onEditClick = { collection ->
-                                    backStack.add(Route.CollectionForm(collection.id, collection.name, collection.description, collection.sourceLanguage, collection.targetLanguage))
-                                },
                             )
                         }
                         entry<Route.Flashcards> { route ->
+                            val collectionsVm: CollectionsViewModel = koinViewModel()
                             FlashcardsScreen(
                                 collection = route.collection,
                                 onBack = { backStack.removeLastOrNull() },
                                 onStartLearning = { backStack.add(Route.Learning(route.collection)) },
                                 onAddCard = { backStack.add(Route.CardForm(route.collection.id, route.collection.name)) },
                                 onEditCard = { flashcard -> backStack.add(Route.CardForm(route.collection.id, route.collection.name, flashcard)) },
+                                onEditCollection = {
+                                    backStack.add(Route.CollectionForm(
+                                        route.collection.id, route.collection.name,
+                                        route.collection.description, route.collection.sourceLanguage, route.collection.targetLanguage,
+                                    ))
+                                },
+                                onDeleteCollection = {
+                                    collectionsVm.deleteCollection(route.collection.id)
+                                    backStack.removeLastOrNull()
+                                },
                             )
                         }
                         entry<Route.CollectionForm> { route ->

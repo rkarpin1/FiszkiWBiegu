@@ -3,6 +3,7 @@ package pl.rkarpinski.fiszkiwbiegu
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,11 +21,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -34,13 +32,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import kotlin.time.Clock
+import kotlin.time.Instant
 import org.koin.compose.viewmodel.koinViewModel
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
@@ -55,7 +52,6 @@ fun CollectionsScreen(
     viewModel: CollectionsViewModel = koinViewModel(),
     onCollectionClick: (CollectionDto) -> Unit,
     onAddClick: () -> Unit = {},
-    onEditClick: (CollectionDto) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -138,10 +134,6 @@ fun CollectionsScreen(
                                     index = index,
                                     collection = collection,
                                     onClick = { onCollectionClick(collection) },
-                                    onEditClick = {
-                                        onEditClick(collection)
-                                    },
-                                    onDeleteClick = { viewModel.requestDelete(collection.id) },
                                 )
                                 if (index < uiState.collections.lastIndex) {
                                     Box(
@@ -181,12 +173,9 @@ private fun LaneRow(
     index: Int,
     collection: CollectionDto,
     onClick: () -> Unit,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit,
 ) {
     val c = LocalFiszkiColors.current
     val accent = accentColorForId(collection.id)
-    var showMenu by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -209,6 +198,21 @@ private fun LaneRow(
                 style = MaterialTheme.typography.headlineSmall,
                 color = c.text,
             )
+            Spacer(Modifier.height(4.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Text(
+                    "${collection.flashcardCount} fiszek",
+                    style = MaterialTheme.typography.labelMedium.copy(fontFamily = mono(), color = accent),
+                )
+                Text("·", style = MaterialTheme.typography.labelMedium, color = c.mute2)
+                Text(
+                    formatLastStudied(collection.lastStudied),
+                    style = MaterialTheme.typography.labelMedium.copy(color = c.mute),
+                )
+            }
             Spacer(Modifier.height(8.dp))
             TrackBar(
                 progress = collection.progress,
@@ -219,27 +223,23 @@ private fun LaneRow(
             )
         }
         Spacer(Modifier.width(8.dp))
-        Box {
-            Icon(
-                Icons.Default.MoreVert,
-                contentDescription = null,
-                tint = c.mute,
-                modifier = Modifier.clickable { showMenu = true },
-            )
-            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                DropdownMenuItem(
-                    text = { Text("Edytuj") },
-                    onClick = { showMenu = false; onEditClick() },
-                )
-                DropdownMenuItem(
-                    text = { Text("Usuń", color = MaterialTheme.colorScheme.error) },
-                    onClick = { showMenu = false; onDeleteClick() },
-                )
-            }
-        }
-        Spacer(Modifier.width(4.dp))
         Icon(Icons.Default.ChevronRight, contentDescription = null, tint = c.mute)
     }
+}
+
+private fun formatLastStudied(lastStudied: String?): String {
+    lastStudied ?: return "nie ćwiczono"
+    return try {
+        val instant = Instant.parse(lastStudied)
+        val days = (Clock.System.now() - instant).inWholeDays
+        when {
+            days == 0L -> "dziś"
+            days == 1L -> "wczoraj"
+            days < 7L -> "$days dni temu"
+            days < 30L -> "${days / 7} tyg. temu"
+            else -> "${days / 30} mies. temu"
+        }
+    } catch (_: Exception) { "" }
 }
 
 @Composable

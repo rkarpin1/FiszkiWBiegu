@@ -21,8 +21,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Headphones
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,6 +35,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,9 +64,14 @@ fun FlashcardsScreen(
     onStartLearning: () -> Unit,
     onAddCard: () -> Unit = {},
     onEditCard: (FlashcardDto) -> Unit = {},
+    onEditCollection: () -> Unit = {},
+    onDeleteCollection: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isOnline by networkChecker.isOnline.collectAsState()
+
+    var showCollectionMenu by remember { mutableStateOf(false) }
+    var showDeleteCollectionDialog by remember { mutableStateOf(false) }
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
@@ -71,6 +82,25 @@ fun FlashcardsScreen(
                 polishText = flashcard?.polishText.orEmpty(),
                 onConfirm = { viewModel.confirmDelete() },
                 onDismiss = { viewModel.cancelDelete() },
+            )
+        }
+
+        if (showDeleteCollectionDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteCollectionDialog = false },
+                title = { Text("Usuń kolekcję") },
+                text = { Text("Czy na pewno chcesz usunąć kolekcję \"${collection.name}\"? Tej operacji nie można cofnąć.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showDeleteCollectionDialog = false
+                        onDeleteCollection()
+                    }) {
+                        Text("Usuń", color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteCollectionDialog = false }) { Text("Anuluj") }
+                },
             )
         }
 
@@ -118,7 +148,27 @@ fun FlashcardsScreen(
                             Spacer(Modifier.weight(1f))
                             CapsLabel("KOLEKCJA")
                             Spacer(Modifier.weight(1f))
-                            Spacer(Modifier.size(40.dp))
+                            Box {
+                                Icon(
+                                    Icons.Default.MoreVert,
+                                    contentDescription = null,
+                                    tint = c.mute,
+                                    modifier = Modifier.size(40.dp).clickable { showCollectionMenu = true },
+                                )
+                                DropdownMenu(
+                                    expanded = showCollectionMenu,
+                                    onDismissRequest = { showCollectionMenu = false },
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text("Edytuj") },
+                                        onClick = { showCollectionMenu = false; onEditCollection() },
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("Usuń", color = MaterialTheme.colorScheme.error) },
+                                        onClick = { showCollectionMenu = false; showDeleteCollectionDialog = true },
+                                    )
+                                }
+                            }
                         }
                     }
 
@@ -298,6 +348,8 @@ private fun FlashcardItem(
     onDeleteClick: () -> Unit,
 ) {
     val c = LocalFiszkiColors.current
+    var showMenu by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -316,9 +368,23 @@ private fun FlashcardItem(
             Text(flashcard.polishText, style = MaterialTheme.typography.bodyLarge, color = c.text)
             Text(flashcard.englishText, style = MaterialTheme.typography.bodyMedium, color = c.mute)
         }
-        TextButton(onClick = onEditClick) { Text("Edytuj", color = c.mute) }
-        TextButton(onClick = onDeleteClick) {
-            Text("Usuń", color = MaterialTheme.colorScheme.error)
+        Box {
+            Icon(
+                Icons.Default.MoreVert,
+                contentDescription = null,
+                tint = c.mute,
+                modifier = Modifier.size(24.dp).clickable { showMenu = true },
+            )
+            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                DropdownMenuItem(
+                    text = { Text("Edytuj") },
+                    onClick = { showMenu = false; onEditClick() },
+                )
+                DropdownMenuItem(
+                    text = { Text("Usuń", color = MaterialTheme.colorScheme.error) },
+                    onClick = { showMenu = false; onDeleteClick() },
+                )
+            }
         }
     }
 }

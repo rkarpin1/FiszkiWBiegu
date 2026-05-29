@@ -122,18 +122,7 @@ fun CollectionFormScreen(
                 }
             }
 
-            // Heading
-            Column(modifier = Modifier.padding(horizontal = 26.dp)) {
-                Text(
-                    text = if (isEdit) "Co\nzmieniamy?" else "Co dziś\ndo worka?",
-                    style = MaterialTheme.typography.displayMedium,
-                    color = c.text,
-                )
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            // Form fields
+            // Form fields (heading inside scroll so keyboard doesn't cover it)
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -141,6 +130,14 @@ fun CollectionFormScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 26.dp),
             ) {
+                Column {
+                    Text(
+                        text = if (isEdit) "Co\nzmieniamy?" else "Co dziś\ndo worka?",
+                        style = MaterialTheme.typography.displayMedium,
+                        color = c.text,
+                    )
+                }
+                Spacer(Modifier.height(24.dp))
                 CapsLabel("NAZWA")
                 Spacer(Modifier.height(6.dp))
                 OutlinedTextField(

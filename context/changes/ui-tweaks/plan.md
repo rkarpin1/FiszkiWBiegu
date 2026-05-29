@@ -230,10 +230,10 @@ cd frontend && ./gradlew :androidApp:assembleDebug 2>&1 | tail -20
 
 ### Phase 1: Backend — flashcard_count
 #### Automated
-- [x] 1.1 models.rs — Collection: dodaj flashcard_count: i64
-- [x] 1.2 handlers/collections.rs — list(): COUNT subzapytanie
-- [x] 1.3 handlers/collections.rs — create/update: flashcard_count = 0 w zwracanym obiekcie
-- [x] 1.4 cargo build — kompiluje się
+- [x] 1.1 models.rs — Collection: dodaj flashcard_count: i64 — 050d846
+- [x] 1.2 handlers/collections.rs — list(): COUNT subzapytanie — 050d846
+- [x] 1.3 handlers/collections.rs — create/update: flashcard_count = 0 w zwracanym obiekcie — 050d846
+- [x] 1.4 cargo build — kompiluje się — 050d846
 
 #### Manual
 - [ ] 1.5 GET /collections zwraca flashcard_count
