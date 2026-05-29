@@ -67,7 +67,7 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
     val scope = rememberCoroutineScope()
 
     val initial: Route = if (authRepository.isLoggedIn()) Route.Collections else Route.Login
-    val backStack = remember { mutableStateListOf<Route>(initial) }
+    val backStack = remember { mutableStateListOf(initial) }
 
     var loginError by remember { mutableStateOf<String?>(null) }
     var isLoggingIn by remember { mutableStateOf(false) }
@@ -149,11 +149,11 @@ fun App(onGoogleSignIn: suspend () -> Result<String>) {
                             FlashcardsScreen(
                                 collection = collection,
                                 actions = object : FlashcardsActions {
-                                    override fun onBack() = backStack.removeLastOrNull()
-                                    override fun onStartLearning() = backStack.add(Route.Learning(collection))
-                                    override fun onAddCard() = backStack.add(Route.CardForm(collection.id, collection.name))
-                                    override fun onEditCard(flashcard: FlashcardDto) = backStack.add(Route.CardForm(collection.id, collection.name, flashcard))
-                                    override fun onEditCollection() = backStack.add(Route.CollectionForm(collection))
+                                    override fun onBack() { backStack.removeLastOrNull() }
+                                    override fun onStartLearning() { backStack.add(Route.Learning(collection)) }
+                                    override fun onAddCard() { backStack.add(Route.CardForm(collection.id, collection.name)) }
+                                    override fun onEditCard(flashcard: FlashcardDto) { backStack.add(Route.CardForm(collection.id, collection.name, flashcard)) }
+                                    override fun onEditCollection() { backStack.add(Route.CollectionForm(collection)) }
                                     override fun onDeleteCollection() {
                                         collectionsVm.deleteCollection(collection.id)
                                         backStack.removeLastOrNull()
