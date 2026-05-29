@@ -29,6 +29,7 @@ pub struct Collection {
     pub created_at: DateTime<Utc>,
     pub last_studied: Option<DateTime<Utc>>,
     pub progress: f64,
+    pub flashcard_count: i64,
 }
 
 #[derive(Debug, Deserialize)]

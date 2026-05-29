@@ -14,8 +14,10 @@ fn validate_languages(src: &str, tgt: &str) -> bool {
 
 pub async fn list(pool: web::Data<PgPool>, user: AuthUser) -> impl Responder {
     let result = sqlx::query_as::<_, Collection>(
-        "SELECT id, user_id, name, description, source_language, target_language, created_at, last_studied, progress \
-         FROM collections WHERE user_id = $1 ORDER BY created_at DESC",
+        "SELECT c.id, c.user_id, c.name, c.description, c.source_language, c.target_language, \
+         c.created_at, c.last_studied, c.progress, \
+         (SELECT COUNT(*) FROM flashcards WHERE collection_id = c.id) AS flashcard_count \
+         FROM collections c WHERE c.user_id = $1 ORDER BY c.created_at DESC",
     )
     .bind(user.id)
     .fetch_all(pool.get_ref())
@@ -47,7 +49,8 @@ pub async fn create(
     let result = sqlx::query_as::<_, Collection>(
         "INSERT INTO collections (user_id, name, description, source_language, target_language) \
          VALUES ($1, $2, $3, $4, $5) \
-         RETURNING id, user_id, name, description, source_language, target_language, created_at, last_studied, progress",
+         RETURNING id, user_id, name, description, source_language, target_language, created_at, last_studied, progress, \
+         0::bigint AS flashcard_count",
     )
     .bind(user.id)
     .bind(&body.name)
@@ -85,7 +88,8 @@ pub async fn update(
     let result = sqlx::query_as::<_, Collection>(
         "UPDATE collections SET name = $1, description = $2, source_language = $3, target_language = $4 \
          WHERE id = $5 AND user_id = $6 \
-         RETURNING id, user_id, name, description, source_language, target_language, created_at, last_studied, progress",
+         RETURNING id, user_id, name, description, source_language, target_language, created_at, last_studied, progress, \
+         0::bigint AS flashcard_count",
     )
     .bind(&body.name)
     .bind(&body.description)
