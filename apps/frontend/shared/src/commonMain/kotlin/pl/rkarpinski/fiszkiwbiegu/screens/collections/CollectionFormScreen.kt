@@ -283,7 +283,7 @@ fun CollectionFormContent(
                     Text(
                         "Usunąć kolekcję?",
                         style = MaterialTheme.typography.headlineMedium,
-                        color = scheme.onBackground,
+                        color = scheme.onSurface,
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(

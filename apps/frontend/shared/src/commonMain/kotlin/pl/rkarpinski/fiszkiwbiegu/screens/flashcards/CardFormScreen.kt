@@ -127,7 +127,9 @@ fun CardFormContent(
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDeleteDialog = false }) { Text("Anuluj") }
+                    TextButton(onClick = { showDeleteDialog = false }) {
+                        Text("Anuluj", color = MaterialTheme.colorScheme.onSurface)
+                    }
                 },
             )
         }

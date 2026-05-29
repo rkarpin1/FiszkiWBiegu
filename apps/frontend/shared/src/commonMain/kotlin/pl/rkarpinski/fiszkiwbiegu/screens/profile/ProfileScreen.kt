@@ -88,7 +88,7 @@ fun ProfileScreen(
                 Text(
                     uiState.displayName.ifBlank { "…" },
                     style = MaterialTheme.typography.headlineMedium,
-                    color = scheme.onBackground,
+                    color = scheme.onSurface,
                 )
                 if (uiState.email.isNotBlank()) {
                     Spacer(Modifier.height(4.dp))

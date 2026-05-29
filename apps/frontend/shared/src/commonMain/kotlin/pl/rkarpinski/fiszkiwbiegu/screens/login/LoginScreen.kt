@@ -133,7 +133,7 @@ private fun AuthButton(label: String, enabled: Boolean, onClick: () -> Unit) {
         Text(
             text = label,
             style = MaterialTheme.typography.titleLarge,
-            color = if (enabled) scheme.onBackground else c.mute2,
+            color = if (enabled) scheme.onSurface else c.mute2,
         )
     }
 }

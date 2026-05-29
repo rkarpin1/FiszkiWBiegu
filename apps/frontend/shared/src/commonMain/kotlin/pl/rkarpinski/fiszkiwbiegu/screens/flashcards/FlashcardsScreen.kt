@@ -133,8 +133,7 @@ fun FlashcardsScreenContent(
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDeleteCollectionDialog = false })
-                    {
+                    TextButton(onClick = { showDeleteCollectionDialog = false }) {
                         Text("Anuluj", color = MaterialTheme.colorScheme.onSurface)
                     }
                 },
