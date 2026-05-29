@@ -133,7 +133,10 @@ fun FlashcardsScreenContent(
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDeleteCollectionDialog = false }) { Text("Anuluj") }
+                    TextButton(onClick = { showDeleteCollectionDialog = false })
+                    {
+                        Text("Anuluj", color = MaterialTheme.colorScheme.onSurface)
+                    }
                 },
             )
         }
@@ -149,7 +152,11 @@ fun FlashcardsScreenContent(
                         .clickable { actions.onAddCard() },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Dodaj", tint = scheme.inverseOnSurface)
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "Dodaj",
+                        tint = scheme.inverseOnSurface
+                    )
                 }
             },
         ) { paddingValues ->
@@ -168,7 +175,11 @@ fun FlashcardsScreenContent(
                                     .size(40.dp)
                                     .clip(MaterialTheme.shapes.medium)
                                     .background(scheme.surface)
-                                    .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium)
+                                    .border(
+                                        1.dp,
+                                        scheme.outlineVariant,
+                                        MaterialTheme.shapes.medium
+                                    )
                                     .clickable(onClick = actions::onBack),
                                 contentAlignment = Alignment.Center,
                             ) {
@@ -310,8 +321,7 @@ fun FlashcardsScreenContent(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 22.dp)
-                                .padding(top=16.dp)
-                            ,
+                                .padding(top = 16.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
@@ -426,8 +436,16 @@ private fun FlashcardItem(
         )
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(flashcard.sourceText, style = MaterialTheme.typography.bodyLarge, color = scheme.onBackground)
-            Text(flashcard.targetText, style = MaterialTheme.typography.bodyMedium, color = scheme.onSurfaceVariant)
+            Text(
+                flashcard.sourceText,
+                style = MaterialTheme.typography.bodyLarge,
+                color = scheme.onBackground
+            )
+            Text(
+                flashcard.targetText,
+                style = MaterialTheme.typography.bodyMedium,
+                color = scheme.onSurfaceVariant
+            )
         }
         Box {
             Icon(
@@ -466,7 +484,9 @@ private fun DeleteFlashcardDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Anuluj") }
+            TextButton(onClick = onDismiss) {
+                Text("Anuluj", color = MaterialTheme.colorScheme.onSurface)
+            }
         },
     )
 }

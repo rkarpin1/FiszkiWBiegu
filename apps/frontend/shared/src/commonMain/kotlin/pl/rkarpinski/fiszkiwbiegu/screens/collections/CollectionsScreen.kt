@@ -102,7 +102,11 @@ fun CollectionsScreenContent(
                         .clickable { onAddClick() },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Dodaj", tint = scheme.inverseOnSurface)
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "Dodaj",
+                        tint = scheme.inverseOnSurface
+                    )
                 }
             },
         ) { paddingValues ->
@@ -132,7 +136,11 @@ fun CollectionsScreenContent(
                                         .padding(horizontal = 22.dp)
                                         .clip(MaterialTheme.shapes.extraLarge)
                                         .background(scheme.surface)
-                                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.extraLarge)
+                                        .border(
+                                            1.dp,
+                                            scheme.outlineVariant,
+                                            MaterialTheme.shapes.extraLarge
+                                        )
                                         .padding(22.dp),
                                 ) {
                                     Column {
@@ -253,7 +261,11 @@ private fun LaneRow(
                         color = accent
                     ),
                 )
-                Text("·", style = MaterialTheme.typography.labelMedium, color = scheme.onSurfaceVariant)
+                Text(
+                    "·",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = scheme.onSurfaceVariant
+                )
                 Text(
                     formatLastStudied(collection.lastStudied),
                     style = MaterialTheme.typography.labelMedium.copy(color = scheme.onSurfaceVariant),
@@ -345,7 +357,7 @@ private fun LastUsedHero(
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.TopEnd
-            ) {
+        ) {
             Row(
                 Modifier
                     .height(56.dp)
@@ -409,7 +421,9 @@ private fun DeleteConfirmationDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Anuluj") }
+            TextButton(onClick = onDismiss) {
+                Text("Anuluj", color = MaterialTheme.colorScheme.onSurface)
+            }
         },
     )
 }
