@@ -291,9 +291,9 @@ private fun LastUsedHero(
             .padding(horizontal = 22.dp)
             .clip(RoundedCornerShape(24.dp))
             .background(scheme.surface)
+            .clickable(onClick = onOpen)
             .border(1.dp, scheme.outlineVariant, RoundedCornerShape(24.dp))
-            .padding(22.dp)
-            .clickable(onClick = onOpen),
+            .padding(22.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(6.dp).clip(CircleShape).background(scheme.primary))
