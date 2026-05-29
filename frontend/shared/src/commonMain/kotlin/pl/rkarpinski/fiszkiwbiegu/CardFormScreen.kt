@@ -54,7 +54,7 @@ fun CardFormScreen(
     collectionId: String,
     collectionName: String,
     flashcard: FlashcardDto? = null,
-    viewModel: FlashcardsViewModel = koinViewModel { parametersOf(collectionId) },
+    viewModel: FlashcardsViewModel = koinViewModel(key = collectionId) { parametersOf(collectionId) },
     onBack: () -> Unit,
 ) {
     val isEdit = flashcard != null

@@ -52,7 +52,7 @@ import pl.rkarpinski.fiszkiwbiegu.ui.components.LanguageNames
 @Composable
 fun FlashcardsScreen(
     collection: CollectionDto,
-    viewModel: FlashcardsViewModel = koinViewModel { parametersOf(collection.id) },
+    viewModel: FlashcardsViewModel = koinViewModel(key = collection.id) { parametersOf(collection.id) },
     networkChecker: NetworkChecker = koinInject(),
     onBack: () -> Unit,
     onStartLearning: () -> Unit,
