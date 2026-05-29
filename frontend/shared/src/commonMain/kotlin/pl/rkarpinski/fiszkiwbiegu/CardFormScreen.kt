@@ -158,20 +158,7 @@ fun CardFormScreen(
                 )
             }
 
-            Spacer(Modifier.height(16.dp))
-
-            // Heading
-            Column(modifier = Modifier.padding(horizontal = 26.dp)) {
-                Text(
-                    text = if (isEdit) "Zmień co\nchcesz." else "Para słów.\nPolski i angielski.",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = c.text,
-                )
-            }
-
-            Spacer(Modifier.height(20.dp))
-
-            // Form fields
+            // Form fields (heading inside scroll so keyboard doesn't cover it)
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -179,6 +166,15 @@ fun CardFormScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 26.dp),
             ) {
+                Spacer(Modifier.height(16.dp))
+                Column {
+                    Text(
+                        text = if (isEdit) "Zmień co\nchcesz." else "Para słów.\nPolski i angielski.",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = c.text,
+                    )
+                }
+                Spacer(Modifier.height(20.dp))
                 // PL field
                 Row(
                     verticalAlignment = Alignment.CenterVertically,

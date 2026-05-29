@@ -230,24 +230,24 @@ cd frontend && ./gradlew :androidApp:assembleDebug 2>&1 | tail -20
 
 ### Phase 1: Backend — flashcard_count
 #### Automated
-- [x] 1.1 models.rs — Collection: dodaj flashcard_count: i64
-- [x] 1.2 handlers/collections.rs — list(): COUNT subzapytanie
-- [x] 1.3 handlers/collections.rs — create/update: flashcard_count = 0 w zwracanym obiekcie
-- [x] 1.4 cargo build — kompiluje się
+- [x] 1.1 models.rs — Collection: dodaj flashcard_count: i64 — 050d846
+- [x] 1.2 handlers/collections.rs — list(): COUNT subzapytanie — 050d846
+- [x] 1.3 handlers/collections.rs — create/update: flashcard_count = 0 w zwracanym obiekcie — 050d846
+- [x] 1.4 cargo build — kompiluje się — 050d846
 
 #### Manual
 - [ ] 1.5 GET /collections zwraca flashcard_count
 
 ### Phase 2: Frontend — UI tweaks
 #### Automated
-- [x] 2.1 ApiModels.kt — dodaj flashcardCount do CollectionDto
-- [x] 2.2 CollectionsScreen.kt — usuń DropdownMenu z LaneRow; dodaj subtitle; usuń onEditClick
-- [x] 2.3 CollectionsViewModel.kt — dodaj deleteCollection()
-- [x] 2.4 FlashcardsScreen.kt — MoreVert w top barze + MoreVert w FlashcardItem
-- [x] 2.5 CollectionFormScreen.kt — heading do scrollowalnej kolumny
-- [x] 2.6 CardFormScreen.kt — heading do scrollowalnej kolumny
-- [x] 2.7 App.kt — usuń onEditClick z Collections; dodaj onEditCollection/onDeleteCollection do Flashcards
-- [x] 2.8 ./gradlew :androidApp:assembleDebug — BUILD SUCCESSFUL
+- [x] 2.1 ApiModels.kt — dodaj flashcardCount do CollectionDto — 293b2c5
+- [x] 2.2 CollectionsScreen.kt — usuń DropdownMenu z LaneRow; dodaj subtitle; usuń onEditClick — 293b2c5
+- [x] 2.3 CollectionsViewModel.kt — dodaj deleteCollection() — 293b2c5
+- [x] 2.4 FlashcardsScreen.kt — MoreVert w top barze + MoreVert w FlashcardItem — 293b2c5
+- [x] 2.5 CollectionFormScreen.kt — heading do scrollowalnej kolumny — 293b2c5
+- [x] 2.6 CardFormScreen.kt — heading do scrollowalnej kolumny — 293b2c5
+- [x] 2.7 App.kt — usuń onEditClick z Collections; dodaj onEditCollection/onDeleteCollection do Flashcards — 293b2c5
+- [x] 2.8 ./gradlew :androidApp:assembleDebug — BUILD SUCCESSFUL — 293b2c5
 
 #### Manual
 - [ ] 2.9 Lista kolekcji: brak MoreVert, widoczny subtitle "N fiszek · X dni temu"

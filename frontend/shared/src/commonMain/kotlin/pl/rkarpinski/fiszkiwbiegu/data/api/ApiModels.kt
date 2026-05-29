@@ -14,6 +14,7 @@ data class CollectionDto(
     @SerialName("created_at") val createdAt: String,
     @SerialName("last_studied") val lastStudied: String? = null,
     val progress: Float = 0f,
+    @SerialName("flashcard_count") val flashcardCount: Int = 0,
 )
 
 @Serializable
