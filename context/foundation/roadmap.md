@@ -256,7 +256,6 @@ _(brak aktywnych pytań — wszystkie zablokowane przez F-01/S-02 zostały rozwi
 - **#1: Obsługa kolekcji i fiszek z przeglądarki Web** — Dlaczego zaparkowane: AGENTS.md §Hard Rules — MVP scope is Android only; webApp istnieje jako cel KMP, ale pełna funkcjonalność CRUD w przeglądarce planowana w v2.
 - **#3: Okno opcji przed przystąpieniem do nauki** — Dlaczego zaparkowane: zawiera funkcje z Non-Goals — tryb nauki z algorytmem powtórkowym, tryb EN→PL (PRD §Non-Goals, p. „FR-015: Tryb EN→PL"), konfigurowalna liczba powtórzeń (PRD §Non-Goals, p. „Konfiguracja liczby powtórzeń EN"); implementacja możliwa w v2 równolegle z algorytmem powtórkowym.
 - **#4: Zmiany UI okna nauki** — Dlaczego zaparkowane: przyciski „Wiem"/„Nie wiem" wymagają algorytmu powtórkowego (PRD §Non-Goals, p. „Spaced repetition"); wizualne wyświetlanie tekstu pytania/odpowiedzi jest sprzeczne z założeniem „wyłącznie audio" (PRD §Sokrates); w v2 razem z trybem wizualnym.
-- **#5: Rozszerzenie na wiele języków** — Dlaczego zaparkowane: PRD §Non-Goals — MVP obsługuje wyłącznie parę PL↔EN; wielojęzyczność wymaga refaktoryzacji TTS, danych i UI; w v2.
 - **#6: Automatyczne tłumaczenie przy wprowadzaniu fiszki** — Dlaczego zaparkowane: wymaga integracji z zewnętrznym API tłumaczącym (np. DeepL/Google Translate) — nowa zależność zewnętrzna poza zakresem MVP; w v2 razem z rozszerzeniem edytora fiszek.
 
 ## Zrobione
@@ -272,3 +271,4 @@ _(brak aktywnych pytań — wszystkie zablokowane przez F-01/S-02 zostały rozwi
 - **S-05: lista kolekcji bez menu + subtitle "N fiszek · X dni temu"; edycja/usuń kolekcji w widoku szczegółów; formularze nie zasłaniane przez klawiaturę** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-ui-tweaks/`. Lekcja: —.
 - **S-06: przemianowanie pól fiszki — `polish_text`→`source_text`, `english_text`→`target_text` w DB, API i całym frontendzie** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-rename-flashcard-fields/`. Lekcja: —.
 - **S-07: zmiany i optymalizacje w UI lub kodzie frontendu** — Zrealizowano 2026-05-29. Lekcja: —.
+- **#5: Rozszerzenie na wiele języków** — Zrealizowano 2026-05-29.
