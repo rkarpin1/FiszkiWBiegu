@@ -22,5 +22,3 @@ reqwest = { version = "0.13", features = ["json", "rustls"], default-features = 
 opt-level = "z"      # optymalizuj pod kątem rozmiaru (alternatywnie "s" dla lepszego balansu)
 lto = true           # Link-Time Optimization — eliminuje martwy kod między kratami
 codegen-units = 1    # jeden unit = lepsza optymalizacja, dłuższa kompilacja
-panic = "abort"      # usuwa logikę unwind, zmniejsza binarke
-strip = true         # usuwa symbole debugowania z pliku wynikowego
