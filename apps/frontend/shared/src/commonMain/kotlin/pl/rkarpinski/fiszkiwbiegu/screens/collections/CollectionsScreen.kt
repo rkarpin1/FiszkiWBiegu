@@ -19,8 +19,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -35,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import kotlin.time.Clock
@@ -44,8 +47,11 @@ import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
 import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.theme.accentColorForId
+import pl.rkarpinski.fiszkiwbiegu.theme.capsMono
 import pl.rkarpinski.fiszkiwbiegu.theme.mono
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
+import pl.rkarpinski.fiszkiwbiegu.ui.components.Flag
+import pl.rkarpinski.fiszkiwbiegu.ui.components.LanguageNames
 import pl.rkarpinski.fiszkiwbiegu.ui.components.TrackBar
 
 @Composable
@@ -102,7 +108,11 @@ fun CollectionsScreenContent(
                 }
             },
         ) { paddingValues ->
-            Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                // .padding(paddingValues)
+            ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     Column(modifier = Modifier.padding(horizontal = 22.dp, vertical = 22.dp)) {
                         CapsLabel("CZEŚĆ!")
@@ -115,6 +125,7 @@ fun CollectionsScreenContent(
                     }
 
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
+
                         if (uiState.collections.isEmpty() && !uiState.isLoading) {
                             item {
                                 Box(
@@ -140,6 +151,15 @@ fun CollectionsScreenContent(
                         }
 
                         if (uiState.collections.isNotEmpty()) {
+
+                            item {
+                                LastUsedHero(
+                                    uiState.collections.first(),
+                                    onResume = { onCollectionClick(uiState.collections.first()) },
+                                    onOpen = { onCollectionClick(uiState.collections.first()) })
+                            }
+
+
                             item {
                                 Spacer(Modifier.height(4.dp))
                                 Box(
@@ -254,6 +274,109 @@ private fun LaneRow(
         Icon(Icons.Default.ChevronRight, contentDescription = null, tint = c.mute)
     }
 }
+
+
+@Composable
+private fun LastUsedHero(
+    collection: CollectionDto,
+    onResume: () -> Unit,
+    onOpen: () -> Unit
+) {
+    val c = LocalFiszkiColors.current
+
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 22.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .background(c.surface2)
+            .border(1.dp, c.line, RoundedCornerShape(24.dp))
+            .padding(22.dp)
+            .clickable(onClick = onOpen),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(6.dp).clip(CircleShape).background(c.accent))
+            Spacer(Modifier.width(8.dp))
+            Text(
+                "OSTATNIO  //  KONTYNUUJ",
+                style = capsMono().copy(color = accentColorForId(collection.id)),
+            )
+        }
+        Spacer(Modifier.height(14.dp))
+
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 22.dp)
+                .padding(top = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Spacer(Modifier.weight(1f))
+            Flag(collection.sourceLanguage, 16.dp)
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = null,
+                tint = c.mute,
+                modifier = Modifier.size(16.dp),
+            )
+            Flag(collection.targetLanguage, 16.dp)
+            Spacer(Modifier.width(8.dp))
+            CapsLabel(
+                "${LanguageNames[collection.sourceLanguage]?.uppercase() ?: collection.sourceLanguage.uppercase()} → ${LanguageNames[collection.targetLanguage]?.uppercase() ?: collection.targetLanguage.uppercase()}"
+            )
+            Spacer(Modifier.weight(1f))
+        }
+
+        Spacer(Modifier.height(6.dp))
+        Text(
+            collection.name,
+            style = MaterialTheme.typography.headlineLarge.copy(color = c.text),
+        )
+
+        Spacer(Modifier.height(14.dp))
+        TrackBar(
+            progress = collection.progress,
+            accent = c.accent,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(14.dp))
+
+
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.TopEnd
+            ) {
+            Row(
+                Modifier
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(c.accent)
+                    .clickable(onClick = onResume)
+                    .padding(horizontal = 22.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Icon(
+                    Icons.Default.PlayArrow,
+                    null,
+                    tint = c.onAccent,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    "Wznów",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = c.onAccent,
+                        fontWeight = FontWeight.Bold,
+                    ),
+                )
+            }
+        }
+
+    }
+}
+
 
 private fun formatLastStudied(lastStudied: String?): String {
     lastStudied ?: return "nie ćwiczono"
