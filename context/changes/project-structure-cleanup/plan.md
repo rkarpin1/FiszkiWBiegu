@@ -213,8 +213,8 @@ Usunięcie trzech pozostałych artefaktów: dwóch scaffoldowych plików KMP (`G
 
 #### Automatyczne
 
-- [ ] 2.1 .tmp/ nie istnieje w katalogu głównym
-- [ ] 2.2 git status czysty po commicie fazy 2
+- [x] 2.1 .tmp/ nie istnieje w katalogu głównym
+- [x] 2.2 git status czysty po commicie fazy 2
 
 ### Faza 3: Usuń scaffold i bootstrap-verification
 
