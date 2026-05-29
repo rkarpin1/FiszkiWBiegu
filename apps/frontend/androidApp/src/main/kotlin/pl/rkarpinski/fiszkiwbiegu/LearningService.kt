@@ -118,10 +118,10 @@ class LearningService : MediaSessionService() {
             publishState(LearningPhase.SPEAKING_POLISH)
             ttsPlayer.updateCurrentItem(card.toMediaItem())
 
-            speakAndWait(card.polishText, Locale.forLanguageTag("pl-PL"))
+            speakAndWait(card.sourceText, Locale.forLanguageTag("pl-PL"))
             if (!isActive || !isPlaying) continue
 
-            val timeForEnglishText = speakAndWait(card.englishText, Locale.ENGLISH, 0f)
+            val timeForTargetText = speakAndWait(card.targetText, Locale.ENGLISH, 0f)
             if (!isActive || !isPlaying) continue
             delay(800)
             if (!isActive || !isPlaying) continue
@@ -129,8 +129,8 @@ class LearningService : MediaSessionService() {
             publishState(LearningPhase.SPEAKING_ENGLISH)
             repeat(3) {
                 if (isActive && isPlaying) {
-                    speakAndWait(card.englishText, Locale.ENGLISH)
-                    if (isActive && isPlaying) delay(timeForEnglishText + 500)
+                    speakAndWait(card.targetText, Locale.ENGLISH)
+                    if (isActive && isPlaying) delay(timeForTargetText + 500)
                 }
             }
             if (!isActive || !isPlaying) continue
@@ -220,8 +220,8 @@ private fun FlashcardDto.toMediaItem() = MediaItem.Builder()
     .setMediaId(id)
     .setMediaMetadata(
         MediaMetadata.Builder()
-            .setTitle(polishText)
-            .setSubtitle(englishText)
+            .setTitle(sourceText)
+            .setSubtitle(targetText)
             .build()
     )
     .build()

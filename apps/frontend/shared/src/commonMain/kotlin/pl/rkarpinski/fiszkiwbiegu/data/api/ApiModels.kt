@@ -49,11 +49,11 @@ data class FlashcardDto(
     @SerialName("collection_id")
     val collectionId: String,
 
-    @SerialName("polish_text")
-    val polishText: String,
+    @SerialName("source_text")
+    val sourceText: String,
 
-    @SerialName("english_text")
-    val englishText: String,
+    @SerialName("target_text")
+    val targetText: String,
 
     val position: Int,
 
@@ -63,20 +63,20 @@ data class FlashcardDto(
 
 @Serializable
 data class FlashcardRequest(
-    @SerialName("polish_text")
-    val polishText: String,
+    @SerialName("source_text")
+    val sourceText: String,
 
-    @SerialName("english_text")
-    val englishText: String,
+    @SerialName("target_text")
+    val targetText: String,
 )
 
 @Serializable
 data class FlashcardUpdateRequest(
-    @SerialName("polish_text")
-    val polishText: String? = null,
+    @SerialName("source_text")
+    val sourceText: String? = null,
 
-    @SerialName("english_text")
-    val englishText: String? = null,
+    @SerialName("target_text")
+    val targetText: String? = null,
 )
 
 @Serializable

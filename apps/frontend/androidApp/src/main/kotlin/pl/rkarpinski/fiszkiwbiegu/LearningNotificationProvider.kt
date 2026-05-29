@@ -39,8 +39,8 @@ class LearningNotificationProvider(private val context: Context) : MediaNotifica
         val isEnglish = learningState.phase == LearningPhase.SPEAKING_ENGLISH
 
         val views = RemoteViews(context.packageName, R.layout.notification_learning).apply {
-            setTextViewText(R.id.notification_title, card?.polishText ?: "")
-            setTextViewText(R.id.notification_subtitle, card?.englishText ?: "")
+            setTextViewText(R.id.notification_title, card?.sourceText ?: "")
+            setTextViewText(R.id.notification_subtitle, card?.targetText ?: "")
             setTextViewText(R.id.btn_play_pause, if (learningState.isPlaying) "⏸" else "▶")
             setInt(
                 R.id.notification_root,
@@ -64,8 +64,8 @@ class LearningNotificationProvider(private val context: Context) : MediaNotifica
         val accentColor = if (isEnglish) Color.parseColor("#1A2980") else Color.parseColor("#8B0000")
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_media_play)
-            .setContentTitle(card?.polishText ?: "FiszkiWBiegu")
-            .setContentText(card?.englishText ?: "")
+            .setContentTitle(card?.sourceText ?: "FiszkiWBiegu")
+            .setContentText(card?.targetText ?: "")
             .setColor(accentColor)
             .setColorized(true)
             .setCustomBigContentView(views)
@@ -86,8 +86,8 @@ class LearningNotificationProvider(private val context: Context) : MediaNotifica
         val card = learningState.flashcards.getOrNull(learningState.currentIndex)
         val isEnglish = learningState.phase == LearningPhase.SPEAKING_ENGLISH
         val views = RemoteViews(context.packageName, R.layout.notification_learning).apply {
-            setTextViewText(R.id.notification_title, card?.polishText ?: "")
-            setTextViewText(R.id.notification_subtitle, card?.englishText ?: "")
+            setTextViewText(R.id.notification_title, card?.sourceText ?: "")
+            setTextViewText(R.id.notification_subtitle, card?.targetText ?: "")
             setTextViewText(R.id.btn_play_pause, if (learningState.isPlaying) "⏸" else "▶")
             setInt(
                 R.id.notification_root,
@@ -98,8 +98,8 @@ class LearningNotificationProvider(private val context: Context) : MediaNotifica
         val accentColor = if (isEnglish) Color.parseColor("#1A2980") else Color.parseColor("#8B0000")
         return NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_media_play)
-            .setContentTitle(card?.polishText ?: "FiszkiWBiegu")
-            .setContentText(card?.englishText ?: "")
+            .setContentTitle(card?.sourceText ?: "FiszkiWBiegu")
+            .setContentText(card?.targetText ?: "")
             .setColor(accentColor)
             .setColorized(true)
             .setCustomBigContentView(views)

@@ -110,7 +110,7 @@ fun FlashcardsScreenContent(
         uiState.pendingDeleteId?.let { id ->
             val flashcard = uiState.flashcards.find { it.id == id }
             DeleteFlashcardDialog(
-                polishText = flashcard?.polishText.orEmpty(),
+                sourceText = flashcard?.sourceText.orEmpty(),
                 onConfirm = onConfirmDelete,
                 onDismiss = onCancelDelete,
             )
@@ -421,8 +421,8 @@ private fun FlashcardItem(
         )
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(flashcard.polishText, style = MaterialTheme.typography.bodyLarge, color = c.text)
-            Text(flashcard.englishText, style = MaterialTheme.typography.bodyMedium, color = c.mute)
+            Text(flashcard.sourceText, style = MaterialTheme.typography.bodyLarge, color = c.text)
+            Text(flashcard.targetText, style = MaterialTheme.typography.bodyMedium, color = c.mute)
         }
         Box {
             Icon(
@@ -447,14 +447,14 @@ private fun FlashcardItem(
 
 @Composable
 private fun DeleteFlashcardDialog(
-    polishText: String,
+    sourceText: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Usuń fiszkę") },
-        text = { Text("Czy na pewno chcesz usunąć fiszkę \"$polishText\"? Tej operacji nie można cofnąć.") },
+        text = { Text("Czy na pewno chcesz usunąć fiszkę \"$sourceText\"? Tej operacji nie można cofnąć.") },
         confirmButton = {
             TextButton(onClick = onConfirm) {
                 Text("Usuń", color = MaterialTheme.colorScheme.error)

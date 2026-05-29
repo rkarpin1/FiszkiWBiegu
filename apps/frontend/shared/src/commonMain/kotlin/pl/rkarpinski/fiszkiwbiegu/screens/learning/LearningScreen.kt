@@ -149,7 +149,7 @@ fun LearningScreen(
             ) {
                 if (card != null) {
                     Text(
-                        text = card.englishText,
+                        text = card.targetText,
                         style = MaterialTheme.typography.displayLarge,
                         color = c.text,
                         textAlign = TextAlign.Center,
@@ -158,7 +158,7 @@ fun LearningScreen(
                     Box(Modifier.fillMaxWidth().height(1.dp).background(c.line))
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        text = card.polishText,
+                        text = card.sourceText,
                         style = MaterialTheme.typography.headlineMedium,
                         color = c.mute,
                         textAlign = TextAlign.Center,
