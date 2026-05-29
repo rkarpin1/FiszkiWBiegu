@@ -86,7 +86,7 @@ fun CardFormScreen(
             )
         }
 
-        Column(Modifier.fillMaxSize().background(c.surface)) {
+        Column(Modifier.fillMaxSize().background(c.surface).imePadding()) {
             // Top bar
             Row(
                 modifier = Modifier
@@ -262,8 +262,7 @@ fun CardFormScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 22.dp, vertical = 16.dp)
-                    .imePadding(),
+                    .padding(horizontal = 22.dp, vertical = 16.dp),
             ) {
                 Box(
                     modifier = Modifier
