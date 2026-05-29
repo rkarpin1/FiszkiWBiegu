@@ -1,7 +1,7 @@
 ---
 change_id: rename-flashcard-fields
 title: Rename flashcard fields
-status: new
+status: impl_reviewed
 created: 2026-05-29
 updated: 2026-05-29
 archived_at: null
