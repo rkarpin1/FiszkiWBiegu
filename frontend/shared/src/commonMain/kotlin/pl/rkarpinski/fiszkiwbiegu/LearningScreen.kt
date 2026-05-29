@@ -46,7 +46,7 @@ import pl.rkarpinski.fiszkiwbiegu.ui.components.MediaControls
 @Composable
 fun LearningScreen(
     collection: CollectionDto,
-    viewModel: LearningViewModel = koinViewModel { parametersOf(collection.id) },
+    viewModel: LearningViewModel = koinViewModel(key = collection.id) { parametersOf(collection.id) },
     onBack: () -> Unit,
 ) {
     LaunchedEffect(Unit) { viewModel.startSession() }
