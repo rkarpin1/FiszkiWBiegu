@@ -6,5 +6,5 @@ target/
 **/*.rs.bk
 *.pdb
 .idea/
-project.env
+.env
 

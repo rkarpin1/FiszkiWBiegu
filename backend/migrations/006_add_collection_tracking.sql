@@ -1,0 +1,2 @@
+ALTER TABLE collections ADD COLUMN last_studied TIMESTAMPTZ;
+ALTER TABLE collections ADD COLUMN progress FLOAT NOT NULL DEFAULT 0;

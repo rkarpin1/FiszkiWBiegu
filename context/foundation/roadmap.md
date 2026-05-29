@@ -186,22 +186,22 @@ Zakres (każdy punkt = osobny `/10x-plan`):
 
 ## Przekazanie do backlogu
 
-| ID mapy drogowej | ID zmiany                           | Sugerowany tytuł problemu                                     | Gotowe do `/10x-plan` | Uwagi                                                              |
-| ---------------- |-------------------------------------| ------------------------------------------------------------- |-----------------------| ------------------------------------------------------------------ |
-| F-01             | offline-flashcard-cache             | Cache i synchronizacja fiszek offline (Android Room/SQLite)  | done                  | Uruchom `/10x-plan offline-flashcard-cache`                        |
-| S-01             | collections-flashcards-e2e          | Zarządzanie kolekcjami i fiszkami — weryfikacja E2E           | done                  | Zrealizowane                                                       |
-| S-02             | audio-learning-session-offline      | Tryb nauki audio offline — integracja i testy                 | done                  | Czeka na ukończenie F-01 + S-01                                    |
-| S-03             | production-run-validation           | Wdrożenie produkcyjne + pierwsza sesja na żywo                | done                  | Zrealizowane                                                       |
-| S-04-A           | ui-reskin-design-system             | Reskin UI — faza A: design system                             | done                  | Zrealizowane                                                       |
-| S-04-B           | ui-reskin-screens                   | Reskin UI — faza B: reskin istniejących ekranów               | done                  | Zrealizowane                                                       |
-| S-04-C           | ui-reskin-new-screens               | Reskin UI — faza C: nowe ekrany + nawigacja                   | done                  | Zrealizowane                                                       |
-| S-04-D           | ui-reskin-backend-stubs             | Reskin UI — faza D: backend dla zaślepek                      | no                    | Czeka na S-04-C; każda zaślepka = osobny plan                      |
+| ID mapy drogowej | ID zmiany                           | Sugerowany tytuł problemu                                     | Gotowe do `/10x-plan` | Uwagi                                         |
+| ---------------- |-------------------------------------| ------------------------------------------------------------- |-----------------------|-----------------------------------------------|
+| F-01             | offline-flashcard-cache             | Cache i synchronizacja fiszek offline (Android Room/SQLite)  | done                  | Uruchom `/10x-plan offline-flashcard-cache`   |
+| S-01             | collections-flashcards-e2e          | Zarządzanie kolekcjami i fiszkami — weryfikacja E2E           | done                  | Zrealizowane                                  |
+| S-02             | audio-learning-session-offline      | Tryb nauki audio offline — integracja i testy                 | done                  | Zrealizowane                                  |
+| S-03             | production-run-validation           | Wdrożenie produkcyjne + pierwsza sesja na żywo                | done                  | Zrealizowane                                  |
+| S-04-A           | ui-reskin-design-system             | Reskin UI — faza A: design system                             | done                  | Zrealizowane                                  |
+| S-04-B           | ui-reskin-screens                   | Reskin UI — faza B: reskin istniejących ekranów               | done                  | Zrealizowane                                  |
+| S-04-C           | ui-reskin-new-screens               | Reskin UI — faza C: nowe ekrany + nawigacja                   | done                  | Zrealizowane                                  |
+| S-04-D           | ui-reskin-backend-stubs             | Reskin UI — faza D: backend dla zaślepek                      | no                    | Czeka na S-04-C; każda zaślepka = osobny plan |
 
 ## Otwarte pytania dotyczące mapy drogowej
 
 1. **Synchronizacja fiszek offline** — kiedy i jak aplikacja synchronizuje fiszki z backendu na urządzenie? (przy uruchomieniu / przy starcie sesji nauki / w tle / ręcznie). Właściciel: Rafał. Blokada: F-01 (decyzja architektoniczna do podjęcia w `/10x-plan offline-flashcard-cache`).
 2. **Długość pauz w cyklu audio** — ile sekund po tekście PL (przed EN) i między powtórzeniami EN? Właściciel: Rafał. Blokada: S-02 (decyzja empiryczna podczas implementacji — nie blokuje startu, ale musi być ustalona przed finalizacją UX trybu nauki).
-
+/19x
 ## Zaparkowane
 
 - **FR-015: Tryb EN→PL (3x angielski, potem 1x polski)** — Dlaczego zaparkowane: PRD §Sokrates — „PL→EN to główny use case; EN→PL komplikuje UI bez kluczowej wartości dla MVP"; planowane w v2.
