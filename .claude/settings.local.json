@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -Command \"(New-Object Media.SoundPlayer 'D:\\Projekty\\kmp\\FiszkiWBiegu\\.claude\\alarm.wav').PlaySync()\"",
+            "shell": "powershell"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -Command \"(New-Object Media.SoundPlayer 'D:\\Projekty\\kmp\\FiszkiWBiegu\\.claude\\alarm.wav').PlaySync()\"",
+            "shell": "powershell"
+          }
+        ]
+      }
+    ]
+  }
+}
