@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -92,10 +91,11 @@ fun LearningContent(
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
+        val scheme = MaterialTheme.colorScheme
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(c.surface)
+                .background(scheme.background)
                 .padding(horizontal = 22.dp),
         ) {
             Spacer(Modifier.height(16.dp))
@@ -110,16 +110,16 @@ fun LearningContent(
                 Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(c.surface2)
-                        .border(1.dp, c.line, RoundedCornerShape(12.dp))
+                        .clip(MaterialTheme.shapes.medium)
+                        .background(scheme.surface)
+                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium)
                         .clickable { onBack() },
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Wróć",
-                        tint = c.text,
+                        tint = scheme.onSurface,
                         modifier = Modifier.size(20.dp),
                     )
                 }
@@ -129,7 +129,7 @@ fun LearningContent(
                 Text(
                     text = "$mins:$secs",
                     style = MaterialTheme.typography.bodyMedium.copy(fontFamily = mono()),
-                    color = c.mute,
+                    color = scheme.onSurfaceVariant,
                 )
             }
 
@@ -141,7 +141,7 @@ fun LearningContent(
             Text(
                 collection.name,
                 style = MaterialTheme.typography.headlineLarge,
-                color = c.text,
+                color = scheme.onBackground,
             )
 //            Spacer(Modifier.height(4.dp))
 //            if (state.flashcards.isNotEmpty()) {
@@ -159,9 +159,9 @@ fun LearningContent(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(28.dp))
-                    .background(c.surface2)
-                    .border(1.dp, c.line, RoundedCornerShape(28.dp))
+                    .clip(MaterialTheme.shapes.extraLarge)
+                    .background(scheme.surface)
+                    .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.extraLarge)
                     .padding(28.dp),
 
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -179,7 +179,7 @@ fun LearningContent(
                     },
                     fontFamily = mono(),
                     style = MaterialTheme.typography.labelLarge,
-                    color = c.accentSoft,
+                    color = scheme.secondary,
                 )
 
                 Spacer(Modifier.height(12.dp))
@@ -202,20 +202,20 @@ fun LearningContent(
                             LearningPhase.IDLE -> CardStageData(
                                 "",
                                 MaterialTheme.typography.headlineLarge,
-                                c.mute,
+                                scheme.onSurfaceVariant,
                             )
 
                             LearningPhase.SPEAKING_SOURCE -> CardStageData(
                                 card.sourceText,
                                 MaterialTheme.typography.headlineLarge,
-                                c.text,
+                                scheme.onSurface,
                             )
 
                             else ->
                                 CardStageData(
                                     card.sourceText,
                                     MaterialTheme.typography.headlineLarge,
-                                    c.mute,
+                                    scheme.onSurfaceVariant,
                                 )
                         }
 
@@ -224,20 +224,20 @@ fun LearningContent(
                             LearningPhase.SPEAKING_TARGET -> CardStageData(
                                 card.targetText,
                                 MaterialTheme.typography.headlineLarge,
-                                c.text
+                                scheme.onSurface,
                             )
 
                             LearningPhase.REPEATING -> CardStageData(
                                 card.targetText,
                                 MaterialTheme.typography.headlineLarge,
-                                c.mute,
+                                scheme.onSurfaceVariant,
                             )
 
                             else ->
                                 CardStageData(
                                     "",
                                     MaterialTheme.typography.headlineLarge,
-                                    c.mute,
+                                    scheme.onSurfaceVariant,
                                 )
 
                         }
@@ -255,7 +255,7 @@ fun LearningContent(
                             Modifier
                                 .fillMaxWidth()
                                 .height(1.dp)
-                                .background(c.line)
+                                .background(scheme.outlineVariant)
                         )
 
                         Spacer(Modifier.height(16.dp))
@@ -287,12 +287,12 @@ fun LearningContent(
                     val active = speed == value
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(if (active) c.accent else c.surface2)
+                            .clip(MaterialTheme.shapes.medium)
+                            .background(if (active) scheme.primary else scheme.surface)
                             .border(
                                 1.dp,
-                                if (active) c.accent else c.line,
-                                RoundedCornerShape(12.dp)
+                                if (active) scheme.primary else scheme.outlineVariant,
+                                MaterialTheme.shapes.medium
                             )
                             .clickable { speed = value }
                             .padding(horizontal = 12.dp, vertical = 6.dp),
@@ -301,7 +301,7 @@ fun LearningContent(
                         Text(
                             label,
                             style = MaterialTheme.typography.labelSmall.copy(fontFamily = mono()),
-                            color = if (active) c.onAccent else c.mute,
+                            color = if (active) scheme.onPrimary else scheme.onSurfaceVariant,
                         )
                     }
 
@@ -334,9 +334,9 @@ fun LearningContent(
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(c.surface3)
-                        .border(1.dp, c.line, RoundedCornerShape(16.dp)),
+                        .clip(MaterialTheme.shapes.large)
+                        .background(scheme.surfaceVariant)
+                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text("Nie wiem", style = MaterialTheme.typography.titleMedium, color = c.mute2)
@@ -345,9 +345,9 @@ fun LearningContent(
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(c.surface3)
-                        .border(1.dp, c.line, RoundedCornerShape(16.dp)),
+                        .clip(MaterialTheme.shapes.large)
+                        .background(scheme.surfaceVariant)
+                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text("Wiem!", style = MaterialTheme.typography.titleMedium, color = c.mute2)

@@ -14,7 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
 import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
@@ -34,11 +36,12 @@ fun LoginScreen(
     onSignInClick: () -> Unit,
 ) {
     FiszkiThemedScreen(naturalDark = true) {
-        val c = LocalFiszkiColors.current
+        val scheme = MaterialTheme.colorScheme
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(c.surface)
+                .background(scheme.background)
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 28.dp),
         ) {
             Spacer(Modifier.height(56.dp))
@@ -48,8 +51,8 @@ fun LoginScreen(
                 Box(
                     modifier = Modifier
                         .size(34.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(c.accent),
+                        .clip(MaterialTheme.shapes.small)
+                        .background(scheme.primary),
                     contentAlignment = Alignment.Center,
                 ) {
                     Column(
@@ -57,7 +60,7 @@ fun LoginScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         repeat(3) {
-                            Box(Modifier.width(18.dp).height(2.dp).background(c.onAccent))
+                            Box(Modifier.width(18.dp).height(2.dp).background(scheme.onPrimary))
                         }
                     }
                 }
@@ -65,34 +68,36 @@ fun LoginScreen(
                 Text(
                     "FiszkiWBiegu",
                     style = MaterialTheme.typography.titleMedium,
-                    color = c.text,
+                    color = scheme.onBackground,
                 )
             }
 
             Spacer(Modifier.height(48.dp))
 
             // Hero copy
-            CapsLabel("// ZACZNIJ W 5 SEKUND", color = c.accentSoft)
+            CapsLabel("// ZACZNIJ W 5 SEKUND", color = scheme.secondary)
             Spacer(Modifier.height(12.dp))
             Text(
                 "Wejdź\ni ruszaj.",
                 style = MaterialTheme.typography.displayMedium,
-                color = c.text,
+                color = scheme.onBackground,
             )
             Spacer(Modifier.height(12.dp))
             Text(
                 "Słuchaj fiszek podczas biegu. Bez ekranu, bez rozpraszania.",
                 style = MaterialTheme.typography.bodyLarge,
-                color = c.mute,
+                color = scheme.onSurfaceVariant,
             )
 
             Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(16.dp))
+
 
             if (error != null) {
                 Text(
                     text = error,
                     style = MaterialTheme.typography.bodySmall,
-                    color = c.accent,
+                    color = scheme.error,
                 )
                 Spacer(Modifier.height(12.dp))
             }
@@ -102,7 +107,7 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth().height(60.dp),
                     contentAlignment = Alignment.Center,
                 ) {
-                    CircularProgressIndicator(color = c.accent)
+                    CircularProgressIndicator(color = scheme.primary)
                 }
             } else {
                 AuthButton(label = "Kontynuuj z Google", enabled = true, onClick = onSignInClick)
@@ -120,20 +125,51 @@ fun LoginScreen(
 @Composable
 private fun AuthButton(label: String, enabled: Boolean, onClick: () -> Unit) {
     val c = LocalFiszkiColors.current
+    val scheme = MaterialTheme.colorScheme
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(60.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(if (enabled) c.surface2 else c.surface3)
-            .border(1.dp, c.line, RoundedCornerShape(16.dp))
+            .clip(MaterialTheme.shapes.large)
+            .background(if (enabled) scheme.surface else scheme.surfaceVariant)
+            .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large)
             .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.titleLarge,
-            color = if (enabled) c.text else c.mute2,
+            color = if (enabled) scheme.onSurface else c.mute2,
         )
     }
+}
+
+@Preview
+@Composable
+fun LoginScreenPreview() {
+    LoginScreen(
+        isLoading = false,
+        error = null,
+        onSignInClick = {}
+    )
+}
+
+@Preview
+@Composable
+fun LoginScreenLoadingPreview() {
+    LoginScreen(
+        isLoading = true,
+        error = null,
+        onSignInClick = {}
+    )
+}
+
+@Preview
+@Composable
+fun LoginScreenErrorPreview() {
+    LoginScreen(
+        isLoading = false,
+        error = "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
+        onSignInClick = {}
+    )
 }

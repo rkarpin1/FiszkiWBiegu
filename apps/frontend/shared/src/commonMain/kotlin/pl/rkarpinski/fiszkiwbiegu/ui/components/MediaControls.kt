@@ -13,14 +13,13 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 
 /**
  * Okrągły przycisk kontrolki mediów. `primary = true` to duży ember-button
@@ -32,20 +31,20 @@ fun CtrlButton(
     primary: Boolean = false,
     onClick: () -> Unit,
 ) {
-    val c = LocalFiszkiColors.current
+    val scheme = MaterialTheme.colorScheme
     val size = if (primary) 78.dp else 52.dp
     Box(
         modifier = Modifier
             .size(size)
             .clip(CircleShape)
-            .background(if (primary) c.accent else c.surface2)
+            .background(if (primary) scheme.primary else scheme.surface)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
             imageVector      = icon,
             contentDescription = null,
-            tint             = if (primary) Color.White else c.text,
+            tint             = if (primary) scheme.onPrimary else scheme.onSurface,
             modifier         = Modifier.size(if (primary) 30.dp else 22.dp),
         )
     }

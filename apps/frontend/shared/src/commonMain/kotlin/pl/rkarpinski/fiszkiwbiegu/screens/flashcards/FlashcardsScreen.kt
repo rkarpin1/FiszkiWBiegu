@@ -16,10 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
@@ -107,6 +108,7 @@ fun FlashcardsScreenContent(
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
+        val scheme = MaterialTheme.colorScheme
 
         uiState.pendingDeleteId?.let { id ->
             val flashcard = uiState.flashcards.find { it.id == id }
@@ -131,23 +133,29 @@ fun FlashcardsScreenContent(
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDeleteCollectionDialog = false }) { Text("Anuluj") }
+                    TextButton(onClick = { showDeleteCollectionDialog = false }) {
+                        Text("Anuluj", color = MaterialTheme.colorScheme.onSurface)
+                    }
                 },
             )
         }
 
         Scaffold(
-            containerColor = c.surface,
+            containerColor = scheme.background,
             floatingActionButton = {
                 Box(
                     modifier = Modifier
                         .size(60.dp)
-                        .clip(RoundedCornerShape(30.dp))
-                        .background(c.text)
+                        .clip(CircleShape)
+                        .background(scheme.inverseSurface.copy(alpha = 0.5f))
                         .clickable { actions.onAddCard() },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text("+", style = MaterialTheme.typography.titleLarge, color = c.surface)
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "Dodaj",
+                        tint = scheme.inverseOnSurface
+                    )
                 }
             },
         ) { paddingValues ->
@@ -164,16 +172,20 @@ fun FlashcardsScreenContent(
                             Box(
                                 modifier = Modifier
                                     .size(40.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(c.surface2)
-                                    .border(1.dp, c.line, RoundedCornerShape(12.dp))
+                                    .clip(MaterialTheme.shapes.medium)
+                                    .background(scheme.surface)
+                                    .border(
+                                        1.dp,
+                                        scheme.outlineVariant,
+                                        MaterialTheme.shapes.medium
+                                    )
                                     .clickable(onClick = actions::onBack),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
                                     Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = "Wróć",
-                                    tint = c.text,
+                                    tint = scheme.onSurface,
                                     modifier = Modifier.size(20.dp),
                                 )
                             }
@@ -184,7 +196,7 @@ fun FlashcardsScreenContent(
                                 Icon(
                                     Icons.Default.MoreVert,
                                     contentDescription = null,
-                                    tint = c.mute,
+                                    tint = scheme.onSurfaceVariant,
                                     modifier = Modifier.size(40.dp)
                                         .clickable { showCollectionMenu = true },
                                 )
@@ -221,13 +233,13 @@ fun FlashcardsScreenContent(
                             Text(
                                 collection.name,
                                 style = MaterialTheme.typography.displaySmall,
-                                color = c.text,
+                                color = scheme.onBackground,
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
                                 collection.description,
                                 style = MaterialTheme.typography.bodyMedium.copy(fontFamily = mono()),
-                                color = c.mute,
+                                color = scheme.onSurfaceVariant,
                             )
                         }
                         Spacer(Modifier.height(24.dp))
@@ -264,8 +276,8 @@ fun FlashcardsScreenContent(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(56.dp)
-                                    .clip(RoundedCornerShape(18.dp))
-                                    .background(if (ctaEnabled) c.accent else c.surface3)
+                                    .clip(MaterialTheme.shapes.large)
+                                    .background(if (ctaEnabled) scheme.primary else scheme.surfaceVariant)
                                     .then(if (ctaEnabled) Modifier.clickable(onClick = actions::onStartLearning) else Modifier),
                                 contentAlignment = Alignment.Center,
                             ) {
@@ -276,13 +288,13 @@ fun FlashcardsScreenContent(
                                     Icon(
                                         Icons.Default.Headphones,
                                         contentDescription = null,
-                                        tint = if (ctaEnabled) c.onAccent else c.mute2,
+                                        tint = if (ctaEnabled) scheme.onPrimary else c.mute2,
                                         modifier = Modifier.size(20.dp),
                                     )
                                     Text(
                                         "Słuchaj w biegu",
                                         style = MaterialTheme.typography.titleMedium,
-                                        color = if (ctaEnabled) c.onAccent else c.mute2,
+                                        color = if (ctaEnabled) scheme.onPrimary else c.mute2,
                                     )
                                 }
                             }
@@ -291,7 +303,7 @@ fun FlashcardsScreenContent(
                                 Text(
                                     "Brak połączenia",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = c.mute,
+                                    color = scheme.onSurfaceVariant,
                                 )
                             }
 
@@ -308,8 +320,7 @@ fun FlashcardsScreenContent(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 22.dp)
-                                .padding(top=16.dp)
-                            ,
+                                .padding(top = 16.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
@@ -318,7 +329,7 @@ fun FlashcardsScreenContent(
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowForward,
                                 contentDescription = null,
-                                tint = c.mute,
+                                tint = scheme.onSurfaceVariant,
                                 modifier = Modifier.size(16.dp),
                             )
                             Flag(collection.targetLanguage, 16.dp)
@@ -339,7 +350,7 @@ fun FlashcardsScreenContent(
                                 modifier = Modifier.fillMaxWidth().padding(32.dp),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                CircularProgressIndicator(color = c.accent)
+                                CircularProgressIndicator(color = scheme.primary)
                             }
                         }
                     } else {
@@ -357,7 +368,7 @@ fun FlashcardsScreenContent(
                                     .fillMaxWidth()
                                     .padding(horizontal = 22.dp)
                                     .height(1.dp)
-                                    .background(c.line),
+                                    .background(scheme.outlineVariant),
                             )
                         }
                     }
@@ -380,12 +391,12 @@ fun FlashcardsScreenContent(
 
 @Composable
 private fun StatTile(label: String, value: String, modifier: Modifier = Modifier) {
-    val c = LocalFiszkiColors.current
+    val scheme = MaterialTheme.colorScheme
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(c.surface2)
-            .border(1.dp, c.line, RoundedCornerShape(16.dp))
+            .clip(MaterialTheme.shapes.large)
+            .background(scheme.surface)
+            .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -394,7 +405,7 @@ private fun StatTile(label: String, value: String, modifier: Modifier = Modifier
         Text(
             value,
             style = bigNumber().copy(fontSize = bigNumber().fontSize * 0.30f),
-            color = c.text
+            color = scheme.onSurface
         )
     }
 }
@@ -406,7 +417,7 @@ private fun FlashcardItem(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
 ) {
-    val c = LocalFiszkiColors.current
+    val scheme = MaterialTheme.colorScheme
     var showMenu by remember { mutableStateOf(false) }
 
     Row(
@@ -419,19 +430,27 @@ private fun FlashcardItem(
             text = (index + 1).toString().padStart(2, '0'),
             style = MaterialTheme.typography.labelSmall.copy(
                 fontFamily = mono(),
-                color = c.mute,
+                color = scheme.onSurfaceVariant,
             ),
         )
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(flashcard.sourceText, style = MaterialTheme.typography.bodyLarge, color = c.text)
-            Text(flashcard.targetText, style = MaterialTheme.typography.bodyMedium, color = c.mute)
+            Text(
+                flashcard.sourceText,
+                style = MaterialTheme.typography.bodyLarge,
+                color = scheme.onBackground
+            )
+            Text(
+                flashcard.targetText,
+                style = MaterialTheme.typography.bodyMedium,
+                color = scheme.onSurfaceVariant
+            )
         }
         Box {
             Icon(
                 Icons.Default.MoreVert,
                 contentDescription = null,
-                tint = c.mute,
+                tint = scheme.onSurfaceVariant,
                 modifier = Modifier.size(24.dp).clickable { showMenu = true },
             )
             DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
@@ -464,7 +483,9 @@ private fun DeleteFlashcardDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Anuluj") }
+            TextButton(onClick = onDismiss) {
+                Text("Anuluj", color = MaterialTheme.colorScheme.onSurface)
+            }
         },
     )
 }

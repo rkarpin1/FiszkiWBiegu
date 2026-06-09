@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -112,6 +111,7 @@ fun CardFormContent(
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
+        val scheme = MaterialTheme.colorScheme
 
         if (showDeleteDialog) {
             AlertDialog(
@@ -127,14 +127,16 @@ fun CardFormContent(
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDeleteDialog = false }) { Text("Anuluj") }
+                    TextButton(onClick = { showDeleteDialog = false }) {
+                        Text("Anuluj", color = MaterialTheme.colorScheme.onSurface)
+                    }
                 },
             )
         }
 
         Column(
             Modifier.fillMaxSize()
-                .background(c.surface)
+                .background(scheme.background)
                 .imePadding()
         ) {
             // Top bar
@@ -147,16 +149,16 @@ fun CardFormContent(
                 Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(c.surface2)
-                        .border(1.dp, c.line, RoundedCornerShape(12.dp))
+                        .clip(MaterialTheme.shapes.medium)
+                        .background(scheme.surface)
+                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium)
                         .clickable(onClick = actions::onBack),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         if (isEdit) Icons.AutoMirrored.Filled.ArrowBack else Icons.Default.Close,
                         contentDescription = "Wróć",
-                        tint = c.text,
+                        tint = scheme.onSurface,
                         modifier = Modifier.size(20.dp),
                     )
                 }
@@ -164,23 +166,23 @@ fun CardFormContent(
                 Text(
                     text = if (isEdit) "Edytuj fiszkę" else "Nowa fiszka",
                     style = MaterialTheme.typography.titleMedium,
-                    color = c.text,
+                    color = scheme.onBackground,
                 )
                 Spacer(Modifier.weight(1f))
                 if (isEdit) {
                     Box(
                         modifier = Modifier
                             .size(40.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(c.surface2)
-                            .border(1.dp, c.line, RoundedCornerShape(12.dp))
+                            .clip(MaterialTheme.shapes.medium)
+                            .background(scheme.surface)
+                            .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium)
                             .clickable { showDeleteDialog = true },
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = "Usuń",
-                            tint = c.accent,
+                            tint = scheme.error,
                             modifier = Modifier.size(20.dp),
                         )
                     }
@@ -193,9 +195,9 @@ fun CardFormContent(
             Box(
                 modifier = Modifier
                     .padding(horizontal = 26.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(c.surface2)
-                    .border(1.dp, c.line, RoundedCornerShape(12.dp))
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(scheme.surface)
+                    .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium)
                     .padding(horizontal = 14.dp, vertical = 8.dp),
             ) {
                 Text(
@@ -204,7 +206,7 @@ fun CardFormContent(
                         fontFamily = mono(),
                         fontWeight = FontWeight.SemiBold,
                     ),
-                    color = c.mute,
+                    color = scheme.onSurfaceVariant,
                 )
             }
 
@@ -220,7 +222,7 @@ fun CardFormContent(
                     Text(
                         text = if (isEdit) "Zmień co\nchcesz" else "Wpisz czego\nchcesz się nauczyć",
                         style = MaterialTheme.typography.headlineLarge,
-                        color = c.text,
+                        color = scheme.onBackground,
                     )
                 }
                 Spacer(Modifier.height(20.dp))
@@ -251,14 +253,14 @@ fun CardFormContent(
                         Modifier
                             .weight(1f)
                             .height(1.dp)
-                            .background(c.line),
+                            .background(scheme.outlineVariant),
                     )
                     Box(
                         modifier = Modifier
                             .padding(horizontal = 12.dp)
-                            .clip(RoundedCornerShape(19.dp))
-                            .background(c.surface2)
-                            .border(1.dp, c.line, RoundedCornerShape(19.dp))
+                            .clip(MaterialTheme.shapes.large)
+                            .background(scheme.surface)
+                            .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large)
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                     ) {
                         Row(
@@ -282,7 +284,7 @@ fun CardFormContent(
                         Modifier
                             .weight(1f)
                             .height(1.dp)
-                            .background(c.line),
+                            .background(scheme.outlineVariant),
                     )
                 }
 
@@ -316,8 +318,8 @@ fun CardFormContent(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp)
-                            .clip(RoundedCornerShape(18.dp))
-                            .background(if (isValid) c.accent else c.surface3)
+                            .clip(MaterialTheme.shapes.large)
+                            .background(if (isValid) scheme.primary else scheme.surfaceVariant)
                             .then(
                                 if (isValid) Modifier.clickable {
                                     actions.onSave(
@@ -337,13 +339,13 @@ fun CardFormContent(
                             Icon(
                                 Icons.Default.Check,
                                 contentDescription = null,
-                                tint = if (isValid) c.onAccent else c.mute2,
+                                tint = if (isValid) scheme.onPrimary else c.mute2,
                                 modifier = Modifier.size(18.dp),
                             )
                             Text(
                                 text = if (isEdit) "Zapisz zmiany" else "Dodaj fiszkę",
                                 style = MaterialTheme.typography.titleMedium,
-                                color = if (isValid) c.onAccent else c.mute2,
+                                color = if (isValid) scheme.onPrimary else c.mute2,
                             )
                         }
                     }

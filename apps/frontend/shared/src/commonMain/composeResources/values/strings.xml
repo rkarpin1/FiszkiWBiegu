@@ -1,0 +1,5 @@
+<resources>
+    <string name="profile_title">Konto</string>
+    <string name="profile_logged_via_google">Zalogowano przez Google</string>
+    <string name="profile_logout">Wyloguj</string>
+</resources>
