@@ -19,7 +19,14 @@ async fn validate_google_token(
     client_id: &str,
 ) -> Result<GoogleTokenInfo, String> {
     let url = format!("https://oauth2.googleapis.com/tokeninfo?id_token={id_token}");
-    let response = reqwest::get(&url)
+
+    let http_client = reqwest::ClientBuilder::new()
+        .danger_accept_invalid_certs(true)
+        .build()
+        .unwrap();
+
+    let response = http_client.get(&url)
+        .send()
         .await
         .map_err(|e| format!("Google API unreachable: {e}"))?;
 
