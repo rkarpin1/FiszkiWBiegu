@@ -1,11 +1,13 @@
 # cargo update; cargo upgrade
 
 [package]
-name = "fiszki-w-biegu"
+name = "fiszki-w-biegu-server"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+log = "0.4"
+flexi_logger = { version = "0.31", features = ["async"] }
 actix-web = "4.13"
 actix-cors = "0.7"
 tokio = { version = "1.52", features = ["full"] }
@@ -16,7 +18,7 @@ chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1", features = ["v4", "serde"] }
 jsonwebtoken = { version = "10.4.0", features = ["rust_crypto"] }
 dotenv = "0.15"
-reqwest = { version = "0.13", features = ["json", "rustls"], default-features = false }
+reqwest = { version = "0.13", features = ["json", "rustls", "gzip","deflate","brotli"], default-features = false }
 
 [profile.release]
 opt-level = "z"      # optymalizuj pod kątem rozmiaru (alternatywnie "s" dla lepszego balansu)

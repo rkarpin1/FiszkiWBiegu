@@ -1,0 +1,89 @@
+name: Deploy Backend
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - apps/backend/Cargo.toml
+
+# Prevent concurrent deploys — queue rather than cancel a running deploy.
+concurrency:
+  group: backend-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  # Use committed .sqlx/ cache — no live DATABASE_URL required in CI.
+  SQLX_OFFLINE: "true"
+  # Incremental compilation conflicts with LTO (already enabled in release profile)
+  # and bloats the cache. Disable for both test and release steps.
+  CARGO_INCREMENTAL: "0"
+  SQLX_DATA_FOLDER: ${{ github.workspace }}/apps/backend/.sqlx
+
+
+jobs:
+  build-test-deploy:
+    name: Test → Build → Deploy
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install latest stable Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-musl
+
+      - name: Install musl tools
+        run: sudo apt-get install -y musl-tools
+
+      # Caches ~/.cargo/registry, ~/.cargo/git and target/.
+      # Key is derived from Cargo.lock so a lock-file change busts the cache.
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workdir: apps/backend
+          cache-on-failure: true
+
+      - name: Test
+        run: cargo test --locked --all-targets --release --target x86_64-unknown-linux-musl
+
+      - name: Build
+        run: cargo build --locked --release --target x86_64-unknown-linux-musl
+
+      - name: Strip debug symbols
+        run: |
+          BINARY=target/x86_64-unknown-linux-musl/release/fiszki-w-biegu-server
+          echo "Size before strip: $(du -sh "$BINARY" | cut -f1)"
+          strip "$BINARY"
+          echo "Size after strip:  $(du -sh "$BINARY" | cut -f1)"
+
+      - name: Upload binary as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fiszki-w-biegu-server
+          path: apps/backend/target/x86_64-unknown-linux-musl/release/fiszki-w-biegu-server
+          retention-days: 1
+
+      - name: Upload binary to /deploy
+        run: |
+          curl \
+            -X POST "${{ secrets.DEPLOY_URL }}" \
+            -H "X-Deploy-Key: ${{ secrets.DEPLOY_API_KEY }}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @target/x86_64-unknown-linux-musl/release/fiszki-w-biegu-server \
+            --max-time 120 \
+            --fail-with-body \
+            --show-error \
+            --progress-bar
+          echo "Deploy initiated — backend is restarting."
