@@ -33,9 +33,14 @@ pub fn main_format(
     )
 }
 
-#[get("/health")]
-async fn health() -> impl Responder {
-    HttpResponse::Ok().body("ok")
+
+#[get("/info")]
+async fn info() -> impl Responder {
+    HttpResponse::Ok().body(format!(
+        "{} {}",
+        env!("CARGO_PKG_NAME"),
+        env!("CARGO_PKG_VERSION")
+    ))
 }
 
 #[actix_web::main]
@@ -67,14 +72,14 @@ async fn main() -> std::io::Result<()> {
         .start()
         .unwrap();
 
-    std::panic::set_hook(Box::new(|info| {
-        let msg = info
+    std::panic::set_hook(Box::new(|panic_info| {
+        let msg = panic_info
             .payload()
             .downcast_ref::<&str>()
             .copied()
-            .or_else(|| info.payload().downcast_ref::<String>().map(String::as_str))
+            .or_else(|| panic_info.payload().downcast_ref::<String>().map(String::as_str))
             .unwrap_or("unknown panic");
-        let location = info
+        let location = panic_info
             .location()
             .map(|l| format!("{}:{}", l.file(), l.line()))
             .unwrap_or_else(|| "unknown location".to_string());
@@ -108,7 +113,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(jwt_config.clone())
             .app_data(google_config.clone())
             .app_data(app_state.clone())
-            .service(health)
+            .service(info)
             .service(
                 web::scope("/auth")
                     .route("/login", web::post().to(handlers::auth::login))
