@@ -19,7 +19,14 @@ class LearningViewModel(
     fun startSession() {
         viewModelScope.launch {
             repo.getAll(collectionId).onSuccess { flashcards ->
-                if (flashcards.isNotEmpty()) controller.start(flashcards)
+                if (flashcards.isNotEmpty()) {
+                    collectionRepo.getAll().onSuccess { collections ->
+                        val collection = collections.find { it.id == collectionId }
+                        if (collection != null) {
+                            controller.start(collection, flashcards)
+                        }
+                    }
+                }
             }
         }
     }

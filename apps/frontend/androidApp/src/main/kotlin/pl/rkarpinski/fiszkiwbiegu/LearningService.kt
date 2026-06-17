@@ -1,5 +1,6 @@
 package pl.rkarpinski.fiszkiwbiegu
 
+import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
@@ -40,6 +41,7 @@ class LearningService : MediaSessionService() {
         const val ACTION_PREV = "pl.rkarpinski.fiszkiwbiegu.learning.PREV"
         const val ACTION_STOP = "pl.rkarpinski.fiszkiwbiegu.learning.STOP"
         const val EXTRA_FLASHCARDS_JSON = "flashcards_json"
+        const val EXTRA_COLLECTION_JSON = "collection_json"
     }
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -50,6 +52,7 @@ class LearningService : MediaSessionService() {
     private var playJob: Job? = null
 
     private var flashcards: List<FlashcardDto> = emptyList()
+    private var collectionJson: String? = null
     private var currentIndex = 0
     private var isPlaying = false
 
@@ -62,7 +65,8 @@ class LearningService : MediaSessionService() {
         player.onSeekToNext = ::next
         player.onSeekToPrevious = ::previous
 
-        mediaSession = MediaSession.Builder(this, player).build()
+        mediaSession = MediaSession.Builder(this, player)
+            .build()
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession =
@@ -77,12 +81,14 @@ class LearningService : MediaSessionService() {
         when (intent?.action) {
             ACTION_START -> {
                 val json = intent.getStringExtra(EXTRA_FLASHCARDS_JSON) ?: return START_STICKY
+                collectionJson = intent.getStringExtra(EXTRA_COLLECTION_JSON)
                 flashcards = Json.decodeFromString(json)
                 if (flashcards.isEmpty()) return START_NOT_STICKY
                 currentIndex = 0
                 isPlaying = true
                 ttsPlayer.updateCurrentItem(flashcards[0].toMediaItem())
                 ttsPlayer.setPlaying(true)
+                updateSessionActivity()
                 startPlayJob()
             }
 
@@ -95,6 +101,19 @@ class LearningService : MediaSessionService() {
         return START_STICKY
     }
 
+    private fun updateSessionActivity() {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            putExtra(EXTRA_COLLECTION_JSON, collectionJson)
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        mediaSession.setSessionActivity(pendingIntent)
+    }
+
     private fun stopSession() {
         playJob?.cancel()
         tts?.stop()
@@ -102,6 +121,7 @@ class LearningService : MediaSessionService() {
         flashcards = emptyList()
         ttsPlayer.setPlaying(false)
         state.value = LearningState()
+        stopSelf()
     }
 
     private fun startPlayJob() {

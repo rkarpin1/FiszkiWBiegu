@@ -1,6 +1,7 @@
 package pl.rkarpinski.fiszkiwbiegu.screens.learning
 
 import kotlinx.coroutines.flow.StateFlow
+import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 
 enum class LearningPhase { IDLE, SPEAKING_SOURCE, ANSWER, SPEAKING_TARGET, REPEATING }
@@ -15,7 +16,7 @@ data class LearningState(
 
 interface LearningController {
     val state: StateFlow<LearningState>
-    fun start(flashcards: List<FlashcardDto>)
+    fun start(collection: CollectionDto, flashcards: List<FlashcardDto>)
     fun play()
     fun pause()
     fun next()
