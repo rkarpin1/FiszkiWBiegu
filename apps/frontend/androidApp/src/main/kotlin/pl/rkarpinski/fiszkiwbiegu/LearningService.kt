@@ -1,15 +1,30 @@
 package pl.rkarpinski.fiszkiwbiegu
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.ContentResolver
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat as CoreNotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.session.CommandButton
+import androidx.media3.session.MediaNotification
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import androidx.media3.session.MediaStyleNotificationHelper
+import com.google.common.collect.ImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,6 +36,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.json.Json
+import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningPhase
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningState
@@ -42,6 +58,9 @@ class LearningService : MediaSessionService() {
         const val ACTION_STOP = "pl.rkarpinski.fiszkiwbiegu.learning.STOP"
         const val EXTRA_FLASHCARDS_JSON = "flashcards_json"
         const val EXTRA_COLLECTION_JSON = "collection_json"
+
+        private const val NOTIFICATION_ID = 1001
+        private const val CHANNEL_ID = "learning_session"
     }
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -50,14 +69,104 @@ class LearningService : MediaSessionService() {
     private lateinit var ttsPlayer: TtsPlayer
     private lateinit var mediaSession: MediaSession
     private var playJob: Job? = null
+    private var collectionJson: String? = null
+
+    private val notificationProvider = object : MediaNotification.Provider {
+        override fun createNotification(
+            mediaSession: MediaSession,
+            customLayout: ImmutableList<CommandButton>,
+            actionFactory: MediaNotification.ActionFactory,
+            onNotificationChangedCallback: MediaNotification.Provider.Callback
+        ): MediaNotification {
+            val player = mediaSession.player
+            val metadata = player.mediaMetadata
+            val lang = metadata.extras?.getString("language_code") ?: "pl"
+            val title = metadata.title ?: "Nauka"
+            val subtitle = metadata.subtitle ?: "Fiszki w Biegu"
+
+            val flagBitmap = getVectorBitmap(getFlagDrawableId(lang))
+
+            val builder = CoreNotificationCompat.Builder(this@LearningService, CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.ic_btn_speak_now) // System monochrome icon that definitely works
+                .setLargeIcon(flagBitmap)
+                .setContentTitle(title)
+                .setContentText(subtitle)
+                .setStyle(MediaStyleNotificationHelper.MediaStyle(mediaSession)
+                    .setShowActionsInCompactView(0, 1, 2))
+                .setColor(getLanguageColor(lang))
+                .setColorized(true)
+                .setContentIntent(mediaSession.sessionActivity)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setSilent(true)
+                .addAction(
+                    CoreNotificationCompat.Action(
+                        android.R.drawable.ic_media_previous, "Prev",
+                        actionFactory.createMediaActionPendingIntent(mediaSession, Player.COMMAND_SEEK_TO_PREVIOUS)
+                    )
+                )
+                .addAction(
+                    CoreNotificationCompat.Action(
+                        if (player.isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play,
+                        if (player.isPlaying) "Pause" else "Play",
+                        actionFactory.createMediaActionPendingIntent(mediaSession, Player.COMMAND_PLAY_PAUSE)
+                    )
+                )
+                .addAction(
+                    CoreNotificationCompat.Action(
+                        android.R.drawable.ic_media_next, "Next",
+                        actionFactory.createMediaActionPendingIntent(mediaSession, Player.COMMAND_SEEK_TO_NEXT)
+                    )
+                )
+
+            return MediaNotification(NOTIFICATION_ID, builder.build())
+        }
+
+        override fun handleCustomCommand(session: MediaSession, action: String, extras: Bundle): Boolean = false
+
+        override fun getNotificationChannelInfo(): MediaNotification.Provider.NotificationChannelInfo {
+            return MediaNotification.Provider.NotificationChannelInfo(CHANNEL_ID, "Nauka")
+        }
+    }
+
+    private fun getVectorBitmap(resId: Int): Bitmap? {
+        val drawable: Drawable = ContextCompat.getDrawable(this, resId) ?: return null
+        val bitmap = Bitmap.createBitmap(
+            drawable.intrinsicWidth,
+            drawable.intrinsicHeight,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        return bitmap
+    }
+
+    private fun getFlagDrawableId(lang: String): Int = when (lang) {
+        "en" -> R.drawable.flag_en
+        "de" -> R.drawable.flag_de
+        "es" -> R.drawable.flag_es
+        "fr" -> R.drawable.flag_fr
+        "it" -> R.drawable.flag_it
+        else -> R.drawable.flag_pl
+    }
+
+    private fun getLanguageColor(lang: String): Int = when (lang) {
+        "pl" -> 0xFFDC143C.toInt()
+        "en" -> 0xFF012169.toInt()
+        "de" -> 0xFF000000.toInt()
+        "es" -> 0xFFAA151B.toInt()
+        "fr" -> 0xFF002395.toInt()
+        "it" -> 0xFF008C45.toInt()
+        else -> 0xFF666666.toInt()
+    }
 
     private var flashcards: List<FlashcardDto> = emptyList()
-    private var collectionJson: String? = null
     private var currentIndex = 0
     private var isPlaying = false
 
     override fun onCreate() {
         super.onCreate()
+        createNotificationChannel()
         initTts()
         val player = TtsPlayer()
         ttsPlayer = player
@@ -67,6 +176,21 @@ class LearningService : MediaSessionService() {
 
         mediaSession = MediaSession.Builder(this, player)
             .build()
+
+        setMediaNotificationProvider(notificationProvider)
+    }
+
+    private fun createNotificationChannel() {
+        val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            "Nauka",
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = "Powiadomienia o postępie nauki"
+            setShowBadge(false)
+        }
+        manager.createNotificationChannel(channel)
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession =
@@ -86,7 +210,7 @@ class LearningService : MediaSessionService() {
                 if (flashcards.isEmpty()) return START_NOT_STICKY
                 currentIndex = 0
                 isPlaying = true
-                ttsPlayer.updateCurrentItem(flashcards[0].toMediaItem())
+                ttsPlayer.updateCurrentItem(flashcards[0].toMediaItem(this))
                 ttsPlayer.setPlaying(true)
                 updateSessionActivity()
                 startPlayJob()
@@ -133,6 +257,7 @@ class LearningService : MediaSessionService() {
     }
 
     private suspend fun CoroutineScope.playLoop() {
+        val collection = collectionJson?.let { Json.decodeFromString<CollectionDto>(it) }
         while (isActive && flashcards.isNotEmpty()) {
             if (!isPlaying) {
                 delay(200); continue
@@ -142,7 +267,7 @@ class LearningService : MediaSessionService() {
             val card = flashcards[currentIndex]
 
             publishState(LearningPhase.SPEAKING_SOURCE)
-            ttsPlayer.updateCurrentItem(card.toMediaItem())
+            ttsPlayer.updateCurrentItem(card.toMediaItem(this@LearningService, collection?.sourceLanguage ?: "pl"))
 
             speakAndWait(card.sourceText, Locale.forLanguageTag("pl-PL"))
             if (!isActive || !isPlaying) continue
@@ -156,6 +281,7 @@ class LearningService : MediaSessionService() {
             repeat(3) {
                 if (isActive && isPlaying) {
                     publishState(LearningPhase.SPEAKING_TARGET)
+                    ttsPlayer.updateCurrentItem(card.toMediaItem(this@LearningService, collection?.targetLanguage ?: "en"))
                     speakAndWait(card.targetText, Locale.ENGLISH)
                     if (isActive && isPlaying) {
                         publishState(LearningPhase.REPEATING)
@@ -223,7 +349,7 @@ class LearningService : MediaSessionService() {
         currentIndex = (currentIndex + 1) % flashcards.size
         tts?.stop()
         playJob?.cancel()
-        ttsPlayer.updateCurrentItem(flashcards[currentIndex].toMediaItem())
+        ttsPlayer.updateCurrentItem(flashcards[currentIndex].toMediaItem(this))
         if (isPlaying) startPlayJob() else publishState()
     }
 
@@ -232,7 +358,7 @@ class LearningService : MediaSessionService() {
         currentIndex = if (currentIndex > 0) currentIndex - 1 else flashcards.size - 1
         tts?.stop()
         playJob?.cancel()
-        ttsPlayer.updateCurrentItem(flashcards[currentIndex].toMediaItem())
+        ttsPlayer.updateCurrentItem(flashcards[currentIndex].toMediaItem(this))
         if (isPlaying) startPlayJob() else publishState()
     }
 
@@ -255,14 +381,26 @@ class LearningService : MediaSessionService() {
         state.value = LearningState()
         super.onDestroy()
     }
-}
 
-private fun FlashcardDto.toMediaItem() = MediaItem.Builder()
-    .setMediaId(id)
-    .setMediaMetadata(
-        MediaMetadata.Builder()
-            .setTitle(sourceText)
-            .setSubtitle(targetText)
+    private fun getFlagUri(lang: String): Uri {
+        val resId = getFlagDrawableId(lang)
+        return Uri.Builder()
+            .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+            .authority(resources.getResourcePackageName(resId))
+            .appendPath(resources.getResourceTypeName(resId))
+            .appendPath(resources.getResourceEntryName(resId))
             .build()
-    )
-    .build()
+    }
+
+    private fun FlashcardDto.toMediaItem(service: LearningService, lang: String = "pl") = MediaItem.Builder()
+        .setMediaId(id)
+        .setMediaMetadata(
+            MediaMetadata.Builder()
+                .setTitle(sourceText)
+                .setSubtitle(targetText)
+                .setArtworkUri(service.getFlagUri(lang))
+                .setExtras(Bundle().apply { putString("language_code", lang) })
+                .build()
+        )
+        .build()
+}
