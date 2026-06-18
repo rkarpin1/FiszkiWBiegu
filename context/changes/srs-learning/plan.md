@@ -611,8 +611,8 @@ Box(
 
 #### Ręczne
 
-- [ ] 1.3 `PUT /flashcards/{id}` z `{"srs_level": 0.5}` zwraca 200 z `srs_level: 0.5`
-- [ ] 1.4 `GET /collections/{id}/learning` zwraca fiszki z polem `srs_level`
+- [x] 1.3 `PUT /flashcards/{id}` z `{"srs_level": 0.5}` zwraca 200 z `srs_level: 0.5`
+- [x] 1.4 `GET /collections/{id}/learning` zwraca fiszki z polem `srs_level`
 
 ### Faza 2: Frontend shared — model + SrsEngine + LearningController
 
@@ -624,31 +624,31 @@ Box(
 
 #### Ręczne
 
-- [ ] 2.4 Brak regresji w ekranach zarządzania fiszkami (lista, edycja)
+- [x] 2.4 Brak regresji w ekranach zarządzania fiszkami (lista, edycja)
 
 ### Faza 3: Android — LearningService SRS
 
 #### Automatyczne
 
-- [x] 3.1 `./gradlew :androidApp:assembleDebug` bez błędów
+- [x] 3.1 `./gradlew :androidApp:assembleDebug` bez błędów — 7fc06f8
 
 #### Ręczne
 
-- [ ] 3.2 Sesja startuje, karty grane w losowej kolejności
-- [ ] 3.3 "Nie wiem" — karta wraca po ~2 kartach, słyszalny dźwięk
-- [ ] 3.4 "Wiem!" — karta wraca po 10+ kartach, słyszalny dźwięk
-- [ ] 3.5 Brak KMP crashy w logcat podczas sesji
+- [x] 3.2 Sesja startuje, karty grane w losowej kolejności
+- [x] 3.3 "Nie wiem" — karta wraca po ~2 kartach, słyszalny dźwięk
+- [x] 3.4 "Wiem!" — karta wraca po 10+ kartach, słyszalny dźwięk
+- [x] 3.5 Brak KMP crashy w logcat podczas sesji
 
 ### Faza 4: UI — przyciski aktywne + feedback
 
 #### Automatyczne
 
-- [ ] 4.1 `./gradlew :androidApp:assembleDebug` bez błędów
+- [x] 4.1 `./gradlew :androidApp:assembleDebug` bez błędów
 
 #### Ręczne
 
-- [ ] 4.2 Przyciski szare (nieaktywne) w fazach innych niż ANSWER
-- [ ] 4.3 Przyciski aktywne (pełny kolor, klikalność) w fazie ANSWER
-- [ ] 4.4 Kliknięcie "Nie wiem" — czerwony flash ~300ms
-- [ ] 4.5 Kliknięcie "Wiem!" — zielony flash ~300ms
-- [ ] 4.6 Po sesji: srs_level fiszek zaktualizowany w DB (weryfikacja przez API)
+- [x] 4.2 Przyciski szare (nieaktywne) w fazach innych niż ANSWER
+- [x] 4.3 Przyciski aktywne (pełny kolor, klikalność) w fazie ANSWER
+- [x] 4.4 Kliknięcie "Nie wiem" — czerwony flash ~300ms
+- [x] 4.5 Kliknięcie "Wiem!" — zielony flash ~300ms
+- [x] 4.6 Po sesji: srs_level fiszek zaktualizowany w DB (weryfikacja przez API)
