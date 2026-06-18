@@ -1,0 +1,2 @@
+ALTER TABLE flashcards
+    ADD COLUMN srs_level REAL NOT NULL DEFAULT 0.0;
