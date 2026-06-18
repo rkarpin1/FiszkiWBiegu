@@ -183,8 +183,8 @@ fun LearningContent(
 
 
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
                         text = when (state.phase) {
@@ -199,8 +199,13 @@ fun LearningContent(
                         color = scheme.secondary,
                     )
 
+                    Spacer(Modifier.weight(1f))
+
                     if (card != null) {
-                        SrsLevelIndicator(srsLevel = card.decayLevel())
+                        SrsLevelIndicator(
+                            srsLevel = card.decayLevel(),
+                            color = Color(0xFF4CAF50)
+                        )
                     }
                 }
 
