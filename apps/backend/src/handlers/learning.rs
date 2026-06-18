@@ -14,7 +14,7 @@ pub async fn get_session(
     let collection_id = path.into_inner();
 
     let result = sqlx::query_as::<_, Flashcard>(
-        r#"SELECT f.id, f.collection_id, f.source_text, f.target_text, f.position, f.created_at, f.srs_level
+        r#"SELECT f.id, f.collection_id, f.source_text, f.target_text, f.position, f.created_at, f.srs_level, f.last_studied_at
            FROM flashcards f
            JOIN collections c ON f.collection_id = c.id
            WHERE f.collection_id = $1 AND c.user_id = $2

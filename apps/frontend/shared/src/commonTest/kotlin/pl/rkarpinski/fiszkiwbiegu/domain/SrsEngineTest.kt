@@ -8,7 +8,7 @@ import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 
 class SrsEngineTest {
 
-    private fun card(srsLevel: Float = 0f) = FlashcardDto(
+    private fun card(srsLevel: Float = 0f, lastStudiedAt: String? = null) = FlashcardDto(
         id = "id",
         collectionId = "col",
         sourceText = "src",
@@ -16,6 +16,7 @@ class SrsEngineTest {
         position = 0,
         createdAt = "2026-01-01",
         srsLevel = srsLevel,
+        lastStudiedAt = lastStudiedAt,
     )
 
     @Test

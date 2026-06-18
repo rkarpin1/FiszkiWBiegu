@@ -38,6 +38,8 @@ class LearningViewModel(
     fun previous() = controller.previous()
     fun rate(rating: Rating) = controller.rate(rating)
 
+    fun setSpeed(speed: Float) = controller.setSpeed(speed)
+
     fun stop() {
         val s = controller.state.value
         if (s.flashcards.isNotEmpty()) {

@@ -55,6 +55,7 @@ pub struct Flashcard {
     pub position: i32,
     pub created_at: DateTime<Utc>,
     pub srs_level: f32,
+    pub last_studied_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -68,4 +69,5 @@ pub struct FlashcardUpdateRequest {
     pub source_text: Option<String>,
     pub target_text: Option<String>,
     pub srs_level: Option<f32>,
+    pub last_studied_at: Option<DateTime<Utc>>,
 }

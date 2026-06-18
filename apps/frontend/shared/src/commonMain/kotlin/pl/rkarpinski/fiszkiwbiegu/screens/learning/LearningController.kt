@@ -14,6 +14,7 @@ data class LearningState(
     val currentIndex: Int = 0,
     val phase: LearningPhase = LearningPhase.IDLE,
     val currentCard: FlashcardDto? = null,
+    val playbackSpeed: Float = 1.0f,
 )
 
 interface LearningController {
@@ -25,4 +26,5 @@ interface LearningController {
     fun previous()
     fun stop()
     fun rate(rating: Rating)
+    fun setSpeed(speed: Float)
 }

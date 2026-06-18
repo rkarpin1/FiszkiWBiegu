@@ -36,6 +36,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import android.media.AudioManager
+import android.media.ToneGenerator
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
@@ -47,9 +48,12 @@ import pl.rkarpinski.fiszkiwbiegu.domain.SrsEngine
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningPhase
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningState
 import java.util.Locale
+import kotlin.time.Clock
 import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
+import androidx.core.graphics.createBitmap
 
 @UnstableApi
 class LearningService : MediaSessionService() {
@@ -64,9 +68,11 @@ class LearningService : MediaSessionService() {
         const val ACTION_PREV = "pl.rkarpinski.fiszkiwbiegu.learning.PREV"
         const val ACTION_STOP = "pl.rkarpinski.fiszkiwbiegu.learning.STOP"
         const val ACTION_RATE = "pl.rkarpinski.fiszkiwbiegu.learning.RATE"
+        const val ACTION_SPEED = "pl.rkarpinski.fiszkiwbiegu.learning.SPEED"
         const val EXTRA_FLASHCARDS_JSON = "flashcards_json"
         const val EXTRA_COLLECTION_JSON = "collection_json"
         const val EXTRA_RATING = "rating"
+        const val EXTRA_SPEED = "speed"
 
         private const val NOTIFICATION_ID = 1001
         private const val CHANNEL_ID = "learning_session"
@@ -139,11 +145,7 @@ class LearningService : MediaSessionService() {
 
     private fun getVectorBitmap(resId: Int): Bitmap? {
         val drawable: Drawable = ContextCompat.getDrawable(this, resId) ?: return null
-        val bitmap = Bitmap.createBitmap(
-            drawable.intrinsicWidth,
-            drawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
+        val bitmap = createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
         val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)
@@ -176,6 +178,7 @@ class LearningService : MediaSessionService() {
     private val rng = Random.Default
     private val flashcardRepo: FlashcardRepository by inject()
     private var isPlaying = false
+    private var playbackSpeed = 1.0f
 
     override fun onCreate() {
         super.onCreate()
@@ -250,6 +253,11 @@ class LearningService : MediaSessionService() {
             ACTION_NEXT -> next()
             ACTION_PREV -> previous()
             ACTION_STOP -> stopSession()
+            ACTION_SPEED -> {
+                playbackSpeed = intent.getFloatExtra(EXTRA_SPEED, 1.0f)
+                tts?.setSpeechRate(playbackSpeed)
+                publishState(card = currentSrsCard?.flashcard)
+            }
         }
         return START_STICKY
     }
@@ -281,7 +289,7 @@ class LearningService : MediaSessionService() {
     private fun startPlayJob() {
         playJob?.cancel()
         playJob = serviceScope.launch {
-            while (!ttsReady) delay(100)
+            while (!ttsReady) delay(100.milliseconds)
             playLoop()
         }
     }
@@ -291,7 +299,7 @@ class LearningService : MediaSessionService() {
         val srcLang = collection?.sourceLanguage ?: "pl"
         val tgtLang = collection?.targetLanguage ?: "en"
         while (isActive && srsQueue.isNotEmpty()) {
-            if (!isPlaying) { delay(200); continue }
+            if (!isPlaying) { delay(200.milliseconds); continue }
 
             val card = SrsEngine.pickNext(srsQueue, globalIndex)
             currentSrsCard = card
@@ -307,7 +315,7 @@ class LearningService : MediaSessionService() {
             publishState(LearningPhase.ANSWER, card.flashcard)
             val timeForTargetText = speakAndWait(card.flashcard.targetText, Locale.forLanguageTag(tgtLang), 0f)
             if (!isActive || !isPlaying) continue
-            delay(800)
+            delay(800.milliseconds)
             if (!isActive || !isPlaying) continue
 
             repeat(3) {
@@ -317,7 +325,7 @@ class LearningService : MediaSessionService() {
                     speakAndWait(card.flashcard.targetText, Locale.forLanguageTag(tgtLang))
                     if (isActive && isPlaying) {
                         publishState(LearningPhase.REPEATING, card.flashcard)
-                        delay(timeForTargetText + 500)
+                        delay((timeForTargetText + 500).milliseconds)
                     }
                 }
             }
@@ -328,7 +336,7 @@ class LearningService : MediaSessionService() {
             }
 
             publishState(LearningPhase.IDLE, card.flashcard)
-            delay(1000)
+            delay(1000.milliseconds)
         }
     }
 
@@ -336,16 +344,18 @@ class LearningService : MediaSessionService() {
         card.srsLevel = SrsEngine.newLevel(card.srsLevel, rating)
         card.dueAtIndex = globalIndex + SrsEngine.intervalFor(card.srsLevel, rating, rng)
         serviceScope.launch {
-            flashcardRepo.updateSrs(card.flashcard.id, card.srsLevel)
+            flashcardRepo.updateSrs(card.flashcard.id, card.srsLevel, Clock.System.now().toString())
         }
     }
 
     private fun playRatingSound(rating: Rating) {
-        val am = getSystemService(AUDIO_SERVICE) as AudioManager
-        when (rating) {
-            Rating.KNOW_WELL -> am.playSoundEffect(AudioManager.FX_KEYPRESS_RETURN, 1f)
-            Rating.DONT_KNOW -> am.playSoundEffect(AudioManager.FX_KEYPRESS_DELETE, 1f)
-            Rating.KNOW      -> Unit
+        runCatching {
+            val toneType = when (rating) {
+                Rating.KNOW_WELL -> ToneGenerator.TONE_PROP_ACK
+                Rating.DONT_KNOW -> ToneGenerator.TONE_PROP_NACK
+                else -> return
+            }
+            ToneGenerator(AudioManager.STREAM_MUSIC, 100).startTone(toneType, 200)
         }
     }
 
@@ -417,6 +427,7 @@ class LearningService : MediaSessionService() {
             currentIndex = 0,
             phase = phase,
             currentCard = card,
+            playbackSpeed = playbackSpeed,
         )
     }
 

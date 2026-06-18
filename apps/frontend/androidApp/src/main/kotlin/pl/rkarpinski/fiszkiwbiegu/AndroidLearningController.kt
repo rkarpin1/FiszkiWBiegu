@@ -57,6 +57,15 @@ class AndroidLearningController(private val context: Context) : LearningControll
         )
     }
 
+    override fun setSpeed(speed: Float) {
+        context.startService(
+            Intent(context, LearningService::class.java).apply {
+                action = LearningService.ACTION_SPEED
+                putExtra(LearningService.EXTRA_SPEED, speed)
+            }
+        )
+    }
+
     override fun stop() {
         releaseController()
         context.startService(

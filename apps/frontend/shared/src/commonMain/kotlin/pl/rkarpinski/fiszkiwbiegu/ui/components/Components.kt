@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Eco
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -83,4 +86,26 @@ fun TrackBar(
 @Composable
 fun CapsLabel(text: String, color: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
     Text(text, style = capsMono().copy(color = color))
+}
+
+/**
+ * Wskaźnik poziomu SRS w postaci listków (0-5).
+ */
+@Composable
+fun SrsLevelIndicator(
+    srsLevel: Float,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.secondary,
+) {
+    val leafCount = (srsLevel * 5).toInt().coerceIn(0, 5)
+    Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+        repeat(leafCount) {
+            Icon(
+                imageVector = Icons.Rounded.Eco,
+                contentDescription = null,
+                modifier = Modifier.size(14.dp),
+                tint = color,
+            )
+        }
+    }
 }

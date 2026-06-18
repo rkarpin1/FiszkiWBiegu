@@ -2,6 +2,9 @@ package pl.rkarpinski.fiszkiwbiegu.data.api
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.math.exp
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 @Serializable
 data class CollectionDto(
@@ -62,7 +65,20 @@ data class FlashcardDto(
 
     @SerialName("srs_level")
     val srsLevel: Float = 0f,
-)
+
+    @SerialName("last_studied_at")
+    val lastStudiedAt: String? = null,
+) {
+    fun decayLevel(now: Instant = Clock.System.now()): Float {
+        val studiedAt = lastStudiedAt ?: return srsLevel
+        val studied = Instant.parse(studiedAt)
+        val diff = now - studied
+        val minutes = diff.inWholeMinutes
+        val days = minutes / 1440.0
+        val stability = 1.0 + srsLevel * 29.0
+        return (srsLevel * exp(-days / stability)).toFloat().coerceAtLeast(0f)
+    }
+}
 
 @Serializable
 data class FlashcardRequest(
@@ -83,6 +99,9 @@ data class FlashcardUpdateRequest(
 
     @SerialName("srs_level")
     val srsLevel: Float? = null,
+
+    @SerialName("last_studied_at")
+    val lastStudiedAt: String? = null,
 )
 
 @Serializable

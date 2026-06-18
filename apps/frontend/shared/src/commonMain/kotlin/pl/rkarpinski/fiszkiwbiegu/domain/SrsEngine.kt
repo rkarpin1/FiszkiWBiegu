@@ -16,8 +16,8 @@ object SrsEngine {
     fun initQueue(flashcards: List<FlashcardDto>, rng: Random = Random.Default): MutableList<SrsCard> =
         flashcards
             .shuffled(rng)
-            .sortedBy { it.srsLevel + rng.nextFloat() * 0.3f }
-            .mapIndexed { i, card -> SrsCard(card, card.srsLevel, dueAtIndex = i) }
+            .sortedBy { it.decayLevel() + rng.nextFloat() * 0.3f }
+            .mapIndexed { i, card -> SrsCard(card, card.decayLevel(), dueAtIndex = i) }
             .toMutableList()
 
     fun pickNext(queue: List<SrsCard>, globalIndex: Int): SrsCard =
