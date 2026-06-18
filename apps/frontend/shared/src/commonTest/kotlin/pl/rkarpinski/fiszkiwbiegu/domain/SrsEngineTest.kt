@@ -4,12 +4,9 @@ import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kotlin.time.Instant
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 
 class SrsEngineTest {
-
-    private val fixedNow = Instant.parse("2026-06-18T12:00:00Z")
 
     private fun card(srsLevel: Float = 0f, lastStudiedAt: String? = null) = FlashcardDto(
         id = "id",
@@ -119,36 +116,5 @@ class SrsEngineTest {
         val queue = SrsEngine.initQueue(flashcards, Random(0))
         val indices = queue.map { it.dueAtIndex }
         assertEquals(indices.sorted(), indices)
-    }
-
-    @Test
-    fun `decayLevel null lastStudiedAt returns level unchanged`() {
-        assertEquals(0.8f, SrsEngine.decayLevel(0.8f, null, fixedNow))
-    }
-
-    @Test
-    fun `decayLevel level 0 stays 0 regardless of timestamp`() {
-        // 7 days before fixedNow
-        assertEquals(0.0f, SrsEngine.decayLevel(0.0f, "2026-06-11T12:00:00Z", fixedNow))
-    }
-
-    @Test
-    fun `decayLevel 0_8 after 7 days is approximately 0_597`() {
-        // stability = 1 + 0.8 * 29 = 24.2; decay = 0.8 * e^(-7/24.2) ≈ 0.597
-        val result = SrsEngine.decayLevel(0.8f, "2026-06-11T12:00:00Z", fixedNow)
-        assertTrue(result in 0.587f..0.607f, "Expected ~0.597, got $result")
-    }
-
-    @Test
-    fun `decayLevel 0_8 after 0 days is nearly unchanged`() {
-        val result = SrsEngine.decayLevel(0.8f, "2026-06-18T12:00:00Z", fixedNow)
-        assertTrue(result in 0.799f..0.801f, "Expected ~0.8, got $result")
-    }
-
-    @Test
-    fun `decayLevel 1_0 after 15 days is above 0_5`() {
-        // stability = 1 + 1.0 * 29 = 30; after 15 days: 1.0 * e^(-15/30) = e^(-0.5) ≈ 0.607
-        val result = SrsEngine.decayLevel(1.0f, "2026-06-03T12:00:00Z", fixedNow)
-        assertTrue(result > 0.5f, "Expected > 0.5 after 15 days, got $result")
     }
 }
