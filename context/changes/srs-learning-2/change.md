@@ -1,9 +1,9 @@
 ---
 change_id: srs-learning-2
 title: SRS decay — korekta srs_level na podstawie krzywej zapominania
-status: implementing
+status: implemented
 created: 2026-06-18
-updated: 2026-06-18
+updated: 2026-06-19
 archived_at: null
 ---
 

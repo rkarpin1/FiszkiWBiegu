@@ -318,10 +318,10 @@ Migration 009 jest addytywna — `last_studied_at NULL DEFAULT NULL` nie wpływa
 
 #### Automatyczne
 
-- [x] 2.1 `./gradlew :androidApp:assembleDebug` bez błędów — 3207757
+- [x] 2.1 `./gradlew :androidApp:assembleDebug` bez błędów — 9e410b8
 
 #### Ręczne
 
-- [x] 2.2 Po ocenieniu karty: `GET /collections/{id}/learning` pokazuje `last_studied_at = <teraz>`
-- [x] 2.3 Karta z `last_studied_at` sprzed 7 dni i `srs_level = 0.8` ma zdecayowany poziom ≈ 0.60 w sesji
-- [x] 2.4 Logcat bez błędów podczas fire & forget sync
+- [x] 2.2 Po ocenieniu karty: `GET /collections/{id}/learning` pokazuje `last_studied_at = <teraz>` — 9e410b8
+- [x] 2.3 Karta z `last_studied_at` sprzed 7 dni i `srs_level = 0.8` ma zdecayowany poziom ≈ 0.60 w sesji — 9e410b8
+- [x] 2.4 Logcat bez błędów podczas fire & forget sync — 9e410b8
