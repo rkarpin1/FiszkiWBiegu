@@ -606,8 +606,8 @@ Box(
 
 #### Automatyczne
 
-- [x] 1.1 `cargo build` bez błędów po zmianach w models.rs i handlers/flashcards.rs
-- [x] 1.2 `cargo test` przechodzi
+- [x] 1.1 `cargo build` bez błędów po zmianach w models.rs i handlers/flashcards.rs — 61668b6
+- [x] 1.2 `cargo test` przechodzi — 61668b6
 
 #### Ręczne
 
@@ -618,9 +618,9 @@ Box(
 
 #### Automatyczne
 
-- [ ] 2.1 `./gradlew :shared:compileKotlinAndroid` bez błędów
-- [ ] 2.2 `./gradlew :shared:test` (testy SrsEngine przechodzą)
-- [ ] 2.3 `./gradlew :androidApp:assembleDebug` — APK buduje się
+- [x] 2.1 `./gradlew :shared:compileKotlinAndroid` bez błędów
+- [x] 2.2 `./gradlew :shared:test` (testy SrsEngine przechodzą)
+- [x] 2.3 `./gradlew :androidApp:assembleDebug` — APK buduje się
 
 #### Ręczne
 

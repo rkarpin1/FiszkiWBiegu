@@ -3,6 +3,7 @@ package pl.rkarpinski.fiszkiwbiegu.screens.learning
 import kotlinx.coroutines.flow.StateFlow
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
+import pl.rkarpinski.fiszkiwbiegu.domain.Rating
 
 enum class LearningPhase { IDLE, SPEAKING_SOURCE, ANSWER, SPEAKING_TARGET, REPEATING }
 
@@ -12,6 +13,7 @@ data class LearningState(
     val flashcards: List<FlashcardDto> = emptyList(),
     val currentIndex: Int = 0,
     val phase: LearningPhase = LearningPhase.IDLE,
+    val currentCard: FlashcardDto? = null,
 )
 
 interface LearningController {
@@ -22,4 +24,5 @@ interface LearningController {
     fun next()
     fun previous()
     fun stop()
+    fun rate(rating: Rating)
 }

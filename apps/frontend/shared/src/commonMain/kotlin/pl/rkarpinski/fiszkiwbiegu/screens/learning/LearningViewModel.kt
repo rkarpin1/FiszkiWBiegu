@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import pl.rkarpinski.fiszkiwbiegu.data.repository.CollectionRepository
 import pl.rkarpinski.fiszkiwbiegu.data.repository.FlashcardRepository
+import pl.rkarpinski.fiszkiwbiegu.domain.Rating
 
 class LearningViewModel(
     private val repo: FlashcardRepository,
@@ -35,6 +36,7 @@ class LearningViewModel(
     fun pause() = controller.pause()
     fun next() = controller.next()
     fun previous() = controller.previous()
+    fun rate(rating: Rating) = controller.rate(rating)
 
     fun stop() {
         val s = controller.state.value

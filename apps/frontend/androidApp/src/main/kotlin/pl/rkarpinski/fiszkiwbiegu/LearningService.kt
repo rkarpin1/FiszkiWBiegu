@@ -56,8 +56,10 @@ class LearningService : MediaSessionService() {
         const val ACTION_NEXT = "pl.rkarpinski.fiszkiwbiegu.learning.NEXT"
         const val ACTION_PREV = "pl.rkarpinski.fiszkiwbiegu.learning.PREV"
         const val ACTION_STOP = "pl.rkarpinski.fiszkiwbiegu.learning.STOP"
+        const val ACTION_RATE = "pl.rkarpinski.fiszkiwbiegu.learning.RATE"
         const val EXTRA_FLASHCARDS_JSON = "flashcards_json"
         const val EXTRA_COLLECTION_JSON = "collection_json"
+        const val EXTRA_RATING = "rating"
 
         private const val NOTIFICATION_ID = 1001
         private const val CHANNEL_ID = "learning_session"

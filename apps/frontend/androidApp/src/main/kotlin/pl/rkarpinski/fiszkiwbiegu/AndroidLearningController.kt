@@ -12,6 +12,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
+import pl.rkarpinski.fiszkiwbiegu.domain.Rating
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningController
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningState
 
@@ -46,6 +47,15 @@ class AndroidLearningController(private val context: Context) : LearningControll
     override fun pause() { controller?.pause() }
     override fun next() { controller?.seekToNext() }
     override fun previous() { controller?.seekToPrevious() }
+
+    override fun rate(rating: Rating) {
+        context.startService(
+            Intent(context, LearningService::class.java).apply {
+                action = LearningService.ACTION_RATE
+                putExtra(LearningService.EXTRA_RATING, rating.name)
+            }
+        )
+    }
 
     override fun stop() {
         releaseController()
