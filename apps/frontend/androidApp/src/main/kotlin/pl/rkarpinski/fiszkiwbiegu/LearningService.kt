@@ -35,14 +35,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import android.media.AudioManager
 import kotlinx.serialization.json.Json
+import org.koin.android.ext.android.inject
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
+import pl.rkarpinski.fiszkiwbiegu.data.repository.FlashcardRepository
+import pl.rkarpinski.fiszkiwbiegu.domain.Rating
+import pl.rkarpinski.fiszkiwbiegu.domain.SrsCard
+import pl.rkarpinski.fiszkiwbiegu.domain.SrsEngine
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningPhase
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningState
 import java.util.Locale
 import java.util.UUID
 import kotlin.coroutines.resume
+import kotlin.random.Random
 
 @UnstableApi
 class LearningService : MediaSessionService() {
@@ -162,8 +169,12 @@ class LearningService : MediaSessionService() {
         else -> 0xFF666666.toInt()
     }
 
-    private var flashcards: List<FlashcardDto> = emptyList()
-    private var currentIndex = 0
+    private val srsQueue = mutableListOf<SrsCard>()
+    private var globalIndex = 0
+    private var currentSrsCard: SrsCard? = null
+    private var cardRated = false
+    private val rng = Random.Default
+    private val flashcardRepo: FlashcardRepository by inject()
     private var isPlaying = false
 
     override fun onCreate() {
@@ -208,14 +219,30 @@ class LearningService : MediaSessionService() {
             ACTION_START -> {
                 val json = intent.getStringExtra(EXTRA_FLASHCARDS_JSON) ?: return START_STICKY
                 collectionJson = intent.getStringExtra(EXTRA_COLLECTION_JSON)
-                flashcards = Json.decodeFromString(json)
-                if (flashcards.isEmpty()) return START_NOT_STICKY
-                currentIndex = 0
+                val allFlashcards: List<FlashcardDto> = Json.decodeFromString(json)
+                if (allFlashcards.isEmpty()) return START_NOT_STICKY
+                srsQueue.clear()
+                srsQueue.addAll(SrsEngine.initQueue(allFlashcards, rng))
+                globalIndex = 0
+                currentSrsCard = null
                 isPlaying = true
-                ttsPlayer.updateCurrentItem(flashcards[0].toMediaItem(this))
+                ttsPlayer.updateCurrentItem(srsQueue[0].flashcard.toMediaItem(this))
                 ttsPlayer.setPlaying(true)
                 updateSessionActivity()
                 startPlayJob()
+            }
+
+            ACTION_RATE -> {
+                val rating = Rating.valueOf(intent.getStringExtra(EXTRA_RATING) ?: return START_STICKY)
+                val card = currentSrsCard
+                if (card != null && !cardRated) {
+                    cardRated = true
+                    applyRating(card, rating)
+                    playRatingSound(rating)
+                    tts?.stop()
+                    playJob?.cancel()
+                    if (isPlaying) startPlayJob()
+                }
             }
 
             ACTION_PLAY -> resume()
@@ -244,7 +271,8 @@ class LearningService : MediaSessionService() {
         playJob?.cancel()
         tts?.stop()
         isPlaying = false
-        flashcards = emptyList()
+        srsQueue.clear()
+        currentSrsCard = null
         ttsPlayer.setPlaying(false)
         state.value = LearningState()
         stopSelf()
@@ -260,44 +288,64 @@ class LearningService : MediaSessionService() {
 
     private suspend fun CoroutineScope.playLoop() {
         val collection = collectionJson?.let { Json.decodeFromString<CollectionDto>(it) }
-        while (isActive && flashcards.isNotEmpty()) {
-            if (!isPlaying) {
-                delay(200); continue
-            }
+        val srcLang = collection?.sourceLanguage ?: "pl"
+        val tgtLang = collection?.targetLanguage ?: "en"
+        while (isActive && srsQueue.isNotEmpty()) {
+            if (!isPlaying) { delay(200); continue }
 
-            publishState(LearningPhase.IDLE)
-            val card = flashcards[currentIndex]
+            val card = SrsEngine.pickNext(srsQueue, globalIndex)
+            currentSrsCard = card
+            cardRated = false
+            globalIndex++
 
-            publishState(LearningPhase.SPEAKING_SOURCE)
-            ttsPlayer.updateCurrentItem(card.toMediaItem(this@LearningService, collection?.sourceLanguage ?: "pl"))
-
-            speakAndWait(card.sourceText, Locale.forLanguageTag("pl-PL"))
+            publishState(LearningPhase.IDLE, card.flashcard)
+            publishState(LearningPhase.SPEAKING_SOURCE, card.flashcard)
+            ttsPlayer.updateCurrentItem(card.flashcard.toMediaItem(this@LearningService, srcLang))
+            speakAndWait(card.flashcard.sourceText, Locale.forLanguageTag(srcLang))
             if (!isActive || !isPlaying) continue
 
-            publishState(LearningPhase.ANSWER)
-            val timeForTargetText = speakAndWait(card.targetText, Locale.ENGLISH, 0f)
+            publishState(LearningPhase.ANSWER, card.flashcard)
+            val timeForTargetText = speakAndWait(card.flashcard.targetText, Locale.forLanguageTag(tgtLang), 0f)
             if (!isActive || !isPlaying) continue
             delay(800)
             if (!isActive || !isPlaying) continue
 
             repeat(3) {
                 if (isActive && isPlaying) {
-                    publishState(LearningPhase.SPEAKING_TARGET)
-                    ttsPlayer.updateCurrentItem(card.toMediaItem(this@LearningService, collection?.targetLanguage ?: "en"))
-                    speakAndWait(card.targetText, Locale.ENGLISH)
+                    publishState(LearningPhase.SPEAKING_TARGET, card.flashcard)
+                    ttsPlayer.updateCurrentItem(card.flashcard.toMediaItem(this@LearningService, tgtLang))
+                    speakAndWait(card.flashcard.targetText, Locale.forLanguageTag(tgtLang))
                     if (isActive && isPlaying) {
-                        publishState(LearningPhase.REPEATING)
+                        publishState(LearningPhase.REPEATING, card.flashcard)
                         delay(timeForTargetText + 500)
                     }
                 }
             }
             if (!isActive || !isPlaying) continue
 
-            publishState(LearningPhase.IDLE)
-            delay(1000)
-            if (!isActive || !isPlaying) continue
+            if (!cardRated) {
+                applyRating(card, Rating.KNOW)
+            }
 
-            currentIndex = (currentIndex + 1) % flashcards.size
+            publishState(LearningPhase.IDLE, card.flashcard)
+            delay(1000)
+        }
+    }
+
+    private fun applyRating(card: SrsCard, rating: Rating) {
+        card.srsLevel = SrsEngine.newLevel(card.srsLevel, rating)
+        card.dueAtIndex = globalIndex + SrsEngine.intervalFor(card.srsLevel, rating, rng)
+        serviceScope.launch {
+            flashcardRepo.updateSrs(card.flashcard.id, card.srsLevel)
+        }
+    }
+
+    private fun playRatingSound(rating: Rating) {
+        val am = getSystemService(AUDIO_SERVICE) as AudioManager
+        when (rating) {
+            Rating.KNOW_WELL -> am.playSoundEffect(AudioManager.FX_KEYPRESS_RETURN, 1f)
+            Rating.DONT_KNOW -> am.playSoundEffect(AudioManager.FX_KEYPRESS_DELETE, 1f)
+            Rating.KNOW      -> Unit
         }
     }
 
@@ -336,41 +384,39 @@ class LearningService : MediaSessionService() {
         tts?.stop()
         playJob?.cancel()
         ttsPlayer.setPlaying(false)
-        publishState()
+        publishState(card = currentSrsCard?.flashcard)
     }
 
     private fun resume() {
-        if (flashcards.isEmpty() || isPlaying) return
+        if (srsQueue.isEmpty() || isPlaying) return
         isPlaying = true
         ttsPlayer.setPlaying(true)
         startPlayJob()
     }
 
     private fun next() {
-        if (flashcards.isEmpty()) return
-        currentIndex = (currentIndex + 1) % flashcards.size
+        if (srsQueue.isEmpty()) return
+        globalIndex++
         tts?.stop()
         playJob?.cancel()
-        ttsPlayer.updateCurrentItem(flashcards[currentIndex].toMediaItem(this))
-        if (isPlaying) startPlayJob() else publishState()
+        if (isPlaying) startPlayJob() else publishState(card = currentSrsCard?.flashcard)
     }
 
     private fun previous() {
-        if (flashcards.isEmpty()) return
-        currentIndex = if (currentIndex > 0) currentIndex - 1 else flashcards.size - 1
+        if (srsQueue.isEmpty()) return
         tts?.stop()
         playJob?.cancel()
-        ttsPlayer.updateCurrentItem(flashcards[currentIndex].toMediaItem(this))
-        if (isPlaying) startPlayJob() else publishState()
+        if (isPlaying) startPlayJob() else publishState(card = currentSrsCard?.flashcard)
     }
 
-    private fun publishState(phase: LearningPhase = LearningPhase.IDLE) {
+    private fun publishState(phase: LearningPhase = LearningPhase.IDLE, card: FlashcardDto? = null) {
         state.value = LearningState(
             isActive = true,
             isPlaying = isPlaying,
-            flashcards = flashcards,
-            currentIndex = currentIndex,
+            flashcards = srsQueue.map { it.flashcard },
+            currentIndex = 0,
             phase = phase,
+            currentCard = card,
         )
     }
 

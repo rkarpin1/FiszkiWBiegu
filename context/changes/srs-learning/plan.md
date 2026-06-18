@@ -618,9 +618,9 @@ Box(
 
 #### Automatyczne
 
-- [x] 2.1 `./gradlew :shared:compileKotlinAndroid` bez błędów
-- [x] 2.2 `./gradlew :shared:test` (testy SrsEngine przechodzą)
-- [x] 2.3 `./gradlew :androidApp:assembleDebug` — APK buduje się
+- [x] 2.1 `./gradlew :shared:compileKotlinAndroid` bez błędów — af9a254
+- [x] 2.2 `./gradlew :shared:test` (testy SrsEngine przechodzą) — af9a254
+- [x] 2.3 `./gradlew :androidApp:assembleDebug` — APK buduje się — af9a254
 
 #### Ręczne
 
@@ -630,7 +630,7 @@ Box(
 
 #### Automatyczne
 
-- [ ] 3.1 `./gradlew :androidApp:assembleDebug` bez błędów
+- [x] 3.1 `./gradlew :androidApp:assembleDebug` bez błędów
 
 #### Ręczne
 
