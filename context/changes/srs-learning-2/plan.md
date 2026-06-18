@@ -302,26 +302,26 @@ Migration 009 jest addytywna — `last_studied_at NULL DEFAULT NULL` nie wpływa
 
 #### Automatyczne
 
-- [x] 1.1 `cargo build` bez błędów po zmianach w models.rs i handlerach
-- [x] 1.2 `cargo test` przechodzi
-- [x] 1.3 `./gradlew :shared:compileKotlinAndroid` bez błędów
-- [x] 1.4 `./gradlew :shared:test` — wszystkie testy SrsEngine przechodzą
-- [x] 1.5 `./gradlew :androidApp:assembleDebug` — APK buduje się
+- [x] 1.1 `cargo build` bez błędów po zmianach w models.rs i handlerach — 3207757
+- [x] 1.2 `cargo test` przechodzi — 3207757
+- [x] 1.3 `./gradlew :shared:compileKotlinAndroid` bez błędów — 3207757
+- [x] 1.4 `./gradlew :shared:test` — wszystkie testy SrsEngine przechodzą — 3207757
+- [x] 1.5 `./gradlew :androidApp:assembleDebug` — APK buduje się — 3207757
 
 #### Ręczne
 
-- [x] 1.6 `GET /collections/{id}/learning` zwraca `last_studied_at` (null dla starych fiszek)
-- [x] 1.7 `PUT /flashcards/{id}` z `{"last_studied_at": "...", "srs_level": 0.8}` → 200 z polem w response
-- [x] 1.8 `PUT /flashcards/{id}` bez `last_studied_at` → 200, pole niezmienione
+- [x] 1.6 `GET /collections/{id}/learning` zwraca `last_studied_at` (null dla starych fiszek) — 3207757
+- [x] 1.7 `PUT /flashcards/{id}` z `{"last_studied_at": "...", "srs_level": 0.8}` → 200 z polem w response — 3207757
+- [x] 1.8 `PUT /flashcards/{id}` bez `last_studied_at` → 200, pole niezmienione — 3207757
 
 ### Faza 2: Android
 
 #### Automatyczne
 
-- [ ] 2.1 `./gradlew :androidApp:assembleDebug` bez błędów
+- [x] 2.1 `./gradlew :androidApp:assembleDebug` bez błędów — 3207757
 
 #### Ręczne
 
-- [ ] 2.2 Po ocenieniu karty: `GET /collections/{id}/learning` pokazuje `last_studied_at = <teraz>`
-- [ ] 2.3 Karta z `last_studied_at` sprzed 7 dni i `srs_level = 0.8` ma zdecayowany poziom ≈ 0.60 w sesji
-- [ ] 2.4 Logcat bez błędów podczas fire & forget sync
+- [x] 2.2 Po ocenieniu karty: `GET /collections/{id}/learning` pokazuje `last_studied_at = <teraz>`
+- [x] 2.3 Karta z `last_studied_at` sprzed 7 dni i `srs_level = 0.8` ma zdecayowany poziom ≈ 0.60 w sesji
+- [x] 2.4 Logcat bez błędów podczas fire & forget sync
