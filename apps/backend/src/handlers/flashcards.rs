@@ -39,7 +39,7 @@ pub async fn list(
     }
 
     let result = sqlx::query_as::<_, Flashcard>(
-        "SELECT id, collection_id, source_text, target_text, position, created_at FROM flashcards WHERE collection_id = $1 ORDER BY position",
+        "SELECT id, collection_id, source_text, target_text, position, created_at, srs_level FROM flashcards WHERE collection_id = $1 ORDER BY position",
     )
     .bind(collection_id)
     .fetch_all(pool.get_ref())
@@ -76,7 +76,7 @@ pub async fn create(
     let result = sqlx::query_as::<_, Flashcard>(
         r#"INSERT INTO flashcards (collection_id, source_text, target_text, position)
            VALUES ($1, $2, $3, (SELECT COALESCE(MAX(position), -1) + 1 FROM flashcards WHERE collection_id = $1))
-           RETURNING id, collection_id, source_text, target_text, position, created_at"#,
+           RETURNING id, collection_id, source_text, target_text, position, created_at, srs_level"#,
     )
     .bind(collection_id)
     .bind(&body.source_text)
@@ -104,16 +104,19 @@ pub async fn update(
     let result = sqlx::query_as::<_, Flashcard>(
         r#"UPDATE flashcards SET
                source_text = COALESCE($1, flashcards.source_text),
-               target_text = COALESCE($2, flashcards.target_text)
+               target_text = COALESCE($2, flashcards.target_text),
+               srs_level   = COALESCE($3, flashcards.srs_level)
            FROM collections
-           WHERE flashcards.id = $3
+           WHERE flashcards.id = $4
              AND flashcards.collection_id = collections.id
-             AND collections.user_id = $4
+             AND collections.user_id = $5
            RETURNING flashcards.id, flashcards.collection_id, flashcards.source_text,
-                     flashcards.target_text, flashcards.position, flashcards.created_at"#,
+                     flashcards.target_text, flashcards.position, flashcards.created_at,
+                     flashcards.srs_level"#,
     )
     .bind(&body.source_text)
     .bind(&body.target_text)
+    .bind(body.srs_level)
     .bind(id)
     .bind(user.id)
     .fetch_optional(pool.get_ref())

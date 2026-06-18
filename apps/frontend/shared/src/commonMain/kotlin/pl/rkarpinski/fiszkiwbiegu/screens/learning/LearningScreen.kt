@@ -1,5 +1,7 @@
 package pl.rkarpinski.fiszkiwbiegu.screens.learning
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -39,6 +41,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
+import pl.rkarpinski.fiszkiwbiegu.domain.Rating
 import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
 import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.theme.mono
@@ -62,6 +65,8 @@ fun LearningScreen(
         onPlayPause = { if (state.isPlaying) viewModel.pause() else viewModel.play() },
         onNext = viewModel::next,
         onPrev = viewModel::previous,
+        onDontKnow = { viewModel.rate(Rating.DONT_KNOW) },
+        onKnowWell = { viewModel.rate(Rating.KNOW_WELL) },
     )
 }
 
@@ -73,6 +78,8 @@ fun LearningContent(
     onPlayPause: () -> Unit,
     onNext: () -> Unit,
     onPrev: () -> Unit,
+    onDontKnow: () -> Unit = {},
+    onKnowWell: () -> Unit = {},
 ) {
     var elapsedSec by remember { mutableStateOf(0) }
     LaunchedEffect(state.isPlaying) {
@@ -87,7 +94,7 @@ fun LearningContent(
     var speed by remember { mutableStateOf(1.0f) }
     val speeds = listOf(0.75f to "0.75×", 1.0f to "1.0×", 1.25f to "1.25×", 1.5f to "1.5×")
 
-    val card = state.flashcards.getOrNull(state.currentIndex)
+    val card = state.currentCard ?: state.flashcards.getOrNull(state.currentIndex)
 
     FiszkiThemedScreen(naturalDark = true) {
         val c = LocalFiszkiColors.current
@@ -325,7 +332,25 @@ fun LearningContent(
 
             Spacer(Modifier.height(24.dp))
 
-            // Wiem / Nie wiem — disabled stubs
+            // Wiem / Nie wiem
+            val isAnswerPhase = state.phase == LearningPhase.ANSWER
+
+            var dontKnowPressed by remember { mutableStateOf(false) }
+            val dontKnowBg by animateColorAsState(
+                targetValue = if (dontKnowPressed) Color.Red.copy(alpha = 0.3f) else scheme.surfaceVariant,
+                animationSpec = tween(300),
+                finishedListener = { dontKnowPressed = false },
+                label = "dontKnowBg",
+            )
+
+            var knowWellPressed by remember { mutableStateOf(false) }
+            val knowWellBg by animateColorAsState(
+                targetValue = if (knowWellPressed) Color(0xFF2E7D32).copy(alpha = 0.3f) else scheme.surfaceVariant,
+                animationSpec = tween(300),
+                finishedListener = { knowWellPressed = false },
+                label = "knowWellBg",
+            )
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -335,22 +360,50 @@ fun LearningContent(
                         .weight(1f)
                         .height(52.dp)
                         .clip(MaterialTheme.shapes.large)
-                        .background(scheme.surfaceVariant)
-                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large),
+                        .background(dontKnowBg)
+                        .border(
+                            1.dp,
+                            if (isAnswerPhase) scheme.outline else scheme.outlineVariant,
+                            MaterialTheme.shapes.large,
+                        )
+                        .then(
+                            if (isAnswerPhase) Modifier.clickable {
+                                dontKnowPressed = true
+                                onDontKnow()
+                            } else Modifier
+                        ),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text("Nie wiem", style = MaterialTheme.typography.titleMedium, color = c.mute2)
+                    Text(
+                        "Nie wiem",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = if (isAnswerPhase) scheme.onSurface else c.mute2,
+                    )
                 }
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp)
                         .clip(MaterialTheme.shapes.large)
-                        .background(scheme.surfaceVariant)
-                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large),
+                        .background(knowWellBg)
+                        .border(
+                            1.dp,
+                            if (isAnswerPhase) scheme.outline else scheme.outlineVariant,
+                            MaterialTheme.shapes.large,
+                        )
+                        .then(
+                            if (isAnswerPhase) Modifier.clickable {
+                                knowWellPressed = true
+                                onKnowWell()
+                            } else Modifier
+                        ),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text("Wiem!", style = MaterialTheme.typography.titleMedium, color = c.mute2)
+                    Text(
+                        "Wiem!",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = if (isAnswerPhase) scheme.onSurface else c.mute2,
+                    )
                 }
             }
 

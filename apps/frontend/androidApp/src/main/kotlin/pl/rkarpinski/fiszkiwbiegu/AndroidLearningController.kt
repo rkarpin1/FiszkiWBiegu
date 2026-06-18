@@ -8,8 +8,11 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
+import pl.rkarpinski.fiszkiwbiegu.domain.Rating
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningController
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningState
 
@@ -23,11 +26,12 @@ class AndroidLearningController(private val context: Context) : LearningControll
         get() = controllerFuture?.takeIf { it.isDone && !it.isCancelled }
             ?.runCatching { get() }?.getOrNull()
 
-    override fun start(flashcards: List<FlashcardDto>) {
+    override fun start(collection: CollectionDto, flashcards: List<FlashcardDto>) {
         context.startForegroundService(
             Intent(context, LearningService::class.java).apply {
                 action = LearningService.ACTION_START
                 putExtra(LearningService.EXTRA_FLASHCARDS_JSON, Json.encodeToString(flashcards))
+                putExtra(LearningService.EXTRA_COLLECTION_JSON, Json.encodeToString(collection))
             }
         )
         connectController()
@@ -43,6 +47,15 @@ class AndroidLearningController(private val context: Context) : LearningControll
     override fun pause() { controller?.pause() }
     override fun next() { controller?.seekToNext() }
     override fun previous() { controller?.seekToPrevious() }
+
+    override fun rate(rating: Rating) {
+        context.startService(
+            Intent(context, LearningService::class.java).apply {
+                action = LearningService.ACTION_RATE
+                putExtra(LearningService.EXTRA_RATING, rating.name)
+            }
+        )
+    }
 
     override fun stop() {
         releaseController()

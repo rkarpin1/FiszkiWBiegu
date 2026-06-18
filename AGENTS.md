@@ -7,7 +7,6 @@ FiszkiWBiegu is an audio flashcard app for runners (Polish↔English vocabulary,
 - Audio playback during workouts must use Android Foreground Service with a system notification — Android kills background processes (`@context/foundation/prd.md:106`).
 - All delete operations must show a confirmation dialog; there is no undo (`@context/foundation/prd.md:99`).
 - MVP scope is Android only. Do not add web learning mode, iOS features, spaced repetition, file import, or payments (`@context/foundation/prd.md:140`).
-- Shared cross-platform logic goes in `apps/frontend/shared/src/commonMain/`; platform-specific code in `androidMain/` or `wasmJsMain/`.
 - Backend database is Supabase (PostgreSQL) — connect via `sqlx` using `DATABASE_URL` (session-mode pooler, port 5432). Always use `SUPABASE_SERVICE_ROLE_KEY` server-side; never the anon key.
 - Flashcard text fields are `source_text` / `target_text` (renamed from `polish_text`/`english_text` in migration 007). Never use the old names in code or SQL.
 - Collection language fields are `source_language` / `target_language`. Accepted codes: `pl`, `en`, `de`, `es`, `fr`, `it`; source ≠ target enforced by backend (422).
@@ -15,11 +14,8 @@ FiszkiWBiegu is an audio flashcard app for runners (Polish↔English vocabulary,
 ## Project Structure
 
 - `apps/backend/` — Rust/Actix-web API; see `@apps/backend/Cargo.toml`
-- `apps/frontend/shared/` — KMP library (commonMain, androidMain, iosMain, wasmJsMain)
 - `apps/frontend/androidApp/` — Android target; `LearningService.kt` (Foreground Service + TTS + MediaSession)
-- `apps/frontend/webApp/` — Web/WASM target
 - `apps/frontend/iosApp/` — iOS Xcode project (out of MVP scope)
-- `context/` — PRD, tech-stack decisions, planning docs
 
 ## DB Schema (current, after all migrations)
 
@@ -56,9 +52,6 @@ Run `./gradlew` commands from `apps/frontend/`; run `cargo` commands from `apps/
 - Android debug APK: `./gradlew :androidApp:assembleDebug`
 - Web dev server (WASM): `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
 - Shared KMP tests: `./gradlew :shared:test`
-- Backend build: `cargo build`
-- Backend run: `cargo run`
-- Backend tests: `cargo test`
 
 ## Key Versions
 
@@ -66,7 +59,7 @@ See @apps/frontend/gradle/libs.versions.toml and @apps/backend/Cargo.toml for pi
 
 ## Code Conventions
 
-No detekt, lint, or format tooling is configured. Kotlin: PascalCase for classes/objects, camelCase for functions and properties, file named after its primary class. Tests use `kotlin.test` and live in `apps/frontend/shared/src/commonTest/`.
+No detekt, lint, or format tooling is configured. Tests use `kotlin.test` and live in `apps/frontend/shared/src/commonTest/`.
 
 ## Commits
 

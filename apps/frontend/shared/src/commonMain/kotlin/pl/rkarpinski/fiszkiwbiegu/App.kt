@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import pl.rkarpinski.fiszkiwbiegu.data.api.AuthEventBus
@@ -60,14 +61,66 @@ private sealed interface Route {
 }
 
 @Composable
-fun App(onGoogleSignIn: suspend () -> Result<String>) {
+fun App(
+    onGoogleSignIn: suspend () -> Result<String>,
+    initialCollectionJson: String? = null,
+) {
     val authRepository: AuthRepository = koinInject()
     val authEventBus: AuthEventBus = koinInject()
     val collectionsVm: CollectionsViewModel = koinViewModel()
     val scope = rememberCoroutineScope()
 
-    val initial: Route = if (authRepository.isLoggedIn()) Route.Collections else Route.Login
-    val backStack = remember { mutableStateListOf(initial) }
+    val initial: Route = remember {
+        val initialCollection = initialCollectionJson?.let {
+            try {
+                Json.decodeFromString<CollectionDto>(it)
+            } catch (e: Exception) {
+                null
+            }
+        }
+        if (initialCollection != null) {
+            Route.Learning(initialCollection)
+        } else if (authRepository.isLoggedIn()) {
+            Route.Collections
+        } else {
+            Route.Login
+        }
+    }
+    val backStack = remember {
+        val list = mutableStateListOf<Route>()
+        if (authRepository.isLoggedIn()) {
+            list.add(Route.Collections)
+            if (initial is Route.Learning) {
+                list.add(initial)
+            }
+        } else {
+            list.add(initial)
+        }
+        list
+    }
+
+    LaunchedEffect(initialCollectionJson) {
+        val collection = initialCollectionJson?.let {
+            try {
+                Json.decodeFromString<CollectionDto>(it)
+            } catch (e: Exception) {
+                null
+            }
+        }
+        if (collection != null) {
+            val targetRoute = Route.Learning(collection)
+            if (backStack.lastOrNull() != targetRoute) {
+                if (authRepository.isLoggedIn()) {
+                    backStack.clear()
+                    backStack.add(Route.Collections)
+                    backStack.add(targetRoute)
+                } else {
+                    backStack.clear()
+                    backStack.add(Route.Login)
+                }
+            }
+        }
+    }
 
     var loginError by remember { mutableStateOf<String?>(null) }
     var isLoggingIn by remember { mutableStateOf(false) }

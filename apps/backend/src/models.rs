@@ -54,6 +54,7 @@ pub struct Flashcard {
     pub target_text: String,
     pub position: i32,
     pub created_at: DateTime<Utc>,
+    pub srs_level: f32,
 }
 
 #[derive(Debug, Deserialize)]
@@ -66,4 +67,5 @@ pub struct FlashcardRequest {
 pub struct FlashcardUpdateRequest {
     pub source_text: Option<String>,
     pub target_text: Option<String>,
+    pub srs_level: Option<f32>,
 }

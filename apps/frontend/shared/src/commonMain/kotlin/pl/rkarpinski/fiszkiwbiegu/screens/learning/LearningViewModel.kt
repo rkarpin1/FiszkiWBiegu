@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import pl.rkarpinski.fiszkiwbiegu.data.repository.CollectionRepository
 import pl.rkarpinski.fiszkiwbiegu.data.repository.FlashcardRepository
+import pl.rkarpinski.fiszkiwbiegu.domain.Rating
 
 class LearningViewModel(
     private val repo: FlashcardRepository,
@@ -19,7 +20,14 @@ class LearningViewModel(
     fun startSession() {
         viewModelScope.launch {
             repo.getAll(collectionId).onSuccess { flashcards ->
-                if (flashcards.isNotEmpty()) controller.start(flashcards)
+                if (flashcards.isNotEmpty()) {
+                    collectionRepo.getAll().onSuccess { collections ->
+                        val collection = collections.find { it.id == collectionId }
+                        if (collection != null) {
+                            controller.start(collection, flashcards)
+                        }
+                    }
+                }
             }
         }
     }
@@ -28,6 +36,7 @@ class LearningViewModel(
     fun pause() = controller.pause()
     fun next() = controller.next()
     fun previous() = controller.previous()
+    fun rate(rating: Rating) = controller.rate(rating)
 
     fun stop() {
         val s = controller.state.value

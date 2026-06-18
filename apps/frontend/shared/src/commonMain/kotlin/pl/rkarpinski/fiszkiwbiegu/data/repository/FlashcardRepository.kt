@@ -26,6 +26,12 @@ class FlashcardRepository(private val api: ApiClient) {
         else error("HTTP ${response.status.value}")
     }
 
+    suspend fun updateSrs(id: String, srsLevel: Float): Result<FlashcardDto> = runCatching {
+        val response = api.updateFlashcard(id, FlashcardUpdateRequest(srsLevel = srsLevel))
+        if (response.status.isSuccess()) response.body()
+        else error("HTTP ${response.status.value}")
+    }
+
     suspend fun delete(id: String): Result<Unit> = runCatching {
         val response = api.deleteFlashcard(id)
         if (!response.status.isSuccess()) error("HTTP ${response.status.value}")

@@ -15,7 +15,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-const val API_BASE_URL = "https://fiszki-w-biegu.onrender.com"
+const val API_BASE_URL = "https://fiszkiwbiegu-server.xtaxi.eu"
 
 class ApiClient(
     private val tokenStorage: TokenStorage,
