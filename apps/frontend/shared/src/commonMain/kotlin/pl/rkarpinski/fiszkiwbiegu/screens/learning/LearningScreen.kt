@@ -49,6 +49,8 @@ import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.theme.mono
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CtrlButton
+import pl.rkarpinski.fiszkiwbiegu.ui.components.SrsLevelIndicator
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun LearningScreen(
@@ -90,7 +92,7 @@ fun LearningContent(
     LaunchedEffect(state.isPlaying) {
         if (state.isPlaying) {
             while (true) {
-                delay(1000)
+                delay(1000.milliseconds)
                 elapsedSec++
             }
         }
@@ -180,18 +182,27 @@ fun LearningContent(
                 ) {
 
 
-                Text(
-                    text = when (state.phase) {
-                        LearningPhase.SPEAKING_SOURCE -> "SŁUCHAJ"
-                        LearningPhase.SPEAKING_TARGET -> "SŁUCHAJ"
-                        LearningPhase.IDLE -> "UWAGA"
-                        LearningPhase.ANSWER -> "ODPOWIEDZ"
-                        LearningPhase.REPEATING -> "POWTÓRZ"
-                    },
-                    fontFamily = mono(),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = scheme.secondary,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = when (state.phase) {
+                            LearningPhase.SPEAKING_SOURCE -> "SŁUCHAJ"
+                            LearningPhase.SPEAKING_TARGET -> "SŁUCHAJ"
+                            LearningPhase.IDLE -> "UWAGA"
+                            LearningPhase.ANSWER -> "ODPOWIEDZ"
+                            LearningPhase.REPEATING -> "POWTÓRZ"
+                        },
+                        fontFamily = mono(),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = scheme.secondary,
+                    )
+
+                    if (card != null) {
+                        SrsLevelIndicator(srsLevel = card.decayLevel())
+                    }
+                }
 
                 Spacer(Modifier.height(12.dp))
 

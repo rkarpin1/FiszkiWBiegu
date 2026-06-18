@@ -53,6 +53,7 @@ import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
+import androidx.core.graphics.createBitmap
 
 @UnstableApi
 class LearningService : MediaSessionService() {
@@ -144,11 +145,7 @@ class LearningService : MediaSessionService() {
 
     private fun getVectorBitmap(resId: Int): Bitmap? {
         val drawable: Drawable = ContextCompat.getDrawable(this, resId) ?: return null
-        val bitmap = Bitmap.createBitmap(
-            drawable.intrinsicWidth,
-            drawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
+        val bitmap = createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
         val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)
@@ -292,7 +289,7 @@ class LearningService : MediaSessionService() {
     private fun startPlayJob() {
         playJob?.cancel()
         playJob = serviceScope.launch {
-            while (!ttsReady) delay(100)
+            while (!ttsReady) delay(100.milliseconds)
             playLoop()
         }
     }
@@ -339,7 +336,7 @@ class LearningService : MediaSessionService() {
             }
 
             publishState(LearningPhase.IDLE, card.flashcard)
-            delay(1000)
+            delay(1000.milliseconds)
         }
     }
 
