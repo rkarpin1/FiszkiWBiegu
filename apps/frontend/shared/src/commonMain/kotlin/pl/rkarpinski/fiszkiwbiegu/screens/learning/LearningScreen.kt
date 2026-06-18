@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -46,6 +48,7 @@ import pl.rkarpinski.fiszkiwbiegu.theme.FiszkiThemedScreen
 import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.theme.mono
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
+import pl.rkarpinski.fiszkiwbiegu.ui.components.CtrlButton
 
 @Composable
 fun LearningScreen(
@@ -65,6 +68,7 @@ fun LearningScreen(
         onPlayPause = { if (state.isPlaying) viewModel.pause() else viewModel.play() },
         onNext = viewModel::next,
         onPrev = viewModel::previous,
+        onSetSpeed = viewModel::setSpeed,
         onDontKnow = { viewModel.rate(Rating.DONT_KNOW) },
         onKnowWell = { viewModel.rate(Rating.KNOW_WELL) },
     )
@@ -78,6 +82,7 @@ fun LearningContent(
     onPlayPause: () -> Unit,
     onNext: () -> Unit,
     onPrev: () -> Unit,
+    onSetSpeed: (Float) -> Unit = {},
     onDontKnow: () -> Unit = {},
     onKnowWell: () -> Unit = {},
 ) {
@@ -91,8 +96,7 @@ fun LearningContent(
         }
     }
 
-    var speed by remember { mutableStateOf(1.0f) }
-    val speeds = listOf(0.75f to "0.75×", 1.0f to "1.0×", 1.25f to "1.25×", 1.5f to "1.5×")
+    val speeds = listOf(0.5f to "0.50*", 0.75f to "0.75*", 1.0f to "1.0*", 1.25f to "1.25*")
 
     val card = state.currentCard ?: state.flashcards.getOrNull(state.currentIndex)
 
@@ -291,7 +295,7 @@ fun LearningContent(
                 Spacer(Modifier.weight(1f))
 
                 speeds.forEach { (value, label) ->
-                    val active = speed == value
+                    val active = state.playbackSpeed == value
                     Box(
                         modifier = Modifier
                             .clip(MaterialTheme.shapes.medium)
@@ -301,7 +305,7 @@ fun LearningContent(
                                 if (active) scheme.primary else scheme.outlineVariant,
                                 MaterialTheme.shapes.medium
                             )
-                            .clickable { speed = value }
+                            .clickable { onSetSpeed(value) }
                             .padding(horizontal = 12.dp, vertical = 6.dp),
                         contentAlignment = Alignment.Center,
                     ) {
@@ -320,20 +324,11 @@ fun LearningContent(
 
             Spacer(Modifier.height(24.dp))
 
-//            // Media controls (centred)
-//            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-//                MediaControls(
-//                    isPlaying = state.isPlaying,
-//                    onPrev = onPrev,
-//                    onPlayPause = onPlayPause,
-//                    onNext = onNext,
-//                )
-//            }
-
-            Spacer(Modifier.height(24.dp))
-
             // Wiem / Nie wiem
-            val isAnswerPhase = state.phase == LearningPhase.ANSWER
+            val isAnswerPhase = state.phase in listOf(
+                LearningPhase.ANSWER,
+                LearningPhase.SPEAKING_TARGET, LearningPhase.REPEATING
+            );
 
             var dontKnowPressed by remember { mutableStateOf(false) }
             val dontKnowBg by animateColorAsState(
@@ -354,6 +349,7 @@ fun LearningContent(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(
                     modifier = Modifier
@@ -380,6 +376,13 @@ fun LearningContent(
                         color = if (isAnswerPhase) scheme.onSurface else c.mute2,
                     )
                 }
+
+                CtrlButton(
+                    icon = if (state.isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                    primary = true,
+                    onClick = onPlayPause,
+                )
+
                 Box(
                     modifier = Modifier
                         .weight(1f)
