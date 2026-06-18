@@ -643,12 +643,12 @@ Box(
 
 #### Automatyczne
 
-- [x] 4.1 `./gradlew :androidApp:assembleDebug` bez błędów
+- [x] 4.1 `./gradlew :androidApp:assembleDebug` bez błędów — 4007389
 
 #### Ręczne
 
-- [x] 4.2 Przyciski szare (nieaktywne) w fazach innych niż ANSWER
-- [x] 4.3 Przyciski aktywne (pełny kolor, klikalność) w fazie ANSWER
-- [x] 4.4 Kliknięcie "Nie wiem" — czerwony flash ~300ms
-- [x] 4.5 Kliknięcie "Wiem!" — zielony flash ~300ms
-- [x] 4.6 Po sesji: srs_level fiszek zaktualizowany w DB (weryfikacja przez API)
+- [x] 4.2 Przyciski szare (nieaktywne) w fazach innych niż ANSWER — 4007389
+- [x] 4.3 Przyciski aktywne (pełny kolor, klikalność) w fazie ANSWER — 4007389
+- [x] 4.4 Kliknięcie "Nie wiem" — czerwony flash ~300ms — 4007389
+- [x] 4.5 Kliknięcie "Wiem!" — zielony flash ~300ms — 4007389
+- [x] 4.6 Po sesji: srs_level fiszek zaktualizowany w DB (weryfikacja przez API) — 4007389

@@ -1,7 +1,7 @@
 ---
 change_id: srs-learning
 title: Algorytm SRS do kolejkowania słów w sesji nauki
-status: implementing
+status: implemented
 created: 2026-06-18
 updated: 2026-06-18
 archived_at: null
