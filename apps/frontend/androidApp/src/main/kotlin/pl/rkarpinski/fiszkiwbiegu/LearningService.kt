@@ -48,6 +48,7 @@ import pl.rkarpinski.fiszkiwbiegu.domain.SrsEngine
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningPhase
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningState
 import java.util.Locale
+import kotlin.time.Clock
 import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.random.Random
@@ -346,7 +347,7 @@ class LearningService : MediaSessionService() {
         card.srsLevel = SrsEngine.newLevel(card.srsLevel, rating)
         card.dueAtIndex = globalIndex + SrsEngine.intervalFor(card.srsLevel, rating, rng)
         serviceScope.launch {
-            flashcardRepo.updateSrs(card.flashcard.id, card.srsLevel)
+            flashcardRepo.updateSrs(card.flashcard.id, card.srsLevel, Clock.System.now().toString())
         }
     }
 

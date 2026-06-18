@@ -1,6 +1,9 @@
 package pl.rkarpinski.fiszkiwbiegu.domain
 
+import kotlin.math.exp
 import kotlin.random.Random
+import kotlin.time.Clock
+import kotlin.time.Instant
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 
 enum class Rating { DONT_KNOW, KNOW, KNOW_WELL }
@@ -13,11 +16,23 @@ data class SrsCard(
 
 object SrsEngine {
 
-    fun initQueue(flashcards: List<FlashcardDto>, rng: Random = Random.Default): MutableList<SrsCard> =
+    fun decayLevel(
+        level: Float,
+        lastStudiedAt: String?,
+        now: Instant = Clock.System.now(),
+    ): Float {
+        if (lastStudiedAt == null) return level
+        val studied = Instant.parse(lastStudiedAt)
+        val days = (now - studied).inWholeMinutes / 1440.0
+        val stability = 1.0 + level * 29.0
+        return (level * exp(-days / stability)).toFloat().coerceAtLeast(0f)
+    }
+
+    fun initQueue(flashcards: List<FlashcardDto>, rng: Random = Random.Default, now: Instant = Clock.System.now()): MutableList<SrsCard> =
         flashcards
             .shuffled(rng)
-            .sortedBy { it.srsLevel + rng.nextFloat() * 0.3f }
-            .mapIndexed { i, card -> SrsCard(card, card.srsLevel, dueAtIndex = i) }
+            .sortedBy { decayLevel(it.srsLevel, it.lastStudiedAt, now) + rng.nextFloat() * 0.3f }
+            .mapIndexed { i, card -> SrsCard(card, decayLevel(card.srsLevel, card.lastStudiedAt, now), dueAtIndex = i) }
             .toMutableList()
 
     fun pickNext(queue: List<SrsCard>, globalIndex: Int): SrsCard =

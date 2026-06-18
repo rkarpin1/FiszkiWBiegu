@@ -62,6 +62,9 @@ data class FlashcardDto(
 
     @SerialName("srs_level")
     val srsLevel: Float = 0f,
+
+    @SerialName("last_studied_at")
+    val lastStudiedAt: String? = null,
 )
 
 @Serializable
@@ -83,6 +86,9 @@ data class FlashcardUpdateRequest(
 
     @SerialName("srs_level")
     val srsLevel: Float? = null,
+
+    @SerialName("last_studied_at")
+    val lastStudiedAt: String? = null,
 )
 
 @Serializable
