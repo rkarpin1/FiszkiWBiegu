@@ -26,6 +26,9 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
 
     init {
         loadCollections()
+        viewModelScope.launch {
+            repo.studyCompleted.collect { loadCollections() }
+        }
     }
 
     fun loadCollections() {
