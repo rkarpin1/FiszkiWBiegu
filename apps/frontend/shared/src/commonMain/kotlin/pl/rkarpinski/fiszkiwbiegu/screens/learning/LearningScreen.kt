@@ -61,7 +61,7 @@ fun LearningScreen(
     viewModel: LearningViewModel = koinViewModel(key = collection.id) { parametersOf(collection.id) },
     onBack: () -> Unit,
 ) {
-    LaunchedEffect(Unit) { viewModel.startSession() }
+    LaunchedEffect(Unit) { viewModel.startSession(collection) }
 
     val state by viewModel.state.collectAsState()
 

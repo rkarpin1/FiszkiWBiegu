@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import android.media.AudioManager
 import android.media.ToneGenerator
 import kotlinx.serialization.json.Json
@@ -289,7 +290,10 @@ class LearningService : MediaSessionService() {
     private fun startPlayJob() {
         playJob?.cancel()
         playJob = serviceScope.launch {
-            while (!ttsReady) delay(100.milliseconds)
+            val ttsOk = withTimeoutOrNull(5_000) {
+                while (!ttsReady) delay(100.milliseconds)
+            }
+            if (ttsOk == null) { stopSession(); return@launch }
             playLoop()
         }
     }

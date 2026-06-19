@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.repository.CollectionRepository
 import pl.rkarpinski.fiszkiwbiegu.data.repository.FlashcardRepository
 import pl.rkarpinski.fiszkiwbiegu.domain.Rating
@@ -17,16 +18,11 @@ class LearningViewModel(
 
     val state: StateFlow<LearningState> = controller.state
 
-    fun startSession() {
+    fun startSession(collection: CollectionDto) {
         viewModelScope.launch {
             repo.getAll(collectionId).onSuccess { flashcards ->
                 if (flashcards.isNotEmpty()) {
-                    collectionRepo.getAll().onSuccess { collections ->
-                        val collection = collections.find { it.id == collectionId }
-                        if (collection != null) {
-                            controller.start(collection, flashcards)
-                        }
-                    }
+                    controller.start(collection, flashcards)
                 }
             }
         }
