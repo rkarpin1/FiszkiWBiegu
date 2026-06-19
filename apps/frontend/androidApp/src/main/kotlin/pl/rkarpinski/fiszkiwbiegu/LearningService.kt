@@ -42,6 +42,7 @@ import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.ToneGenerator
+import android.util.Log
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
@@ -64,6 +65,7 @@ import androidx.core.graphics.createBitmap
 class LearningService : MediaSessionService() {
 
     companion object {
+        private const val TAG = "LearningService"
         val state = MutableStateFlow(LearningState())
 
         const val ACTION_START = "pl.rkarpinski.fiszkiwbiegu.learning.START"
@@ -118,6 +120,7 @@ class LearningService : MediaSessionService() {
                 .setContentIntent(mediaSession.sessionActivity)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setSilent(true)
+                .setOngoing(true)
                 .addAction(
                     CoreNotificationCompat.Action(
                         android.R.drawable.ic_media_previous, "Prev",
@@ -194,7 +197,7 @@ class LearningService : MediaSessionService() {
         val player = TtsPlayer()
         ttsPlayer = player
         player.onPlayWhenReadyChanged = { playing -> if (playing) resume() else pause() }
-        player.onSeekToNext = { rateCard(Rating.KNOW_WELL) }
+        player.onSeekToNext = { rateCard(Rating.KNOW) }
         player.onSeekToPrevious = { rateCard(Rating.DONT_KNOW) }
 
         mediaSession = MediaSession.Builder(this, player)
@@ -204,15 +207,9 @@ class LearningService : MediaSessionService() {
                     controller: MediaSession.ControllerInfo,
                     playerCommand: Int
                 ): Int {
-                    when (playerCommand) {
-                        Player.COMMAND_SEEK_TO_NEXT, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM -> {
-                            rateCard(Rating.KNOW_WELL)
-                            return SessionResult.RESULT_SUCCESS
-                        }
-                        Player.COMMAND_SEEK_TO_PREVIOUS, Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM -> {
-                            rateCard(Rating.DONT_KNOW)
-                            return SessionResult.RESULT_SUCCESS
-                        }
+                    Log.i(TAG, "onPlayerCommandRequest command=$playerCommand from=${controller.packageName} isPlaying=$isPlaying")
+                    if (handlePlayerCommand(playerCommand)) {
+                        return SessionResult.RESULT_SUCCESS
                     }
                     return super.onPlayerCommandRequest(session, controller, playerCommand)
                 }
@@ -224,36 +221,11 @@ class LearningService : MediaSessionService() {
                 ): Boolean {
                     @Suppress("DEPRECATION")
                     val keyEvent = intent.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)
-                        ?: return false
-                    
-                    val isDown = keyEvent.action == KeyEvent.ACTION_DOWN
-                    if (!isDown && keyEvent.action != KeyEvent.ACTION_UP) return false
-
-                    return when (keyEvent.keyCode) {
-                        KeyEvent.KEYCODE_MEDIA_NEXT, KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> {
-                            if (isDown) rateCard(Rating.KNOW_WELL)
-                            true
+                        ?: run {
+                            Log.i(TAG, "onMediaButtonEvent without keyEvent from=${controller.packageName}")
+                            return false
                         }
-                        KeyEvent.KEYCODE_MEDIA_PREVIOUS, KeyEvent.KEYCODE_MEDIA_REWIND -> {
-                            if (isDown) rateCard(Rating.DONT_KNOW)
-                            true
-                        }
-                        KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK -> {
-                            if (isDown) {
-                                if (isPlaying) pause() else resume()
-                            }
-                            true
-                        }
-                        KeyEvent.KEYCODE_MEDIA_PLAY -> {
-                            if (isDown) resume()
-                            true
-                        }
-                        KeyEvent.KEYCODE_MEDIA_PAUSE -> {
-                            if (isDown) pause()
-                            true
-                        }
-                        else -> false
-                    }
+                    return handleMediaKeyEvent(keyEvent, "session:${controller.packageName}")
                 }
             })
             .build()
@@ -284,6 +256,13 @@ class LearningService : MediaSessionService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         when (intent?.action) {
+            Intent.ACTION_MEDIA_BUTTON -> {
+                @Suppress("DEPRECATION")
+                val keyEvent = intent.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)
+                if (handleMediaKeyEvent(keyEvent, "intent")) {
+                    return START_STICKY
+                }
+            }
             ACTION_START -> {
                 val json = intent.getStringExtra(EXTRA_FLASHCARDS_JSON) ?: return START_STICKY
                 collectionJson = intent.getStringExtra(EXTRA_COLLECTION_JSON)
@@ -318,6 +297,63 @@ class LearningService : MediaSessionService() {
             }
         }
         return START_STICKY
+    }
+
+    private fun handlePlayerCommand(playerCommand: Int): Boolean {
+        return when (playerCommand) {
+            Player.COMMAND_PLAY_PAUSE -> {
+                if (isPlaying) pause() else resume()
+                true
+            }
+            Player.COMMAND_SEEK_TO_NEXT, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM -> {
+                rateCard(Rating.KNOW)
+                true
+            }
+            Player.COMMAND_SEEK_TO_PREVIOUS, Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM -> {
+                rateCard(Rating.DONT_KNOW)
+                true
+            }
+            else -> false
+        }
+    }
+
+    private fun handleMediaKeyEvent(keyEvent: KeyEvent?, source: String): Boolean {
+        keyEvent ?: return false
+
+        val isDown = keyEvent.action == KeyEvent.ACTION_DOWN
+        if (!isDown && keyEvent.action != KeyEvent.ACTION_UP) return false
+
+        val consumed = when (keyEvent.keyCode) {
+            KeyEvent.KEYCODE_MEDIA_NEXT, KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> {
+                if (isDown) rateCard(Rating.KNOW)
+                true
+            }
+            KeyEvent.KEYCODE_MEDIA_PREVIOUS, KeyEvent.KEYCODE_MEDIA_REWIND -> {
+                if (isDown) rateCard(Rating.DONT_KNOW)
+                true
+            }
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK -> {
+                if (isDown) {
+                    if (isPlaying) pause() else resume()
+                }
+                true
+            }
+            KeyEvent.KEYCODE_MEDIA_PLAY -> {
+                if (isDown) resume()
+                true
+            }
+            KeyEvent.KEYCODE_MEDIA_PAUSE -> {
+                if (isDown) pause()
+                true
+            }
+            else -> false
+        }
+        if (consumed) {
+            Log.i(TAG, "mediaKey consumed source=$source keyCode=${keyEvent.keyCode} action=${keyEvent.action} isPlaying=$isPlaying")
+        } else {
+            Log.i(TAG, "mediaKey ignored source=$source keyCode=${keyEvent.keyCode} action=${keyEvent.action}")
+        }
+        return consumed
     }
 
     private fun updateSessionActivity() {
@@ -458,6 +494,7 @@ class LearningService : MediaSessionService() {
         tts?.stop()
         playJob?.cancel()
         ttsPlayer.setPlaying(false)
+        ttsPlayer.refreshNotification()
         publishState(card = currentSrsCard?.flashcard)
     }
 
@@ -466,6 +503,7 @@ class LearningService : MediaSessionService() {
         acquireAudioFocus()
         isPlaying = true
         ttsPlayer.setPlaying(true)
+        ttsPlayer.refreshNotification()
         startPlayJob()
     }
 
