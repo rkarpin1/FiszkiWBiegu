@@ -8,19 +8,26 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.net.Uri
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
-import androidx.media3.session.SessionResult
+import android.util.Log
 import android.view.KeyEvent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat as CoreNotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.createBitmap
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaNotification
 import androidx.media3.session.MediaSession
@@ -38,11 +45,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
-import android.media.AudioAttributes
-import android.media.AudioFocusRequest
-import android.media.AudioManager
-import android.media.ToneGenerator
-import android.util.Log
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
@@ -54,12 +56,12 @@ import pl.rkarpinski.fiszkiwbiegu.domain.SrsEngine
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningPhase
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningState
 import java.util.Locale
-import kotlin.time.Clock
 import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.random.Random
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.milliseconds
-import androidx.core.graphics.createBitmap
+import androidx.core.net.toUri
 
 @UnstableApi
 class LearningService : MediaSessionService() {
@@ -88,10 +90,15 @@ class LearningService : MediaSessionService() {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var tts: TextToSpeech? = null
     private var ttsReady = false
-    private lateinit var ttsPlayer: TtsPlayer
+    private lateinit var exoPlayer: ExoPlayer
+    private lateinit var mediaPlayer: Player
     private lateinit var mediaSession: MediaSession
     private var playJob: Job? = null
     private var collectionJson: String? = null
+
+    private val silenceUri by lazy {
+        "android.resource://$packageName/${R.raw.silence}".toUri()
+    }
 
     private val notificationProvider = object : MediaNotification.Provider {
         override fun createNotification(
@@ -109,12 +116,14 @@ class LearningService : MediaSessionService() {
             val flagBitmap = getVectorBitmap(getFlagDrawableId(lang))
 
             val builder = CoreNotificationCompat.Builder(this@LearningService, CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.ic_btn_speak_now) // System monochrome icon that definitely works
+                .setSmallIcon(android.R.drawable.ic_btn_speak_now)
                 .setLargeIcon(flagBitmap)
                 .setContentTitle(title)
                 .setContentText(subtitle)
-                .setStyle(MediaStyleNotificationHelper.MediaStyle(mediaSession)
-                    .setShowActionsInCompactView(0, 1, 2))
+                .setStyle(
+                    MediaStyleNotificationHelper.MediaStyle(mediaSession)
+                        .setShowActionsInCompactView(0, 1, 2)
+                )
                 .setColor(getLanguageColor(lang))
                 .setColorized(true)
                 .setContentIntent(mediaSession.sessionActivity)
@@ -124,27 +133,40 @@ class LearningService : MediaSessionService() {
                 .addAction(
                     CoreNotificationCompat.Action(
                         android.R.drawable.ic_media_previous, "Prev",
-                        actionFactory.createMediaActionPendingIntent(mediaSession, Player.COMMAND_SEEK_TO_PREVIOUS)
+                        actionFactory.createMediaActionPendingIntent(
+                            mediaSession,
+                            Player.COMMAND_SEEK_TO_PREVIOUS
+                        )
                     )
                 )
                 .addAction(
                     CoreNotificationCompat.Action(
                         if (player.isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play,
                         if (player.isPlaying) "Pause" else "Play",
-                        actionFactory.createMediaActionPendingIntent(mediaSession, Player.COMMAND_PLAY_PAUSE)
+                        actionFactory.createMediaActionPendingIntent(
+                            mediaSession,
+                            Player.COMMAND_PLAY_PAUSE
+                        )
                     )
                 )
                 .addAction(
                     CoreNotificationCompat.Action(
                         android.R.drawable.ic_media_next, "Next",
-                        actionFactory.createMediaActionPendingIntent(mediaSession, Player.COMMAND_SEEK_TO_NEXT)
+                        actionFactory.createMediaActionPendingIntent(
+                            mediaSession,
+                            Player.COMMAND_SEEK_TO_NEXT
+                        )
                     )
                 )
 
             return MediaNotification(NOTIFICATION_ID, builder.build())
         }
 
-        override fun handleCustomCommand(session: MediaSession, action: String, extras: Bundle): Boolean = false
+        override fun handleCustomCommand(
+            session: MediaSession,
+            action: String,
+            extras: Bundle
+        ): Boolean = false
 
         override fun getNotificationChannelInfo(): MediaNotification.Provider.NotificationChannelInfo {
             return MediaNotification.Provider.NotificationChannelInfo(CHANNEL_ID, "Nauka")
@@ -187,49 +209,62 @@ class LearningService : MediaSessionService() {
     private val flashcardRepo: FlashcardRepository by inject()
     private var isPlaying = false
     private var playbackSpeed = 1.0f
-    private lateinit var audioManager: AudioManager
 
     override fun onCreate() {
         super.onCreate()
-        audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         createNotificationChannel()
         initTts()
-        val player = TtsPlayer()
-        ttsPlayer = player
-        player.onPlayWhenReadyChanged = { playing -> if (playing) resume() else pause() }
-        player.onSeekToNext = { rateCard(Rating.KNOW) }
-        player.onSeekToPrevious = { rateCard(Rating.DONT_KNOW) }
 
-        mediaSession = MediaSession.Builder(this, player)
-            .setCallback(object : MediaSession.Callback {
-                override fun onPlayerCommandRequest(
-                    session: MediaSession,
-                    controller: MediaSession.ControllerInfo,
-                    playerCommand: Int
-                ): Int {
-                    Log.i(TAG, "onPlayerCommandRequest command=$playerCommand from=${controller.packageName} isPlaying=$isPlaying")
-                    if (handlePlayerCommand(playerCommand)) {
-                        return SessionResult.RESULT_SUCCESS
-                    }
-                    return super.onPlayerCommandRequest(session, controller, playerCommand)
-                }
-
-                override fun onMediaButtonEvent(
-                    session: MediaSession,
-                    controller: MediaSession.ControllerInfo,
-                    intent: Intent,
-                ): Boolean {
-                    @Suppress("DEPRECATION")
-                    val keyEvent = intent.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)
-                        ?: run {
-                            Log.i(TAG, "onMediaButtonEvent without keyEvent from=${controller.packageName}")
-                            return false
-                        }
-                    return handleMediaKeyEvent(keyEvent, "session:${controller.packageName}")
-                }
-            })
+        exoPlayer = ExoPlayer.Builder(this)
+            .setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+                    .setUsage(C.USAGE_MEDIA)
+                    .build(),
+                true // handleAudioFocus — ExoPlayer automatically acquires/releases focus
+            )
             .build()
+        exoPlayer.setMediaItem(MediaItem.fromUri(silenceUri))
+        exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
+        exoPlayer.prepare()
 
+        mediaPlayer = object : ForwardingPlayer(exoPlayer) {
+            override fun play() {
+                super.play()
+                if (!this@LearningService.isPlaying && srsQueue.isNotEmpty()) {
+                    this@LearningService.isPlaying = true
+                    startPlayJob()
+                }
+            }
+
+            override fun pause() {
+                super.pause()
+                if (this@LearningService.isPlaying) {
+                    this@LearningService.isPlaying = false
+                    tts?.stop()
+                    playJob?.cancel()
+                    publishState(card = currentSrsCard?.flashcard)
+                }
+            }
+
+            override fun seekToNext() {
+                rateCard(Rating.KNOW_WELL)
+            }
+
+            override fun seekToNextMediaItem() {
+                rateCard(Rating.KNOW_WELL)
+            }
+
+            override fun seekToPrevious() {
+                rateCard(Rating.DONT_KNOW)
+            }
+
+            override fun seekToPreviousMediaItem() {
+                rateCard(Rating.DONT_KNOW)
+            }
+        }
+
+        mediaSession = MediaSession.Builder(this, mediaPlayer).build()
         setMediaNotificationProvider(notificationProvider)
     }
 
@@ -256,13 +291,7 @@ class LearningService : MediaSessionService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         when (intent?.action) {
-            Intent.ACTION_MEDIA_BUTTON -> {
-                @Suppress("DEPRECATION")
-                val keyEvent = intent.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)
-                if (handleMediaKeyEvent(keyEvent, "intent")) {
-                    return START_STICKY
-                }
-            }
+
             ACTION_START -> {
                 val json = intent.getStringExtra(EXTRA_FLASHCARDS_JSON) ?: return START_STICKY
                 collectionJson = intent.getStringExtra(EXTRA_COLLECTION_JSON)
@@ -272,16 +301,16 @@ class LearningService : MediaSessionService() {
                 srsQueue.addAll(SrsEngine.initQueue(allFlashcards, rng))
                 globalIndex = 0
                 currentSrsCard = null
-                acquireAudioFocus()
                 isPlaying = true
-                ttsPlayer.updateCurrentItem(srsQueue[0].flashcard.toMediaItem(this))
-                ttsPlayer.setPlaying(true)
+                updateCurrentItem(srsQueue[0].flashcard.toMediaItem(this))
+                exoPlayer.play()
                 updateSessionActivity()
                 startPlayJob()
             }
 
             ACTION_RATE -> {
-                val rating = Rating.valueOf(intent.getStringExtra(EXTRA_RATING) ?: return START_STICKY)
+                val rating =
+                    Rating.valueOf(intent.getStringExtra(EXTRA_RATING) ?: return START_STICKY)
                 rateCard(rating)
             }
 
@@ -299,62 +328,6 @@ class LearningService : MediaSessionService() {
         return START_STICKY
     }
 
-    private fun handlePlayerCommand(playerCommand: Int): Boolean {
-        return when (playerCommand) {
-            Player.COMMAND_PLAY_PAUSE -> {
-                if (isPlaying) pause() else resume()
-                true
-            }
-            Player.COMMAND_SEEK_TO_NEXT, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM -> {
-                rateCard(Rating.KNOW)
-                true
-            }
-            Player.COMMAND_SEEK_TO_PREVIOUS, Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM -> {
-                rateCard(Rating.DONT_KNOW)
-                true
-            }
-            else -> false
-        }
-    }
-
-    private fun handleMediaKeyEvent(keyEvent: KeyEvent?, source: String): Boolean {
-        keyEvent ?: return false
-
-        val isDown = keyEvent.action == KeyEvent.ACTION_DOWN
-        if (!isDown && keyEvent.action != KeyEvent.ACTION_UP) return false
-
-        val consumed = when (keyEvent.keyCode) {
-            KeyEvent.KEYCODE_MEDIA_NEXT, KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> {
-                if (isDown) rateCard(Rating.KNOW)
-                true
-            }
-            KeyEvent.KEYCODE_MEDIA_PREVIOUS, KeyEvent.KEYCODE_MEDIA_REWIND -> {
-                if (isDown) rateCard(Rating.DONT_KNOW)
-                true
-            }
-            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK -> {
-                if (isDown) {
-                    if (isPlaying) pause() else resume()
-                }
-                true
-            }
-            KeyEvent.KEYCODE_MEDIA_PLAY -> {
-                if (isDown) resume()
-                true
-            }
-            KeyEvent.KEYCODE_MEDIA_PAUSE -> {
-                if (isDown) pause()
-                true
-            }
-            else -> false
-        }
-        if (consumed) {
-            Log.i(TAG, "mediaKey consumed source=$source keyCode=${keyEvent.keyCode} action=${keyEvent.action} isPlaying=$isPlaying")
-        } else {
-            Log.i(TAG, "mediaKey ignored source=$source keyCode=${keyEvent.keyCode} action=${keyEvent.action}")
-        }
-        return consumed
-    }
 
     private fun updateSessionActivity() {
         val intent = Intent(this, MainActivity::class.java).apply {
@@ -365,8 +338,18 @@ class LearningService : MediaSessionService() {
             this, 0, intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-
         mediaSession.setSessionActivity(pendingIntent)
+    }
+
+    private fun updateCurrentItem(mediaItem: MediaItem) {
+        exoPlayer.replaceMediaItem(
+            0,
+            MediaItem.Builder()
+                .setUri(silenceUri)
+                .setMediaId(mediaItem.mediaId)
+                .setMediaMetadata(mediaItem.mediaMetadata)
+                .build()
+        )
     }
 
     private fun stopSession() {
@@ -375,7 +358,7 @@ class LearningService : MediaSessionService() {
         isPlaying = false
         srsQueue.clear()
         currentSrsCard = null
-        ttsPlayer.setPlaying(false)
+        exoPlayer.pause()
         state.value = LearningState()
         stopSelf()
     }
@@ -383,10 +366,12 @@ class LearningService : MediaSessionService() {
     private fun startPlayJob() {
         playJob?.cancel()
         playJob = serviceScope.launch {
-            val ttsOk = withTimeoutOrNull(5_000) {
+            val ttsOk = withTimeoutOrNull(5_000.milliseconds) {
                 while (!ttsReady) delay(100.milliseconds)
             }
-            if (ttsOk == null) { stopSession(); return@launch }
+            if (ttsOk == null) {
+                stopSession(); return@launch
+            }
             playLoop()
         }
     }
@@ -396,7 +381,9 @@ class LearningService : MediaSessionService() {
         val srcLang = collection?.sourceLanguage ?: "pl"
         val tgtLang = collection?.targetLanguage ?: "en"
         while (isActive && srsQueue.isNotEmpty()) {
-            if (!isPlaying) { delay(200.milliseconds); continue }
+            if (!isPlaying) {
+                delay(200.milliseconds); continue
+            }
 
             val card = SrsEngine.pickNext(srsQueue, globalIndex)
             currentSrsCard = card
@@ -405,12 +392,13 @@ class LearningService : MediaSessionService() {
 
             publishState(LearningPhase.IDLE, card.flashcard)
             publishState(LearningPhase.SPEAKING_SOURCE, card.flashcard)
-            ttsPlayer.updateCurrentItem(card.flashcard.toMediaItem(this@LearningService, srcLang))
+            updateCurrentItem(card.flashcard.toMediaItem(this@LearningService, srcLang))
             speakAndWait(card.flashcard.sourceText, Locale.forLanguageTag(srcLang))
             if (!isActive || !isPlaying) continue
 
             publishState(LearningPhase.ANSWER, card.flashcard)
-            val timeForTargetText = speakAndWait(card.flashcard.targetText, Locale.forLanguageTag(tgtLang), 0f)
+            val timeForTargetText =
+                speakAndWait(card.flashcard.targetText, Locale.forLanguageTag(tgtLang), 0f)
             if (!isActive || !isPlaying) continue
             delay(800.milliseconds)
             if (!isActive || !isPlaying) continue
@@ -418,7 +406,7 @@ class LearningService : MediaSessionService() {
             repeat(3) {
                 if (isActive && isPlaying) {
                     publishState(LearningPhase.SPEAKING_TARGET, card.flashcard)
-                    ttsPlayer.updateCurrentItem(card.flashcard.toMediaItem(this@LearningService, tgtLang))
+                    updateCurrentItem(card.flashcard.toMediaItem(this@LearningService, tgtLang))
                     speakAndWait(card.flashcard.targetText, Locale.forLanguageTag(tgtLang))
                     if (isActive && isPlaying) {
                         publishState(LearningPhase.REPEATING, card.flashcard)
@@ -493,29 +481,15 @@ class LearningService : MediaSessionService() {
         isPlaying = false
         tts?.stop()
         playJob?.cancel()
-        ttsPlayer.setPlaying(false)
-        ttsPlayer.refreshNotification()
+        exoPlayer.pause()
         publishState(card = currentSrsCard?.flashcard)
     }
 
     private fun resume() {
         if (srsQueue.isEmpty() || isPlaying) return
-        acquireAudioFocus()
         isPlaying = true
-        ttsPlayer.setPlaying(true)
-        ttsPlayer.refreshNotification()
+        exoPlayer.play()
         startPlayJob()
-    }
-
-    private fun acquireAudioFocus() {
-        val attr = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_MEDIA)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-            .build()
-        val request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-            .setAudioAttributes(attr)
-            .build()
-        audioManager.requestAudioFocus(request)
     }
 
     private fun rateCard(rating: Rating) {
@@ -545,7 +519,10 @@ class LearningService : MediaSessionService() {
         if (isPlaying) startPlayJob() else publishState(card = currentSrsCard?.flashcard)
     }
 
-    private fun publishState(phase: LearningPhase = LearningPhase.IDLE, card: FlashcardDto? = null) {
+    private fun publishState(
+        phase: LearningPhase = LearningPhase.IDLE,
+        card: FlashcardDto? = null
+    ) {
         state.value = LearningState(
             isActive = true,
             isPlaying = isPlaying,
@@ -562,7 +539,7 @@ class LearningService : MediaSessionService() {
         serviceScope.cancel()
         tts?.shutdown()
         mediaSession.release()
-        ttsPlayer.release()
+        exoPlayer.release()
         state.value = LearningState()
         super.onDestroy()
     }
@@ -577,15 +554,16 @@ class LearningService : MediaSessionService() {
             .build()
     }
 
-    private fun FlashcardDto.toMediaItem(service: LearningService, lang: String = "pl") = MediaItem.Builder()
-        .setMediaId(id)
-        .setMediaMetadata(
-            MediaMetadata.Builder()
-                .setTitle(sourceText)
-                .setSubtitle(targetText)
-                .setArtworkUri(service.getFlagUri(lang))
-                .setExtras(Bundle().apply { putString("language_code", lang) })
-                .build()
-        )
-        .build()
+    private fun FlashcardDto.toMediaItem(service: LearningService, lang: String = "pl") =
+        MediaItem.Builder()
+            .setMediaId(id)
+            .setMediaMetadata(
+                MediaMetadata.Builder()
+                    .setTitle(sourceText)
+                    .setSubtitle(targetText)
+                    .setArtworkUri(service.getFlagUri(lang))
+                    .setExtras(Bundle().apply { putString("language_code", lang) })
+                    .build()
+            )
+            .build()
 }
