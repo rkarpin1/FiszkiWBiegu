@@ -341,10 +341,13 @@ class LearningService : MediaSessionService() {
     }
 
     private fun applyRating(card: SrsCard, rating: Rating) {
-        card.srsLevel = SrsEngine.newLevel(card.srsLevel, rating)
-        card.dueAtIndex = globalIndex + SrsEngine.intervalFor(card.srsLevel, rating, rng)
+        val now = Clock.System.now()
+        val newLevel = SrsEngine.newLevel(card.srsLevel, rating)
+        card.srsLevel = newLevel
+        card.dueAtIndex = globalIndex + SrsEngine.intervalFor(newLevel, rating, rng)
+        card.flashcard = card.flashcard.copy(srsLevel = newLevel, lastStudiedAt = now.toString())
         serviceScope.launch {
-            flashcardRepo.updateSrs(card.flashcard.id, card.srsLevel, Clock.System.now().toString())
+            flashcardRepo.updateSrs(card.flashcard.id, newLevel, now.toString())
         }
     }
 
