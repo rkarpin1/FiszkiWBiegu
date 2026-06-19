@@ -63,6 +63,7 @@ import pl.rkarpinski.fiszkiwbiegu.ui.components.TrackBar
 fun CollectionsScreen(
     viewModel: CollectionsViewModel = koinViewModel(),
     onCollectionClick: (CollectionDto) -> Unit,
+    onResumeLearning: (CollectionDto) -> Unit = onCollectionClick,
     onAddClick: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -70,6 +71,7 @@ fun CollectionsScreen(
     CollectionsScreenContent(
         uiState = uiState,
         onCollectionClick = onCollectionClick,
+        onResumeLearning = onResumeLearning,
         onAddClick = onAddClick,
         onConfirmDelete = { viewModel.confirmDelete() },
         onCancelDelete = { viewModel.cancelDelete() },
@@ -81,6 +83,7 @@ fun CollectionsScreen(
 fun CollectionsScreenContent(
     uiState: CollectionsUiState,
     onCollectionClick: (CollectionDto) -> Unit,
+    onResumeLearning: (CollectionDto) -> Unit = onCollectionClick,
     onAddClick: () -> Unit,
     onConfirmDelete: () -> Unit,
     onCancelDelete: () -> Unit,
@@ -165,7 +168,7 @@ fun CollectionsScreenContent(
                                 item {
                                     LastUsedHero(
                                         last,
-                                        onResume = { onCollectionClick(last) },
+                                        onResume = { onResumeLearning(last) },
                                         onOpen = { onCollectionClick(last) },
                                     )
                                 }

@@ -192,6 +192,7 @@ fun App(
                             CollectionsScreen(
                                 viewModel = collectionsVm,
                                 onCollectionClick = { backStack.add(Route.Flashcards(it)) },
+                                onResumeLearning = { backStack.add(Route.Learning(it)) },
                                 onAddClick = { backStack.add(Route.CollectionForm()) },
                             )
                         }
