@@ -40,15 +40,13 @@ class LearningViewModel(
 
     fun setSpeed(speed: Float) = controller.setSpeed(speed)
 
-    fun stop() {
+    fun stop(elapsedSec: Int = 0) {
         val s = controller.state.value
         if (s.flashcards.isNotEmpty()) {
+            val progress = s.flashcards.map { it.decayLevel() }.average().toFloat()
+            val sessionMinutes = elapsedSec / 60
             viewModelScope.launch {
-                collectionRepo.markStudied(
-                    collectionId,
-                    cardsHeard = minOf(s.currentIndex + 1, s.flashcards.size),
-                    totalCards = s.flashcards.size,
-                )
+                collectionRepo.markStudied(collectionId, progress, sessionMinutes)
             }
         }
         controller.stop()

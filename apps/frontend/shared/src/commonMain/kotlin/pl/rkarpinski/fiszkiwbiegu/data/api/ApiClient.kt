@@ -86,11 +86,11 @@ class ApiClient(
     suspend fun getMe(): HttpResponse =
         client.get("$API_BASE_URL/auth/me") { bearerAuth(requireToken()) }
 
-    suspend fun patchLearningComplete(collectionId: String, cardsHeard: Int, totalCards: Int): HttpResponse =
+    suspend fun patchLearningComplete(collectionId: String, progress: Float, sessionMinutes: Int): HttpResponse =
         client.post("$API_BASE_URL/collections/$collectionId/learning/complete") {
             bearerAuth(requireToken())
             contentType(ContentType.Application.Json)
-            setBody(LearningCompleteRequest(cardsHeard, totalCards))
+            setBody(LearningCompleteRequest(progress, sessionMinutes))
         }
 
     private fun requireToken(): String =

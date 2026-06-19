@@ -29,8 +29,11 @@ data class CollectionDto(
     val lastStudied: String? = null,
 
     val progress: Float = 0f,
-    @SerialName("flashcard_count")
 
+    @SerialName("total_study_minutes")
+    val totalStudyMinutes: Int = 0,
+
+    @SerialName("flashcard_count")
     val flashcardCount: Int = 0,
 )
 
@@ -128,9 +131,7 @@ data class UserDto(
 
 @Serializable
 data class LearningCompleteRequest(
-    @SerialName("cards_heard")
-    val cardsHeard: Int,
-
-    @SerialName("total_cards")
-    val totalCards: Int,
+    val progress: Float,
+    @SerialName("session_minutes")
+    val sessionMinutes: Int,
 )

@@ -2,7 +2,7 @@ package pl.rkarpinski.fiszkiwbiegu.screens.flashcards
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,11 +25,16 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -44,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.koin.compose.koinInject
@@ -59,6 +66,7 @@ import pl.rkarpinski.fiszkiwbiegu.theme.mono
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
 import pl.rkarpinski.fiszkiwbiegu.ui.components.Flag
 import pl.rkarpinski.fiszkiwbiegu.ui.components.LanguageNames
+import pl.rkarpinski.fiszkiwbiegu.ui.components.SrsLevelIndicator
 
 @Stable
 interface FlashcardsActions {
@@ -106,7 +114,7 @@ fun FlashcardsScreenContent(
     var showCollectionMenu by remember { mutableStateOf(false) }
     var showDeleteCollectionDialog by remember { mutableStateOf(false) }
 
-    FiszkiThemedScreen(naturalDark = true) {
+    FiszkiThemedScreen(naturalDark = isSystemInDarkTheme()) {
         val c = LocalFiszkiColors.current
         val scheme = MaterialTheme.colorScheme
 
@@ -143,19 +151,15 @@ fun FlashcardsScreenContent(
         Scaffold(
             containerColor = scheme.background,
             floatingActionButton = {
-                Box(
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape)
-                        .background(scheme.inverseSurface.copy(alpha = 0.5f))
-                        .clickable { actions.onAddCard() },
-                    contentAlignment = Alignment.Center,
+                FloatingActionButton(
+                    onClick = { actions.onAddCard() },
+                    modifier = Modifier.size(60.dp),
+                    shape = CircleShape,
+                    containerColor = scheme.inverseSurface.copy(alpha = 0.5f),
+                    contentColor = scheme.inverseOnSurface,
+                    elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
                 ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = "Dodaj",
-                        tint = scheme.inverseOnSurface
-                    )
+                    Icon(Icons.Default.Add, contentDescription = "Dodaj")
                 }
             },
         ) { paddingValues ->
@@ -169,18 +173,13 @@ fun FlashcardsScreenContent(
                                 .padding(horizontal = 22.dp, vertical = 16.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Box(
+                            IconButton(
+                                onClick = actions::onBack,
                                 modifier = Modifier
                                     .size(40.dp)
                                     .clip(MaterialTheme.shapes.medium)
                                     .background(scheme.surface)
-                                    .border(
-                                        1.dp,
-                                        scheme.outlineVariant,
-                                        MaterialTheme.shapes.medium
-                                    )
-                                    .clickable(onClick = actions::onBack),
-                                contentAlignment = Alignment.Center,
+                                    .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium),
                             ) {
                                 Icon(
                                     Icons.AutoMirrored.Filled.ArrowBack,
@@ -193,13 +192,16 @@ fun FlashcardsScreenContent(
                             CapsLabel("KOLEKCJA")
                             Spacer(Modifier.weight(1f))
                             Box {
-                                Icon(
-                                    Icons.Default.MoreVert,
-                                    contentDescription = null,
-                                    tint = scheme.onSurfaceVariant,
-                                    modifier = Modifier.size(40.dp)
-                                        .clickable { showCollectionMenu = true },
-                                )
+                                IconButton(
+                                    onClick = { showCollectionMenu = true },
+                                    modifier = Modifier.size(40.dp),
+                                ) {
+                                    Icon(
+                                        Icons.Default.MoreVert,
+                                        contentDescription = null,
+                                        tint = scheme.onSurfaceVariant,
+                                    )
+                                }
                                 DropdownMenu(
                                     expanded = showCollectionMenu,
                                     onDismissRequest = { showCollectionMenu = false },
@@ -263,7 +265,11 @@ fun FlashcardsScreenContent(
                                 value = "${(collection.progress * 100).toInt()}%",
                                 modifier = Modifier.weight(1f)
                             )
-                            StatTile(label = "CZAS", value = "—", modifier = Modifier.weight(1f))
+                            StatTile(
+                                label = "CZAS",
+                                value = formatStudyTime(collection.totalStudyMinutes),
+                                modifier = Modifier.weight(1f)
+                            )
                         }
                         Spacer(Modifier.height(16.dp))
                     }
@@ -272,31 +278,29 @@ fun FlashcardsScreenContent(
                     item {
                         val ctaEnabled = uiState.flashcards.isNotEmpty() && isOnline
                         Column(modifier = Modifier.padding(horizontal = 22.dp)) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(56.dp)
-                                    .clip(MaterialTheme.shapes.large)
-                                    .background(if (ctaEnabled) scheme.primary else scheme.surfaceVariant)
-                                    .then(if (ctaEnabled) Modifier.clickable(onClick = actions::onStartLearning) else Modifier),
-                                contentAlignment = Alignment.Center,
+                            Button(
+                                onClick = actions::onStartLearning,
+                                enabled = ctaEnabled,
+                                modifier = Modifier.fillMaxWidth().height(56.dp),
+                                shape = MaterialTheme.shapes.large,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = scheme.primary,
+                                    contentColor = scheme.onPrimary,
+                                    disabledContainerColor = scheme.surfaceVariant,
+                                    disabledContentColor = c.mute2,
+                                ),
+                                contentPadding = PaddingValues(horizontal = 16.dp),
                             ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                ) {
-                                    Icon(
-                                        Icons.Default.Headphones,
-                                        contentDescription = null,
-                                        tint = if (ctaEnabled) scheme.onPrimary else c.mute2,
-                                        modifier = Modifier.size(20.dp),
-                                    )
-                                    Text(
-                                        "Słuchaj w biegu",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = if (ctaEnabled) scheme.onPrimary else c.mute2,
-                                    )
-                                }
+                                Icon(
+                                    Icons.Default.Headphones,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    "Słuchaj w biegu",
+                                    style = MaterialTheme.typography.titleMedium,
+                                )
                             }
                             if (!isOnline) {
                                 Spacer(Modifier.height(4.dp))
@@ -389,6 +393,13 @@ fun FlashcardsScreenContent(
     }
 }
 
+private fun formatStudyTime(minutes: Int): String {
+    if (minutes < 1440) return "$minutes min"
+    val days = minutes / 1440
+    val rem = minutes % 1440
+    return "$days dn $rem min"
+}
+
 @Composable
 private fun StatTile(label: String, value: String, modifier: Modifier = Modifier) {
     val scheme = MaterialTheme.colorScheme
@@ -446,13 +457,19 @@ private fun FlashcardItem(
                 color = scheme.onSurfaceVariant
             )
         }
+        SrsLevelIndicator(
+            srsLevel = flashcard.decayLevel(),
+            modifier = Modifier.padding(horizontal = 8.dp),
+            color = Color(0xFF4CAF50),
+            leafSize = 10.dp,
+        )
         Box {
-            Icon(
-                Icons.Default.MoreVert,
-                contentDescription = null,
-                tint = scheme.onSurfaceVariant,
-                modifier = Modifier.size(24.dp).clickable { showMenu = true },
-            )
+            IconButton(
+                onClick = { showMenu = true },
+                modifier = Modifier.size(24.dp),
+            ) {
+                Icon(Icons.Default.MoreVert, contentDescription = null, tint = scheme.onSurfaceVariant)
+            }
             DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                 DropdownMenuItem(
                     text = { Text("Edytuj") },

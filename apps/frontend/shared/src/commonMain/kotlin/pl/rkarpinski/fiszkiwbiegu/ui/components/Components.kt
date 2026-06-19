@@ -96,6 +96,7 @@ fun SrsLevelIndicator(
     srsLevel: Float,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.secondary,
+    leafSize: androidx.compose.ui.unit.Dp = 14.dp,
 ) {
     val leafCount = (srsLevel * 5).toInt().coerceIn(0, 5)
     Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -103,7 +104,7 @@ fun SrsLevelIndicator(
             Icon(
                 imageVector = Icons.Rounded.Eco,
                 contentDescription = null,
-                modifier = Modifier.size(14.dp),
+                modifier = Modifier.size(leafSize),
                 tint = color,
             )
         }

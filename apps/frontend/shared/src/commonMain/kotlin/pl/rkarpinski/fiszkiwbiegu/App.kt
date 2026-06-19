@@ -4,6 +4,7 @@
 
 package pl.rkarpinski.fiszkiwbiegu
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
@@ -134,7 +135,7 @@ fun App(
     }
 
     FiszkiAppTheme(override = null) {
-        FiszkiThemedScreen(naturalDark = true) {
+        FiszkiThemedScreen(naturalDark = isSystemInDarkTheme()) {
             val currentRoute = backStack.lastOrNull()
             val showTabBar = currentRoute is Route.Collections || currentRoute is Route.Profile
 
@@ -191,6 +192,7 @@ fun App(
                             CollectionsScreen(
                                 viewModel = collectionsVm,
                                 onCollectionClick = { backStack.add(Route.Flashcards(it)) },
+                                onResumeLearning = { backStack.add(Route.Learning(it)) },
                                 onAddClick = { backStack.add(Route.CollectionForm()) },
                             )
                         }

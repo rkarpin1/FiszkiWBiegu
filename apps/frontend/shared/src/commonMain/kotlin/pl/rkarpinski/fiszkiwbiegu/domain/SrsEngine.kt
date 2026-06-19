@@ -6,7 +6,7 @@ import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 enum class Rating { DONT_KNOW, KNOW, KNOW_WELL }
 
 data class SrsCard(
-    val flashcard: FlashcardDto,
+    var flashcard: FlashcardDto,
     var srsLevel: Float,
     var dueAtIndex: Int,
 )

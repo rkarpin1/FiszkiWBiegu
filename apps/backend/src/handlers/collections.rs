@@ -15,7 +15,7 @@ fn validate_languages(src: &str, tgt: &str) -> bool {
 pub async fn list(pool: web::Data<PgPool>, user: AuthUser) -> impl Responder {
     let result = sqlx::query_as::<_, Collection>(
         "SELECT c.id, c.user_id, c.name, c.description, c.source_language, c.target_language, \
-         c.created_at, c.last_studied, c.progress, \
+         c.created_at, c.last_studied, c.progress, c.total_study_minutes, \
          (SELECT COUNT(*) FROM flashcards WHERE collection_id = c.id) AS flashcard_count \
          FROM collections c WHERE c.user_id = $1 ORDER BY c.created_at DESC",
     )
@@ -50,7 +50,7 @@ pub async fn create(
         "INSERT INTO collections (user_id, name, description, source_language, target_language) \
          VALUES ($1, $2, $3, $4, $5) \
          RETURNING id, user_id, name, description, source_language, target_language, created_at, last_studied, progress, \
-         0::bigint AS flashcard_count",
+         0::bigint AS total_study_minutes, 0::bigint AS flashcard_count",
     )
     .bind(user.id)
     .bind(&body.name)
@@ -89,7 +89,7 @@ pub async fn update(
         "UPDATE collections SET name = $1, description = $2, source_language = $3, target_language = $4 \
          WHERE id = $5 AND user_id = $6 \
          RETURNING id, user_id, name, description, source_language, target_language, created_at, last_studied, progress, \
-         0::bigint AS flashcard_count",
+         total_study_minutes, 0::bigint AS flashcard_count",
     )
     .bind(&body.name)
     .bind(&body.description)
@@ -141,16 +141,15 @@ pub async fn learning_complete(
     body: web::Json<LearningCompleteRequest>,
 ) -> impl Responder {
     let id = path.into_inner();
-    let progress = if body.total_cards > 0 {
-        (body.cards_heard as f64 / body.total_cards as f64).clamp(0.0, 1.0)
-    } else {
-        0.0f64
-    };
 
     let result = sqlx::query(
-        "UPDATE collections SET last_studied = NOW(), progress = $1 WHERE id = $2 AND user_id = $3",
+        "UPDATE collections \
+         SET last_studied = NOW(), progress = $1, \
+             total_study_minutes = total_study_minutes + $2 \
+         WHERE id = $3 AND user_id = $4",
     )
-    .bind(progress)
+    .bind(body.progress as f64)
+    .bind(body.session_minutes)
     .bind(id)
     .bind(user.id)
     .execute(pool.get_ref())
