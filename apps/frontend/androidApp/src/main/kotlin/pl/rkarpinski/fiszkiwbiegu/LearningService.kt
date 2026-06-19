@@ -14,12 +14,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
-import android.util.Log
-import android.view.KeyEvent
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationCompat as CoreNotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
+import androidx.core.net.toUri
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.ForwardingPlayer
@@ -61,7 +59,7 @@ import kotlin.coroutines.resume
 import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.milliseconds
-import androidx.core.net.toUri
+import androidx.core.app.NotificationCompat as CoreNotificationCompat
 
 @UnstableApi
 class LearningService : MediaSessionService() {
@@ -221,7 +219,7 @@ class LearningService : MediaSessionService() {
                     .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
                     .setUsage(C.USAGE_MEDIA)
                     .build(),
-                true // handleAudioFocus — ExoPlayer automatically acquires/releases focus
+                true
             )
             .build()
         exoPlayer.setMediaItem(MediaItem.fromUri(silenceUri))
