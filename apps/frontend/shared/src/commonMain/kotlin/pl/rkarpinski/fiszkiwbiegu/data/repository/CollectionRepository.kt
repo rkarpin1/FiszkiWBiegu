@@ -30,8 +30,8 @@ class CollectionRepository(private val api: ApiClient) {
         if (!response.status.isSuccess()) error("HTTP ${response.status.value}")
     }
 
-    suspend fun markStudied(id: String, progress: Float): Result<Unit> = runCatching {
-        val response = api.patchLearningComplete(id, progress)
+    suspend fun markStudied(id: String, progress: Float, sessionMinutes: Int): Result<Unit> = runCatching {
+        val response = api.patchLearningComplete(id, progress, sessionMinutes)
         if (!response.status.isSuccess()) error("HTTP ${response.status.value}")
     }
 }

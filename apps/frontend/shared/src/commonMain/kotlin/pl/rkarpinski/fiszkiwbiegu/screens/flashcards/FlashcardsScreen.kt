@@ -265,7 +265,11 @@ fun FlashcardsScreenContent(
                                 value = "${(collection.progress * 100).toInt()}%",
                                 modifier = Modifier.weight(1f)
                             )
-                            StatTile(label = "CZAS", value = "—", modifier = Modifier.weight(1f))
+                            StatTile(
+                                label = "CZAS",
+                                value = formatStudyTime(collection.totalStudyMinutes),
+                                modifier = Modifier.weight(1f)
+                            )
                         }
                         Spacer(Modifier.height(16.dp))
                     }
@@ -387,6 +391,13 @@ fun FlashcardsScreenContent(
             }
         }
     }
+}
+
+private fun formatStudyTime(minutes: Int): String {
+    if (minutes < 1440) return "$minutes min"
+    val days = minutes / 1440
+    val rem = minutes % 1440
+    return "$days dn $rem min"
 }
 
 @Composable

@@ -31,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,14 +62,27 @@ fun LearningScreen(
     onBack: () -> Unit,
 ) {
     LaunchedEffect(Unit) { viewModel.startSession() }
-    DisposableEffect(Unit) { onDispose { viewModel.stop() } }
 
     val state by viewModel.state.collectAsState()
+
+    var elapsedSec by remember { mutableStateOf(0) }
+    LaunchedEffect(state.isPlaying) {
+        if (state.isPlaying) {
+            while (true) {
+                delay(1000.milliseconds)
+                elapsedSec++
+            }
+        }
+    }
+
+    val currentElapsedSec by rememberUpdatedState(elapsedSec)
+    DisposableEffect(Unit) { onDispose { viewModel.stop(currentElapsedSec) } }
 
     LearningContent(
         collection = collection,
         state = state,
-        onBack = { viewModel.stop(); onBack() },
+        elapsedSec = elapsedSec,
+        onBack = { viewModel.stop(elapsedSec); onBack() },
         onPlayPause = { if (state.isPlaying) viewModel.pause() else viewModel.play() },
         onNext = viewModel::next,
         onPrev = viewModel::previous,
@@ -82,6 +96,7 @@ fun LearningScreen(
 fun LearningContent(
     collection: CollectionDto,
     state: LearningState,
+    elapsedSec: Int = 0,
     onBack: () -> Unit,
     onPlayPause: () -> Unit,
     onNext: () -> Unit,
@@ -90,16 +105,6 @@ fun LearningContent(
     onDontKnow: () -> Unit = {},
     onKnowWell: () -> Unit = {},
 ) {
-    var elapsedSec by remember { mutableStateOf(0) }
-    LaunchedEffect(state.isPlaying) {
-        if (state.isPlaying) {
-            while (true) {
-                delay(1000.milliseconds)
-                elapsedSec++
-            }
-        }
-    }
-
     val speeds = listOf(0.5f to "0.50*", 0.75f to "0.75*", 1.0f to "1.0*", 1.25f to "1.25*")
 
     val card = state.currentCard ?: state.flashcards.getOrNull(state.currentIndex)

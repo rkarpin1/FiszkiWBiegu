@@ -29,6 +29,7 @@ pub struct Collection {
     pub created_at: DateTime<Utc>,
     pub last_studied: Option<DateTime<Utc>>,
     pub progress: f64,
+    pub total_study_minutes: i64,
     pub flashcard_count: i64,
 }
 
@@ -43,6 +44,7 @@ pub struct CollectionRequest {
 #[derive(Debug, Deserialize)]
 pub struct LearningCompleteRequest {
     pub progress: f32,
+    pub session_minutes: i32,
 }
 
 #[derive(Debug, Serialize, FromRow)]
