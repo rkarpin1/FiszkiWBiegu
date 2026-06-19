@@ -1,10 +1,12 @@
 package pl.rkarpinski.fiszkiwbiegu.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,11 +33,13 @@ fun Flag(code: String, size: Dp = 28.dp) {
         else -> null
     }
 
+    val shape = RoundedCornerShape(size * 0.18f)
     Box(
         modifier = Modifier
             .width(w)
             .height(size)
-            .clip(RoundedCornerShape(size * 0.18f)),
+            .clip(shape)
+            .border(0.5.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f), shape),
         contentAlignment = Alignment.Center,
     ) {
         if (resource != null) {
