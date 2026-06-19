@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -102,7 +103,7 @@ fun LearningContent(
 
     val card = state.currentCard ?: state.flashcards.getOrNull(state.currentIndex)
 
-    FiszkiThemedScreen(naturalDark = true) {
+    FiszkiThemedScreen(naturalDark = isSystemInDarkTheme()) {
         val c = LocalFiszkiColors.current
         val scheme = MaterialTheme.colorScheme
         Column(

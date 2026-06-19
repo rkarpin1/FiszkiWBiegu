@@ -3,6 +3,7 @@ package pl.rkarpinski.fiszkiwbiegu.screens.flashcards
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -106,7 +107,7 @@ fun FlashcardsScreenContent(
     var showCollectionMenu by remember { mutableStateOf(false) }
     var showDeleteCollectionDialog by remember { mutableStateOf(false) }
 
-    FiszkiThemedScreen(naturalDark = true) {
+    FiszkiThemedScreen(naturalDark = isSystemInDarkTheme()) {
         val c = LocalFiszkiColors.current
         val scheme = MaterialTheme.colorScheme
 

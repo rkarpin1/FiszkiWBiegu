@@ -3,6 +3,7 @@ package pl.rkarpinski.fiszkiwbiegu.screens.collections
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -106,7 +107,7 @@ fun CollectionFormContent(
     val isValid =
         draft.name.isNotBlank() && draft.sourceLanguage != draft.targetLanguage && !isSubmitting
 
-    FiszkiThemedScreen(naturalDark = true) {
+    FiszkiThemedScreen(naturalDark = isSystemInDarkTheme()) {
         val c = LocalFiszkiColors.current
         val scheme = MaterialTheme.colorScheme
 
