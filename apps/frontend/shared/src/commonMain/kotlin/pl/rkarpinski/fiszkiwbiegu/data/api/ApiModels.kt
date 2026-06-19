@@ -128,9 +128,5 @@ data class UserDto(
 
 @Serializable
 data class LearningCompleteRequest(
-    @SerialName("cards_heard")
-    val cardsHeard: Int,
-
-    @SerialName("total_cards")
-    val totalCards: Int,
+    val progress: Float,
 )

@@ -42,8 +42,7 @@ pub struct CollectionRequest {
 
 #[derive(Debug, Deserialize)]
 pub struct LearningCompleteRequest {
-    pub cards_heard: i32,
-    pub total_cards: i32,
+    pub progress: f32,
 }
 
 #[derive(Debug, Serialize, FromRow)]

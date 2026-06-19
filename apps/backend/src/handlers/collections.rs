@@ -141,16 +141,11 @@ pub async fn learning_complete(
     body: web::Json<LearningCompleteRequest>,
 ) -> impl Responder {
     let id = path.into_inner();
-    let progress = if body.total_cards > 0 {
-        (body.cards_heard as f64 / body.total_cards as f64).clamp(0.0, 1.0)
-    } else {
-        0.0f64
-    };
 
     let result = sqlx::query(
         "UPDATE collections SET last_studied = NOW(), progress = $1 WHERE id = $2 AND user_id = $3",
     )
-    .bind(progress)
+    .bind(body.progress as f64)
     .bind(id)
     .bind(user.id)
     .execute(pool.get_ref())
