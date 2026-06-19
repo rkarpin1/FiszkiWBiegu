@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.koin.compose.koinInject
@@ -60,6 +61,7 @@ import pl.rkarpinski.fiszkiwbiegu.theme.mono
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
 import pl.rkarpinski.fiszkiwbiegu.ui.components.Flag
 import pl.rkarpinski.fiszkiwbiegu.ui.components.LanguageNames
+import pl.rkarpinski.fiszkiwbiegu.ui.components.SrsLevelIndicator
 
 @Stable
 interface FlashcardsActions {
@@ -447,6 +449,12 @@ private fun FlashcardItem(
                 color = scheme.onSurfaceVariant
             )
         }
+        SrsLevelIndicator(
+            srsLevel = flashcard.decayLevel(),
+            modifier = Modifier.padding(horizontal = 8.dp),
+            color = Color(0xFF4CAF50),
+            leafSize = 10.dp,
+        )
         Box {
             Icon(
                 Icons.Default.MoreVert,

@@ -12,6 +12,7 @@ import pl.rkarpinski.fiszkiwbiegu.data.repository.CollectionRepository
 
 data class CollectionsUiState(
     val collections: List<CollectionDto> = emptyList(),
+    val lastStudiedCollection: CollectionDto? = null,
     val isLoading: Boolean = false,
     val isSubmitting: Boolean = false,
     val error: String? = null,
@@ -35,6 +36,8 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
                     _uiState.update {
                         it.copy(
                             collections = list,
+                            lastStudiedCollection = list.filter { c -> c.lastStudied != null }
+                                .maxByOrNull { c -> c.lastStudied!! },
                             isLoading = false
                         )
                     }

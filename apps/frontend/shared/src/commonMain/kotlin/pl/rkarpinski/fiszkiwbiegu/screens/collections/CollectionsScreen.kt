@@ -159,11 +159,14 @@ fun CollectionsScreenContent(
 
                         if (uiState.collections.isNotEmpty()) {
 
-                            item {
-                                LastUsedHero(
-                                    uiState.collections.first(),
-                                    onResume = { onCollectionClick(uiState.collections.first()) },
-                                    onOpen = { onCollectionClick(uiState.collections.first()) })
+                            uiState.lastStudiedCollection?.let { last ->
+                                item {
+                                    LastUsedHero(
+                                        last,
+                                        onResume = { onCollectionClick(last) },
+                                        onOpen = { onCollectionClick(last) },
+                                    )
+                                }
                             }
 
 
