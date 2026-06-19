@@ -12,6 +12,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import androidx.media3.session.SessionResult
+import android.view.KeyEvent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat as CoreNotificationCompat
 import androidx.core.content.ContextCompat
@@ -36,6 +38,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.ToneGenerator
 import kotlinx.serialization.json.Json
@@ -180,9 +184,11 @@ class LearningService : MediaSessionService() {
     private val flashcardRepo: FlashcardRepository by inject()
     private var isPlaying = false
     private var playbackSpeed = 1.0f
+    private lateinit var audioManager: AudioManager
 
     override fun onCreate() {
         super.onCreate()
+        audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         createNotificationChannel()
         initTts()
         val player = TtsPlayer()
@@ -192,6 +198,64 @@ class LearningService : MediaSessionService() {
         player.onSeekToPrevious = { rateCard(Rating.DONT_KNOW) }
 
         mediaSession = MediaSession.Builder(this, player)
+            .setCallback(object : MediaSession.Callback {
+                override fun onPlayerCommandRequest(
+                    session: MediaSession,
+                    controller: MediaSession.ControllerInfo,
+                    playerCommand: Int
+                ): Int {
+                    when (playerCommand) {
+                        Player.COMMAND_SEEK_TO_NEXT, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM -> {
+                            rateCard(Rating.KNOW_WELL)
+                            return SessionResult.RESULT_SUCCESS
+                        }
+                        Player.COMMAND_SEEK_TO_PREVIOUS, Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM -> {
+                            rateCard(Rating.DONT_KNOW)
+                            return SessionResult.RESULT_SUCCESS
+                        }
+                    }
+                    return super.onPlayerCommandRequest(session, controller, playerCommand)
+                }
+
+                override fun onMediaButtonEvent(
+                    session: MediaSession,
+                    controller: MediaSession.ControllerInfo,
+                    intent: Intent,
+                ): Boolean {
+                    @Suppress("DEPRECATION")
+                    val keyEvent = intent.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)
+                        ?: return false
+                    
+                    val isDown = keyEvent.action == KeyEvent.ACTION_DOWN
+                    if (!isDown && keyEvent.action != KeyEvent.ACTION_UP) return false
+
+                    return when (keyEvent.keyCode) {
+                        KeyEvent.KEYCODE_MEDIA_NEXT, KeyEvent.KEYCODE_MEDIA_FAST_FORWARD -> {
+                            if (isDown) rateCard(Rating.KNOW_WELL)
+                            true
+                        }
+                        KeyEvent.KEYCODE_MEDIA_PREVIOUS, KeyEvent.KEYCODE_MEDIA_REWIND -> {
+                            if (isDown) rateCard(Rating.DONT_KNOW)
+                            true
+                        }
+                        KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK -> {
+                            if (isDown) {
+                                if (isPlaying) pause() else resume()
+                            }
+                            true
+                        }
+                        KeyEvent.KEYCODE_MEDIA_PLAY -> {
+                            if (isDown) resume()
+                            true
+                        }
+                        KeyEvent.KEYCODE_MEDIA_PAUSE -> {
+                            if (isDown) pause()
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            })
             .build()
 
         setMediaNotificationProvider(notificationProvider)
@@ -229,6 +293,7 @@ class LearningService : MediaSessionService() {
                 srsQueue.addAll(SrsEngine.initQueue(allFlashcards, rng))
                 globalIndex = 0
                 currentSrsCard = null
+                acquireAudioFocus()
                 isPlaying = true
                 ttsPlayer.updateCurrentItem(srsQueue[0].flashcard.toMediaItem(this))
                 ttsPlayer.setPlaying(true)
@@ -398,9 +463,21 @@ class LearningService : MediaSessionService() {
 
     private fun resume() {
         if (srsQueue.isEmpty() || isPlaying) return
+        acquireAudioFocus()
         isPlaying = true
         ttsPlayer.setPlaying(true)
         startPlayJob()
+    }
+
+    private fun acquireAudioFocus() {
+        val attr = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+            .build()
+        val request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+            .setAudioAttributes(attr)
+            .build()
+        audioManager.requestAudioFocus(request)
     }
 
     private fun rateCard(rating: Rating) {
