@@ -50,13 +50,12 @@ import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 import pl.rkarpinski.fiszkiwbiegu.data.repository.FlashcardRepository
 import pl.rkarpinski.fiszkiwbiegu.domain.Rating
 import pl.rkarpinski.fiszkiwbiegu.domain.SrsCard
-import pl.rkarpinski.fiszkiwbiegu.domain.SrsEngine
+import pl.rkarpinski.fiszkiwbiegu.domain.SrsQueue
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningPhase
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningState
 import java.util.Locale
 import java.util.UUID
 import kotlin.coroutines.resume
-import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.milliseconds
 import androidx.core.app.NotificationCompat as CoreNotificationCompat
@@ -199,11 +198,9 @@ class LearningService : MediaSessionService() {
         else -> 0xFF666666.toInt()
     }
 
-    private val srsQueue = mutableListOf<SrsCard>()
-    private var globalIndex = 0
+    private val srsEngine = SrsQueue()
     private var currentSrsCard: SrsCard? = null
     private var cardRated = false
-    private val rng = Random.Default
     private val flashcardRepo: FlashcardRepository by inject()
     private var isPlaying = false
     private var playbackSpeed = 1.0f
@@ -229,7 +226,7 @@ class LearningService : MediaSessionService() {
         mediaPlayer = object : ForwardingPlayer(exoPlayer) {
             override fun play() {
                 super.play()
-                if (!this@LearningService.isPlaying && srsQueue.isNotEmpty()) {
+                if (!this@LearningService.isPlaying && srsEngine.isNotEmpty()) {
                     this@LearningService.isPlaying = true
                     startPlayJob()
                 }
@@ -304,12 +301,10 @@ class LearningService : MediaSessionService() {
                 collectionJson = intent.getStringExtra(EXTRA_COLLECTION_JSON)
                 val allFlashcards: List<FlashcardDto> = Json.decodeFromString(json)
                 if (allFlashcards.isEmpty()) return START_NOT_STICKY
-                srsQueue.clear()
-                srsQueue.addAll(SrsEngine.initQueue(allFlashcards, rng))
-                globalIndex = 0
+                srsEngine.init(allFlashcards)
                 currentSrsCard = null
                 isPlaying = true
-                updateCurrentItem(srsQueue[0].flashcard.toMediaItem(this))
+                updateCurrentItem(srsEngine.cards[0].flashcard.toMediaItem(this))
                 exoPlayer.play()
                 updateSessionActivity()
                 startPlayJob()
@@ -363,7 +358,7 @@ class LearningService : MediaSessionService() {
         playJob?.cancel()
         tts?.stop()
         isPlaying = false
-        srsQueue.clear()
+        srsEngine.clear()
         currentSrsCard = null
         exoPlayer.pause()
         state.value = LearningState()
@@ -387,15 +382,14 @@ class LearningService : MediaSessionService() {
         val collection = collectionJson?.let { Json.decodeFromString<CollectionDto>(it) }
         val srcLang = collection?.sourceLanguage ?: "pl"
         val tgtLang = collection?.targetLanguage ?: "en"
-        while (isActive && srsQueue.isNotEmpty()) {
+        while (isActive && srsEngine.isNotEmpty()) {
             if (!isPlaying) {
                 delay(200.milliseconds); continue
             }
 
-            val card = SrsEngine.pickNext(srsQueue, globalIndex)
+            val card = srsEngine.pickNext()
             currentSrsCard = card
             cardRated = false
-            globalIndex++
 
             publishState(LearningPhase.IDLE, card.flashcard)
             publishState(LearningPhase.SPEAKING_SOURCE, card.flashcard)
@@ -434,12 +428,10 @@ class LearningService : MediaSessionService() {
 
     private fun applyRating(card: SrsCard, rating: Rating) {
         val now = Clock.System.now()
-        val newLevel = SrsEngine.newLevel(card.srsLevel, rating)
-        card.srsLevel = newLevel
-        card.dueAtIndex = globalIndex + SrsEngine.intervalFor(newLevel, rating, rng)
-        card.flashcard = card.flashcard.copy(srsLevel = newLevel, lastStudiedAt = now.toString())
+        srsEngine.rate(card, rating)
+        card.flashcard = card.flashcard.copy(srsLevel = card.srsLevel, lastStudiedAt = now.toString())
         serviceScope.launch {
-            flashcardRepo.updateSrs(card.flashcard.id, newLevel, now.toString())
+            flashcardRepo.updateSrs(card.flashcard.id, card.srsLevel, now.toString())
         }
     }
 
@@ -493,7 +485,7 @@ class LearningService : MediaSessionService() {
     }
 
     private fun resume() {
-        if (srsQueue.isEmpty() || isPlaying) return
+        if (srsEngine.isEmpty() || isPlaying) return
         isPlaying = true
         exoPlayer.play()
         startPlayJob()
@@ -512,15 +504,14 @@ class LearningService : MediaSessionService() {
     }
 
     private fun next() {
-        if (srsQueue.isEmpty()) return
-        globalIndex++
+        if (srsEngine.isEmpty()) return
         tts?.stop()
         playJob?.cancel()
         if (isPlaying) startPlayJob() else publishState(card = currentSrsCard?.flashcard)
     }
 
     private fun previous() {
-        if (srsQueue.isEmpty()) return
+        if (srsEngine.isEmpty()) return
         tts?.stop()
         playJob?.cancel()
         if (isPlaying) startPlayJob() else publishState(card = currentSrsCard?.flashcard)
@@ -533,7 +524,7 @@ class LearningService : MediaSessionService() {
         state.value = LearningState(
             isActive = true,
             isPlaying = isPlaying,
-            flashcards = srsQueue.map { it.flashcard },
+            flashcards = srsEngine.cards.map { it.flashcard },
             currentIndex = 0,
             phase = phase,
             currentCard = card,

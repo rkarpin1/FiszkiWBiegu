@@ -20,11 +20,11 @@ class SrsEngineTest {
     )
 
     @Test
-    fun `intervalFor DONT_KNOW always returns 2`() {
+    fun `intervalFor DONT_KNOW always returns 0`() {
         repeat(20) {
-            assertEquals(2, SrsEngine.intervalFor(0f, Rating.DONT_KNOW))
-            assertEquals(2, SrsEngine.intervalFor(0.5f, Rating.DONT_KNOW))
-            assertEquals(2, SrsEngine.intervalFor(1f, Rating.DONT_KNOW))
+            assertEquals(0, SrsEngine.intervalFor(0f, Rating.DONT_KNOW))
+            assertEquals(0, SrsEngine.intervalFor(0.5f, Rating.DONT_KNOW))
+            assertEquals(0, SrsEngine.intervalFor(1f, Rating.DONT_KNOW))
         }
     }
 
