@@ -1,7 +1,8 @@
 ---
 id: back-stack-leak
 title: "Przyciek back stack — powrót do nauki po wyjściu przez powiadomienie"
-status: preparing
+status: archived
+archived_at: 2026-06-19T09:05:58Z
 created: 2026-06-19
 updated: 2026-06-19
 ---
