@@ -50,7 +50,7 @@ pub async fn create(
         "INSERT INTO collections (user_id, name, description, source_language, target_language) \
          VALUES ($1, $2, $3, $4, $5) \
          RETURNING id, user_id, name, description, source_language, target_language, created_at, last_studied, progress, \
-         0::bigint AS total_study_minutes, 0::bigint AS flashcard_count",
+         0 AS total_study_minutes, 0::bigint AS flashcard_count",
     )
     .bind(user.id)
     .bind(&body.name)
