@@ -1,9 +1,10 @@
 ---
 id: srs-local-refresh
 title: "Odświeżenie lokalnych danych SRS po ocenie fiszki"
-status: preparing
+status: archived
 created: 2026-06-19
 updated: 2026-06-19
+archived_at: 2026-06-19T09:09:26Z
 ---
 
 ## Cel
