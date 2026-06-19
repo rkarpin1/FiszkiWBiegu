@@ -2,7 +2,6 @@ package pl.rkarpinski.fiszkiwbiegu.screens.flashcards
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -25,7 +25,10 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -147,14 +150,13 @@ fun CardFormContent(
                     .padding(horizontal = 22.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Box(
+                IconButton(
+                    onClick = actions::onBack,
                     modifier = Modifier
                         .size(40.dp)
                         .clip(MaterialTheme.shapes.medium)
                         .background(scheme.surface)
-                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium)
-                        .clickable(onClick = actions::onBack),
-                    contentAlignment = Alignment.Center,
+                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium),
                 ) {
                     Icon(
                         if (isEdit) Icons.AutoMirrored.Filled.ArrowBack else Icons.Default.Close,
@@ -171,14 +173,13 @@ fun CardFormContent(
                 )
                 Spacer(Modifier.weight(1f))
                 if (isEdit) {
-                    Box(
+                    IconButton(
+                        onClick = { showDeleteDialog = true },
                         modifier = Modifier
                             .size(40.dp)
                             .clip(MaterialTheme.shapes.medium)
                             .background(scheme.surface)
-                            .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium)
-                            .clickable { showDeleteDialog = true },
-                        contentAlignment = Alignment.Center,
+                            .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium),
                     ) {
                         Icon(
                             Icons.Default.Delete,
@@ -315,40 +316,36 @@ fun CardFormContent(
                         .fillMaxWidth()
                         .padding(horizontal = 22.dp, vertical = 16.dp),
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .clip(MaterialTheme.shapes.large)
-                            .background(if (isValid) scheme.primary else scheme.surfaceVariant)
-                            .then(
-                                if (isValid) Modifier.clickable {
-                                    actions.onSave(
-                                        draft.copy(
-                                            sourceText = draft.sourceText.trim(),
-                                            targetText = draft.targetText.trim()
-                                        )
-                                    )
-                                } else Modifier,
-                            ),
-                        contentAlignment = Alignment.Center,
+                    Button(
+                        onClick = {
+                            actions.onSave(
+                                draft.copy(
+                                    sourceText = draft.sourceText.trim(),
+                                    targetText = draft.targetText.trim()
+                                )
+                            )
+                        },
+                        enabled = isValid,
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = scheme.primary,
+                            contentColor = scheme.onPrimary,
+                            disabledContainerColor = scheme.surfaceVariant,
+                            disabledContentColor = c.mute2,
+                        ),
+                        contentPadding = PaddingValues(horizontal = 16.dp),
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Icon(
-                                Icons.Default.Check,
-                                contentDescription = null,
-                                tint = if (isValid) scheme.onPrimary else c.mute2,
-                                modifier = Modifier.size(18.dp),
-                            )
-                            Text(
-                                text = if (isEdit) "Zapisz zmiany" else "Dodaj fiszkę",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = if (isValid) scheme.onPrimary else c.mute2,
-                            )
-                        }
+                        Icon(
+                            Icons.Default.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = if (isEdit) "Zapisz zmiany" else "Dodaj fiszkę",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
                     }
                 }
             }

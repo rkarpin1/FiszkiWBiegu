@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,7 +26,11 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -95,19 +101,15 @@ fun CollectionsScreenContent(
         Scaffold(
             containerColor = scheme.background,
             floatingActionButton = {
-                Box(
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape)
-                        .background(scheme.inverseSurface.copy(alpha = 0.5f))
-                        .clickable { onAddClick() },
-                    contentAlignment = Alignment.Center,
+                FloatingActionButton(
+                    onClick = { onAddClick() },
+                    modifier = Modifier.size(60.dp),
+                    shape = CircleShape,
+                    containerColor = scheme.inverseSurface.copy(alpha = 0.5f),
+                    contentColor = scheme.inverseOnSurface,
+                    elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
                 ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = "Dodaj",
-                        tint = scheme.inverseOnSurface
-                    )
+                    Icon(Icons.Default.Add, contentDescription = "Dodaj")
                 }
             },
         ) { paddingValues ->
@@ -362,26 +364,25 @@ private fun LastUsedHero(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.TopEnd
         ) {
-            Row(
-                Modifier
-                    .height(56.dp)
-                    .clip(MaterialTheme.shapes.large)
-                    .background(scheme.primary)
-                    .clickable(onClick = onResume)
-                    .padding(horizontal = 22.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            Button(
+                onClick = onResume,
+                modifier = Modifier.height(56.dp),
+                shape = MaterialTheme.shapes.large,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = scheme.primary,
+                    contentColor = scheme.onPrimary,
+                ),
+                contentPadding = PaddingValues(horizontal = 22.dp),
             ) {
                 Icon(
                     Icons.Default.PlayArrow,
                     null,
-                    tint = scheme.onPrimary,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
                 )
+                Spacer(Modifier.width(10.dp))
                 Text(
                     "Wznów",
                     style = MaterialTheme.typography.titleLarge.copy(
-                        color = scheme.onPrimary,
                         fontWeight = FontWeight.Bold,
                     ),
                 )

@@ -1,9 +1,8 @@
 package pl.rkarpinski.fiszkiwbiegu.screens.login
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +16,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -127,20 +128,22 @@ fun LoginScreen(
 private fun AuthButton(label: String, enabled: Boolean, onClick: () -> Unit) {
     val c = LocalFiszkiColors.current
     val scheme = MaterialTheme.colorScheme
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .clip(MaterialTheme.shapes.large)
-            .background(if (enabled) scheme.surface else scheme.surfaceVariant)
-            .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large)
-            .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier),
-        contentAlignment = Alignment.Center,
+    OutlinedButton(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier.fillMaxWidth().height(60.dp),
+        shape = MaterialTheme.shapes.large,
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = scheme.surface,
+            contentColor = scheme.onSurface,
+            disabledContainerColor = scheme.surfaceVariant,
+            disabledContentColor = c.mute2,
+        ),
+        border = BorderStroke(1.dp, scheme.outlineVariant),
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.titleLarge,
-            color = if (enabled) scheme.onSurface else c.mute2,
         )
     }
 }

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -121,14 +122,13 @@ fun LearningContent(
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Box(
+                IconButton(
+                    onClick = { onBack() },
                     modifier = Modifier
                         .size(40.dp)
                         .clip(MaterialTheme.shapes.medium)
                         .background(scheme.surface)
-                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium)
-                        .clickable { onBack() },
-                    contentAlignment = Alignment.Center,
+                        .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.medium),
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
