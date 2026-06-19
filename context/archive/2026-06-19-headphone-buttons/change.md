@@ -2,7 +2,8 @@
 change_id: headphone-buttons
 created: 2026-06-19
 updated: 2026-06-19
-status: preparing
+archived_at: 2026-06-19T18:56:58Z
+status: archived
 ---
 
 # headphone-buttons
