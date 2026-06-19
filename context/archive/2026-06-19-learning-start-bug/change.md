@@ -2,7 +2,8 @@
 change_id: learning-start-bug
 created: 2026-06-19
 updated: 2026-06-19
-status: preparing
+archived_at: 2026-06-19T18:57:23Z
+status: archived
 ---
 
 # learning-start-bug
