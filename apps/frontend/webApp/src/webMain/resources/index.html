@@ -1,10 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FiszkiWBiegu</title>
     <link type="text/css" rel="stylesheet" href="styles.css">
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <script>
+        var GOOGLE_CLIENT_ID = '71847229905-mqalk30tubb1pstdjq73krh0ovasqf2f.apps.googleusercontent.com';
+
+        window._googleToken = null;
+        window._googleSignInError = null;
+
+        function _runGoogleSignIn(onSuccess, onError) {
+            if (!window.google || !window.google.accounts) {
+                var msg = 'Google Sign-In SDK nie jest gotowy. Odśwież stronę i spróbuj ponownie.';
+                if (onSuccess) { onError(msg); } else { window._googleSignInError = msg; }
+                return;
+            }
+            google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: function(response) {
+                    if (onSuccess) { onSuccess(response.credential); } else { window._googleToken = response.credential; }
+                },
+                cancel_on_tap_outside: false,
+                use_fedcm_for_prompt: true
+            });
+            google.accounts.id.prompt(function(notification) {
+                if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                    var msg = 'Logowanie zostało anulowane lub zablokowane przez przeglądarkę.';
+                    if (onError) { onError(msg); } else { window._googleSignInError = msg; }
+                }
+            });
+        }
+
+        // Kotlin/JS: callback-based
+        window._initiateGoogleSignIn = function(onSuccess, onError) {
+            _runGoogleSignIn(onSuccess, onError);
+        };
+
+        // Kotlin/WASM: polling-based
+        window._triggerGoogleSignIn = function() {
+            window._googleToken = null;
+            window._googleSignInError = null;
+            _runGoogleSignIn(null, null);
+        };
+    </script>
 </head>
 <body style="text-align: center; align-content: center">
     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 50 50" role="presentation">
