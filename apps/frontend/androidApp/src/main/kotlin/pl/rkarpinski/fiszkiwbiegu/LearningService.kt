@@ -188,8 +188,8 @@ class LearningService : MediaSessionService() {
         val player = TtsPlayer()
         ttsPlayer = player
         player.onPlayWhenReadyChanged = { playing -> if (playing) resume() else pause() }
-        player.onSeekToNext = ::next
-        player.onSeekToPrevious = ::previous
+        player.onSeekToNext = { rateCard(Rating.KNOW_WELL) }
+        player.onSeekToPrevious = { rateCard(Rating.DONT_KNOW) }
 
         mediaSession = MediaSession.Builder(this, player)
             .build()
@@ -238,15 +238,7 @@ class LearningService : MediaSessionService() {
 
             ACTION_RATE -> {
                 val rating = Rating.valueOf(intent.getStringExtra(EXTRA_RATING) ?: return START_STICKY)
-                val card = currentSrsCard
-                if (card != null && !cardRated) {
-                    cardRated = true
-                    applyRating(card, rating)
-                    playRatingSound(rating)
-                    tts?.stop()
-                    playJob?.cancel()
-                    if (isPlaying) startPlayJob()
-                }
+                rateCard(rating)
             }
 
             ACTION_PLAY -> resume()
@@ -409,6 +401,18 @@ class LearningService : MediaSessionService() {
         isPlaying = true
         ttsPlayer.setPlaying(true)
         startPlayJob()
+    }
+
+    private fun rateCard(rating: Rating) {
+        val card = currentSrsCard
+        if (card != null && !cardRated) {
+            cardRated = true
+            applyRating(card, rating)
+            playRatingSound(rating)
+            tts?.stop()
+            playJob?.cancel()
+            if (isPlaying) startPlayJob()
+        }
     }
 
     private fun next() {

@@ -14,6 +14,7 @@ import androidx.media3.session.MediaNotification
 import androidx.media3.session.MediaSession
 import com.google.common.collect.ImmutableList
 import pl.rkarpinski.fiszkiwbiegu.screens.learning.LearningPhase
+import androidx.core.graphics.toColorInt
 
 @UnstableApi
 class LearningNotificationProvider(private val context: Context) : MediaNotification.Provider {
@@ -61,7 +62,7 @@ class LearningNotificationProvider(private val context: Context) : MediaNotifica
             )
         }
 
-        val accentColor = if (isEnglish) Color.parseColor("#1A2980") else Color.parseColor("#8B0000")
+        val accentColor = if (isEnglish) "#1A2980".toColorInt() else "#8B0000".toColorInt()
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_media_play)
             .setContentTitle(card?.sourceText ?: "FiszkiWBiegu")

@@ -32,6 +32,8 @@ class TtsPlayer : SimpleBasePlayer(Looper.getMainLooper()) {
         )
         .setPlayWhenReady(isPlayWhenReady, PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST)
         .setPlaybackState(STATE_READY)
+        // Bez REPEAT_MODE_ALL seekToNext/Previous z 1-elementową playlistą nie wywołuje handleSeek().
+        .setRepeatMode(Player.REPEAT_MODE_ALL)
         .setPlaylist(
             ImmutableList.of(MediaItemData.Builder(uid).setMediaItem(currentMediaItem).build())
         )
