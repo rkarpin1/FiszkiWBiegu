@@ -29,7 +29,7 @@ pub struct Collection {
     pub created_at: DateTime<Utc>,
     pub last_studied: Option<DateTime<Utc>>,
     pub progress: f64,
-    pub total_study_minutes: i64,
+    pub total_study_minutes: i32,
     pub flashcard_count: i64,
 }
 
