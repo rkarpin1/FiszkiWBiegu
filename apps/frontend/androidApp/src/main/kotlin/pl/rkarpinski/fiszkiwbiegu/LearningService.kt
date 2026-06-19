@@ -262,6 +262,15 @@ class LearningService : MediaSessionService() {
             override fun seekToPreviousMediaItem() {
                 rateCard(Rating.DONT_KNOW)
             }
+
+            // ExoPlayer z 1 elementem w REPEAT_MODE_ONE nie udostępnia tych komend
+            override fun getAvailableCommands(): Player.Commands =
+                super.getAvailableCommands().buildUpon()
+                    .add(Player.COMMAND_SEEK_TO_NEXT)
+                    .add(Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
+                    .add(Player.COMMAND_SEEK_TO_PREVIOUS)
+                    .add(Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM)
+                    .build()
         }
 
         mediaSession = MediaSession.Builder(this, mediaPlayer).build()
