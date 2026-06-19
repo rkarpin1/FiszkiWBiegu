@@ -33,6 +33,13 @@ cd apps/frontend
 ./gradlew :webApp:wasmJsBrowserProductionWebpack
 ```
 
+#### Web — Wasm target (faster, modern browsers)
+```bash
+cd apps/frontend
+./gradlew :webApp:wasmJsBrowserDevelopmentRun
+```
+
+
 Output lands in `apps/frontend/webApp/build/dist/wasmJs/productionExecutable/`.
 
 ### JS target (fallback)

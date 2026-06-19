@@ -14,52 +14,52 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Web.
 
 ### Running the apps
 
-**Android:**
+#### Android
 ```bash
 ./gradlew :androidApp:assembleDebug
 ```
 
-**Web — Wasm target (faster, modern browsers):**
+#### Web — Wasm target (faster, modern browsers)
 ```bash
 ./gradlew :webApp:wasmJsBrowserDevelopmentRun
 ```
 
-**Web — JS target (slower, supports older browsers):**
+#### Web — JS target (slower, supports older browsers)
 ```bash
 ./gradlew :webApp:jsBrowserDevelopmentRun
 ```
 
-**Web — production build (Wasm):**
+#### Web — production build (Wasm) → webApp/build/dist/wasmJs/productionExecutable/
 ```bash
 ./gradlew :webApp:wasmJsBrowserProductionWebpack
 ```
-Output: `webApp/build/dist/wasmJs/productionExecutable/`
 
-**iOS:** open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+
+iOS: open the [/iosApp](./iosApp) directory in Xcode and run it from there.
 
 ### Running tests
 
-**Shared (all platforms):**
+#### Shared (all platforms)
 ```bash
 ./gradlew :shared:test
 ```
 
-**Android tests:**
+#### Android
 ```bash
 ./gradlew :shared:testAndroidHostTest
 ```
 
-**Web tests — Wasm:**
+#### Web — Wasm
 ```bash
 ./gradlew :shared:wasmJsTest
 ```
 
-**Web tests — JS:**
+#### Web — JS
 ```bash
 ./gradlew :shared:jsTest
 ```
 
-**iOS tests:**
+#### iOS
 ```bash
 ./gradlew :shared:iosSimulatorArm64Test
 ```
