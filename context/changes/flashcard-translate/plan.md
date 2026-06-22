@@ -297,14 +297,14 @@ Brak zmian w bazie danych. Wdrożenie wymaga ustawienia nowych zmiennych env na 
 
 #### Automatyczne
 
-- [x] 2.1 Testy współdzielone przechodzą: `./gradlew :shared:test`
+- [x] 2.1 Testy współdzielone przechodzą: `./gradlew :shared:test` — 9386522
 
 ### Faza 3: Frontend — UI i ViewModel
 
 #### Automatyczne
 
-- [ ] 3.1 Testy współdzielone przechodzą: `./gradlew :shared:test`
-- [ ] 3.2 APK debug buduje się: `./gradlew :androidApp:assembleDebug`
+- [x] 3.1 Testy współdzielone przechodzą: `./gradlew :shared:test`
+- [x] 3.2 APK debug buduje się: `./gradlew :androidApp:assembleDebug`
 
 #### Ręczne
 

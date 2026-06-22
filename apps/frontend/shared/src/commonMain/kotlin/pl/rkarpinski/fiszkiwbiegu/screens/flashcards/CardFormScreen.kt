@@ -2,6 +2,7 @@ package pl.rkarpinski.fiszkiwbiegu.screens.flashcards
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,12 +57,14 @@ import pl.rkarpinski.fiszkiwbiegu.theme.LocalFiszkiColors
 import pl.rkarpinski.fiszkiwbiegu.theme.mono
 import pl.rkarpinski.fiszkiwbiegu.ui.components.CapsLabel
 import pl.rkarpinski.fiszkiwbiegu.ui.components.Flag
+import pl.rkarpinski.fiszkiwbiegu.ui.components.LanguageNames
 
 @Stable
 interface CardFormActions {
     fun onBack()
     fun onSave(newFlashcard: FlashcardDto)
     fun onDelete()
+    fun onTranslate(text: String, from: String, to: String, onResult: (String) -> Unit)
 }
 
 @Composable
@@ -69,9 +74,13 @@ fun CardFormScreen(
     viewModel: FlashcardsViewModel = koinViewModel(key = collection.id) { parametersOf(collection.id) },
     onBack: () -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     CardFormContent(
         collection = collection,
         flashcard = flashcard,
+        isTranslating = uiState.isTranslating,
+        translationError = uiState.translationError,
 
         actions = object : CardFormActions {
             override fun onBack() = onBack()
@@ -86,6 +95,10 @@ fun CardFormScreen(
                 onBack()
             }
 
+            override fun onTranslate(text: String, from: String, to: String, onResult: (String) -> Unit) {
+                viewModel.translate(text, from, to, onResult)
+            }
+
         }
 
     )
@@ -95,6 +108,8 @@ fun CardFormScreen(
 fun CardFormContent(
     collection: CollectionDto,
     flashcard: FlashcardDto? = null,
+    isTranslating: Boolean = false,
+    translationError: String? = null,
     actions: CardFormActions,
 ) {
     var draft by remember(flashcard) {
@@ -233,8 +248,8 @@ fun CardFormContent(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Flag("pl", 22.dp)
-                    CapsLabel("POLSKI")
+                    Flag(collection.sourceLanguage, 22.dp)
+                    CapsLabel((LanguageNames[collection.sourceLanguage] ?: collection.sourceLanguage).uppercase())
                 }
                 Spacer(Modifier.height(6.dp))
                 OutlinedTextField(
@@ -246,7 +261,26 @@ fun CardFormContent(
 
                 Spacer(Modifier.height(12.dp))
 
-                // Translate row (disabled)
+                // Translate row — direction depends on which field is filled.
+                // Source filled (alone or both) → source→target, result into Target.
+                // Only target filled → target→source, result into Source.
+                val canTranslate = draft.sourceText.isNotBlank() || draft.targetText.isNotBlank()
+                val translateColor = if (canTranslate && !isTranslating) scheme.onSurface else c.mute2
+                val doTranslate = {
+                    if (draft.sourceText.isNotBlank()) {
+                        actions.onTranslate(
+                            draft.sourceText.trim(),
+                            collection.sourceLanguage,
+                            collection.targetLanguage,
+                        ) { result -> draft = draft.copy(targetText = result) }
+                    } else {
+                        actions.onTranslate(
+                            draft.targetText.trim(),
+                            collection.targetLanguage,
+                            collection.sourceLanguage,
+                        ) { result -> draft = draft.copy(sourceText = result) }
+                    }
+                }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -261,6 +295,7 @@ fun CardFormContent(
                         modifier = Modifier
                             .padding(horizontal = 12.dp)
                             .clip(MaterialTheme.shapes.large)
+                            .clickable(enabled = canTranslate && !isTranslating) { doTranslate() }
                             .background(scheme.surface)
                             .border(1.dp, scheme.outlineVariant, MaterialTheme.shapes.large)
                             .padding(horizontal = 16.dp, vertical = 10.dp),
@@ -269,16 +304,24 @@ fun CardFormContent(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
                         ) {
-                            Icon(
-                                Icons.Default.Translate,
-                                contentDescription = null,
-                                tint = c.mute2,
-                                modifier = Modifier.size(16.dp),
-                            )
+                            if (isTranslating) {
+                                CircularProgressIndicator(
+                                    color = scheme.onSurface,
+                                    strokeWidth = 2.dp,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                            } else {
+                                Icon(
+                                    Icons.Default.Translate,
+                                    contentDescription = null,
+                                    tint = translateColor,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                            }
                             Text(
-                                "Przetłumacz",
+                                if (isTranslating) "Tłumaczę…" else "Przetłumacz",
                                 style = MaterialTheme.typography.labelMedium,
-                                color = c.mute2,
+                                color = translateColor,
                             )
                         }
                     }
@@ -290,6 +333,16 @@ fun CardFormContent(
                     )
                 }
 
+                if (translationError != null) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = translationError,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = scheme.error,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+
                 Spacer(Modifier.height(12.dp))
 
                 // EN field
@@ -297,8 +350,8 @@ fun CardFormContent(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Flag("en", 22.dp)
-                    CapsLabel("ANGIELSKI")
+                    Flag(collection.targetLanguage, 22.dp)
+                    CapsLabel((LanguageNames[collection.targetLanguage] ?: collection.targetLanguage).uppercase())
                 }
                 Spacer(Modifier.height(6.dp))
                 OutlinedTextField(
@@ -367,6 +420,7 @@ private object NoOpCardFormActions : CardFormActions {
     override fun onBack() {}
     override fun onSave(newFlashcard: FlashcardDto) {}
     override fun onDelete() {}
+    override fun onTranslate(text: String, from: String, to: String, onResult: (String) -> Unit) {}
 }
 
 @Preview
