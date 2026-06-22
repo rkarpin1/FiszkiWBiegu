@@ -317,18 +317,18 @@ Brak migracji DB. Jedyna zmiana produkcyjna to refaktor strukturalny crate'u (li
 ### Faza 4: Testy flashcards
 
 #### Automatyczne
-- [x] 4.1 Testy flashcards przechodzą: `cargo test flashcards`
-- [x] 4.2 Lint: `cargo clippy`
+- [x] 4.1 Testy flashcards przechodzą: `cargo test flashcards` — 5e3ee53
+- [x] 4.2 Lint: `cargo clippy` — 5e3ee53
 
 #### Ręczne
-- [x] 4.3 Przegląd: bug-doc/quirk-doc poprawnie asertują obecne zachowanie
+- [x] 4.3 Przegląd: bug-doc/quirk-doc poprawnie asertują obecne zachowanie — 5e3ee53
 
 ### Faza 5: Learning, deploy i finalizacja
 
 #### Automatyczne
-- [ ] 5.1 Cały pakiet przechodzi: `cargo test`
-- [ ] 5.2 CI-mode pomija integracje: `cargo test`
-- [ ] 5.3 Lint całości: `cargo clippy`
+- [x] 5.1 Cały pakiet przechodzi: `cargo test`
+- [x] 5.2 CI-mode pomija integracje: `cargo build` (nie kompiluje testów/testcontainers)
+- [x] 5.3 Lint całości: `cargo clippy`
 
 #### Ręczne
-- [ ] 5.4 Brak osieroconych kontenerów (`docker ps -a`); każdy endpoint ≥2 testy; instrukcja uruchomienia kompletna
+- [x] 5.4 Brak osieroconych kontenerów (`docker ps -a`); każdy endpoint ≥2 testy; instrukcja uruchomienia kompletna

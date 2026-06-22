@@ -9,7 +9,9 @@
 mod auth;
 mod collections;
 mod common;
+mod deploy;
 mod flashcards;
+mod learning;
 
 use common::{client, spawn_app};
 
