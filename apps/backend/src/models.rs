@@ -72,3 +72,15 @@ pub struct FlashcardUpdateRequest {
     pub srs_level: Option<f32>,
     pub last_studied_at: Option<DateTime<Utc>>,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct TranslateRequest {
+    pub source_text: String,
+    pub source_language: String,
+    pub target_language: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct TranslateResponse {
+    pub translated_text: String,
+}

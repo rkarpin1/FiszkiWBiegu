@@ -7,6 +7,7 @@ use std::net::TcpListener;
 use flexi_logger::{Age, Cleanup, Criterion, DeferredNow, FileSpec, Naming, WriteMode, TS_DASHES_BLANK_COLONS_DOT_BLANK};
 use log::{error, Record};
 
+use fiszki_w_biegu_server::translation::Translator;
 use fiszki_w_biegu_server::{run, run_migrations, AppState, GoogleConfig, JwtConfig};
 
 pub fn main_format(
@@ -39,6 +40,10 @@ async fn main() -> std::io::Result<()> {
         std::env::var("GOOGLE_CLIENT_ID").expect("GOOGLE_CLIENT_ID must be set");
 
     let deploy_api_key = std::env::var("DEPLOY_API_KEY").ok();
+
+    // Translation provider selected by TRANSLATION_PROVIDER (default azure);
+    // None when its keys are unset, in which case /translate answers 503.
+    let translator = Translator::from_env();
 
     let _handle = flexi_logger::Logger::try_with_str("info")
         .unwrap()
@@ -82,7 +87,7 @@ async fn main() -> std::io::Result<()> {
         pool,
         JwtConfig { secret: jwt_secret },
         GoogleConfig { client_id: google_client_id },
-        AppState { deploy_api_key },
+        AppState { deploy_api_key, translator },
     )?
     .await
 }
