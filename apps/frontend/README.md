@@ -31,8 +31,12 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Web.
 
 #### Web — production build (Wasm) → webApp/build/dist/wasmJs/productionExecutable/
 ```bash
-./gradlew :webApp:wasmJsBrowserProductionWebpack
+./gradlew :webApp:composeCompatibilityBrowserDistribution
 ```
+
+Deploy a dir `webApp/build/dist/composeWebCompatibility/productionExecutable` to a web server
+
+Starts a local dev server with hot reload. Open the URL printed in the console (typically `http://localhost:8080`).
 
 
 iOS: open the [/iosApp](./iosApp) directory in Xcode and run it from there.

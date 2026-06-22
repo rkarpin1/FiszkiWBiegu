@@ -21,8 +21,9 @@ All Gradle commands are run from `apps/frontend/`.
 
 ```bash
 cd apps/frontend
-./gradlew :webApp:wasmJsBrowserDevelopmentRun
+./gradlew :webApp:composeCompatibilityBrowserDistribution
 ```
+Deploy a dir `webApp/build/dist/composeWebCompatibility/productionExecutable` to a web server
 
 Starts a local dev server with hot reload. Open the URL printed in the console (typically `http://localhost:8080`).
 
