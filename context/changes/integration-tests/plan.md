@@ -287,23 +287,23 @@ Brak migracji DB. Jedyna zmiana produkcyjna to refaktor strukturalny crate'u (li
 ### Faza 1: Refaktor do src/lib.rs
 
 #### Automatyczne
-- [x] 1.1 Projekt się kompiluje: `cargo build`
-- [x] 1.2 Brak nowych krytycznych warningów: `cargo build 2>&1`
-- [x] 1.3 Binarka linkuje lib: `cargo build --bin fiszki-w-biegu-server`
+- [x] 1.1 Projekt się kompiluje: `cargo build` — 6dd23a4
+- [x] 1.2 Brak nowych krytycznych warningów: `cargo build 2>&1` — 6dd23a4
+- [x] 1.3 Binarka linkuje lib: `cargo build --bin fiszki-w-biegu-server` — 6dd23a4
 
 #### Ręczne
-- [x] 1.4 Serwer odpowiada 200 na GET /info i 401 na GET /collections bez tokenu (zachowanie jak przed refaktorem)
+- [x] 1.4 Serwer odpowiada 200 na GET /info i 401 na GET /collections bez tokenu (zachowanie jak przed refaktorem) — 6dd23a4
 
 ### Faza 2: Harness testowy (testcontainers, fixture, auth)
 
 #### Automatyczne
-- [ ] 2.1 Testy się kompilują: `cargo test --features integration-tests --no-run`
-- [ ] 2.2 Smoke + auth przechodzą: `cargo test --features integration-tests --test integration`
-- [ ] 2.3 Bez feature CI nic nie uruchamia: `cargo test`
-- [ ] 2.4 Lint: `cargo clippy --features integration-tests`
+- [x] 2.1 Testy się kompilują: `cargo test --features integration-tests --no-run`
+- [x] 2.2 Smoke + auth przechodzą: `cargo test --features integration-tests --test integration`
+- [x] 2.3 Bez feature CI nic nie uruchamia: `cargo test`
+- [x] 2.4 Lint: `cargo clippy --features integration-tests`
 
 #### Ręczne
-- [ ] 2.5 Jeden kontener startuje i kończy się; brak osieroconych (`docker ps -a`)
+- [x] 2.5 Jeden kontener startuje i kończy się; brak osieroconych (`docker ps -a`)
 
 ### Faza 3: Testy collections
 

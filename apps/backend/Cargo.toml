@@ -20,6 +20,20 @@ jsonwebtoken = { version = "10.4.0", features = ["rust_crypto"] }
 dotenv = "0.15"
 reqwest = { version = "0.13", features = ["json", "rustls", "gzip","deflate","brotli"], default-features = false }
 
+[dev-dependencies]
+# Integration tests spin up a real Postgres in Docker. testcontainers manages
+# the container lifecycle; reqwest/sqlx/jsonwebtoken/uuid are reused from deps.
+testcontainers = "0.25"
+testcontainers-modules = { version = "0.13", features = ["postgres"] }
+# Process-exit hook to remove the shared container (testcontainers removes on Drop,
+# which never runs for a container held in a 'static OnceCell; no Ryuk reaper exists).
+ctor = "0.2"
+
+[features]
+# Integration tests are gated behind this feature so plain `cargo test` (CI)
+# does not require Docker. Run locally with: cargo test --features integration-tests
+integration-tests = []
+
 [profile.release]
 opt-level = "z"      # optymalizuj pod kątem rozmiaru (alternatywnie "s" dla lepszego balansu)
 lto = true           # Link-Time Optimization — eliminuje martwy kod między kratami
