@@ -303,8 +303,8 @@ Brak zmian w bazie danych. Wdrożenie wymaga ustawienia nowych zmiennych env na 
 
 #### Automatyczne
 
-- [x] 3.1 Testy współdzielone przechodzą: `./gradlew :shared:test`
-- [x] 3.2 APK debug buduje się: `./gradlew :androidApp:assembleDebug`
+- [x] 3.1 Testy współdzielone przechodzą: `./gradlew :shared:test` — 661a660
+- [x] 3.2 APK debug buduje się: `./gradlew :androidApp:assembleDebug` — 661a660
 
 #### Ręczne
 
