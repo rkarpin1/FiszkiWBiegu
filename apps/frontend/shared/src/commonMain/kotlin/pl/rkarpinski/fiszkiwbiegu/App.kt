@@ -66,6 +66,7 @@ fun App(
     onGoogleSignIn: suspend () -> Result<String>,
     initialCollectionJson: String? = null,
     learningEnabled: Boolean = true,
+    onDownloadApk: (() -> Unit)? = null,
 ) {
     val authRepository: AuthRepository = koinInject()
     val authEventBus: AuthEventBus = koinInject()
@@ -196,6 +197,7 @@ fun App(
                                 onResumeLearning = { backStack.add(Route.Learning(it)) },
                                 onAddClick = { backStack.add(Route.CollectionForm()) },
                                 showLastStudied = learningEnabled,
+                                onDownloadApk = onDownloadApk,
                             )
                         }
                         entry<Route.Flashcards> { route ->

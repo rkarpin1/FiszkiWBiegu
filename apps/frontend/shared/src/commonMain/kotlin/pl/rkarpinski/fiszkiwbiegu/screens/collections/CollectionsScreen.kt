@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
@@ -66,6 +67,7 @@ fun CollectionsScreen(
     onResumeLearning: (CollectionDto) -> Unit = onCollectionClick,
     onAddClick: () -> Unit = {},
     showLastStudied: Boolean = true,
+    onDownloadApk: (() -> Unit)? = null,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -78,6 +80,7 @@ fun CollectionsScreen(
         onCancelDelete = { viewModel.cancelDelete() },
         onRetry = { viewModel.loadCollections() },
         showLastStudied = showLastStudied,
+        onDownloadApk = onDownloadApk,
     )
 }
 
@@ -91,6 +94,7 @@ fun CollectionsScreenContent(
     onCancelDelete: () -> Unit,
     onRetry: () -> Unit,
     showLastStudied: Boolean = true,
+    onDownloadApk: (() -> Unit)? = null,
 ) {
     FiszkiThemedScreen(naturalDark = isSystemInDarkTheme()) {
         val scheme = MaterialTheme.colorScheme
@@ -125,14 +129,40 @@ fun CollectionsScreenContent(
                 // .padding(paddingValues)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Column(modifier = Modifier.padding(horizontal = 22.dp, vertical = 22.dp)) {
-                        CapsLabel("CZEŚĆ!")
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            "Twoje kolekcje",
-                            style = MaterialTheme.typography.headlineLarge,
-                            color = scheme.onBackground,
-                        )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 22.dp, vertical = 22.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            CapsLabel("CZEŚĆ!")
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                "Twoje kolekcje",
+                                style = MaterialTheme.typography.headlineLarge,
+                                color = scheme.onBackground,
+                            )
+                        }
+                        onDownloadApk?.let { download ->
+                            Button(
+                                onClick = download,
+                                shape = MaterialTheme.shapes.large,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = scheme.primary,
+                                    contentColor = scheme.onPrimary,
+                                ),
+                                contentPadding = PaddingValues(horizontal = 16.dp),
+                            ) {
+                                Icon(
+                                    Icons.Default.Android,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp),
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text("Pobierz")
+                            }
+                        }
                     }
 
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
