@@ -34,8 +34,8 @@ static CONTAINER_ID: Mutex<Option<String>> = Mutex::new(None);
 // testcontainers removes a container on Drop, but our container lives in a 'static
 // OnceCell that is never dropped, and this crate ships no Ryuk reaper. So we record
 // the id at startup and force-remove it when the test process exits.
-#[ctor::dtor]
-fn remove_shared_container() {
+#[dtor::dtor]
+unsafe fn remove_shared_container() {
     if let Some(id) = CONTAINER_ID.lock().unwrap().take() {
         let _ = std::process::Command::new("docker")
             .args(["rm", "-f", &id])
