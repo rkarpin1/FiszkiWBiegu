@@ -9,6 +9,7 @@
 mod auth;
 mod collections;
 mod common;
+mod flashcards;
 
 use common::{client, spawn_app};
 

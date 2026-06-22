@@ -308,20 +308,20 @@ Brak migracji DB. Jedyna zmiana produkcyjna to refaktor strukturalny crate'u (li
 ### Faza 3: Testy collections
 
 #### Automatyczne
-- [x] 3.1 Testy collections przechodzą: `cargo test collections`
-- [x] 3.2 Lint: `cargo clippy`
+- [x] 3.1 Testy collections przechodzą: `cargo test collections` — ea5423d
+- [x] 3.2 Lint: `cargo clippy` — ea5423d
 
 #### Ręczne
-- [x] 3.3 Przegląd komentarzy po angielsku; bug-doc oznaczony KNOWN ISSUE
+- [x] 3.3 Przegląd komentarzy po angielsku; bug-doc oznaczony KNOWN ISSUE — ea5423d
 
 ### Faza 4: Testy flashcards
 
 #### Automatyczne
-- [ ] 4.1 Testy flashcards przechodzą: `cargo test flashcards`
-- [ ] 4.2 Lint: `cargo clippy`
+- [x] 4.1 Testy flashcards przechodzą: `cargo test flashcards`
+- [x] 4.2 Lint: `cargo clippy`
 
 #### Ręczne
-- [ ] 4.3 Przegląd: bug-doc/quirk-doc poprawnie asertują obecne zachowanie
+- [x] 4.3 Przegląd: bug-doc/quirk-doc poprawnie asertują obecne zachowanie
 
 ### Faza 5: Learning, deploy i finalizacja
 
