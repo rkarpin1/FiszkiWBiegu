@@ -12,25 +12,81 @@
         window._googleToken = null;
         window._googleSignInError = null;
 
+        var _gsiOverlay = null;
+
+        function _removeGsiOverlay() {
+            if (_gsiOverlay && _gsiOverlay.parentNode) {
+                _gsiOverlay.parentNode.removeChild(_gsiOverlay);
+            }
+            _gsiOverlay = null;
+        }
+
+        // Renderuje oficjalny przycisk Google w nakładce modalnej.
+        // Kliknięcie przycisku otwiera popup logowania (nawigacja first-party do
+        // accounts.google.com) — działa bez cookies stron trzecich i bez aktywnej
+        // sesji Google, w przeciwieństwie do One Tap (google.accounts.id.prompt).
         function _runGoogleSignIn(onSuccess, onError) {
-            if (!window.google || !window.google.accounts) {
-                var msg = 'Google Sign-In SDK nie jest gotowy. Odśwież stronę i spróbuj ponownie.';
-                if (onSuccess) { onError(msg); } else { window._googleSignInError = msg; }
+            if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+                onError('Google Sign-In SDK nie jest gotowy. Odśwież stronę i spróbuj ponownie.');
                 return;
             }
+
+            _removeGsiOverlay();
+
             google.accounts.id.initialize({
                 client_id: GOOGLE_CLIENT_ID,
                 callback: function(response) {
-                    if (onSuccess) { onSuccess(response.credential); } else { window._googleToken = response.credential; }
+                    _removeGsiOverlay();
+                    onSuccess(response.credential);
                 },
-                cancel_on_tap_outside: false,
-                use_fedcm_for_prompt: true
+                ux_mode: 'popup',
+                auto_select: false,
+                itp_support: true
             });
-            google.accounts.id.prompt(function(notification) {
-                if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                    var msg = 'Logowanie zostało anulowane lub zablokowane przez przeglądarkę.';
-                    if (onError) { onError(msg); } else { window._googleSignInError = msg; }
+
+            var overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;z-index:2147483647;display:flex;' +
+                'align-items:center;justify-content:center;background:rgba(0,0,0,0.55);';
+
+            var card = document.createElement('div');
+            card.style.cssText = 'background:#fff;padding:28px 24px;border-radius:16px;display:flex;' +
+                'flex-direction:column;align-items:center;gap:18px;box-shadow:0 10px 40px rgba(0,0,0,0.3);';
+
+            var title = document.createElement('div');
+            title.textContent = 'Zaloguj się przez Google';
+            title.style.cssText = 'font-family:sans-serif;font-size:16px;color:#111;';
+
+            var btnHost = document.createElement('div');
+
+            var cancel = document.createElement('button');
+            cancel.textContent = 'Anuluj';
+            cancel.style.cssText = 'background:none;border:none;color:#666;font-size:14px;' +
+                'cursor:pointer;font-family:sans-serif;';
+            cancel.onclick = function() {
+                _removeGsiOverlay();
+                onError('Logowanie anulowane.');
+            };
+
+            card.appendChild(title);
+            card.appendChild(btnHost);
+            card.appendChild(cancel);
+            overlay.appendChild(card);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    _removeGsiOverlay();
+                    onError('Logowanie anulowane.');
                 }
+            });
+            document.body.appendChild(overlay);
+            _gsiOverlay = overlay;
+
+            google.accounts.id.renderButton(btnHost, {
+                type: 'standard',
+                theme: 'filled_blue',
+                size: 'large',
+                text: 'continue_with',
+                shape: 'pill',
+                logo_alignment: 'center'
             });
         }
 
@@ -43,7 +99,15 @@
         window._triggerGoogleSignIn = function() {
             window._googleToken = null;
             window._googleSignInError = null;
-            _runGoogleSignIn(null, null);
+            _runGoogleSignIn(
+                function(credential) { window._googleToken = credential; },
+                function(msg) { window._googleSignInError = msg; }
+            );
+        };
+
+        // Sprzątanie nakładki (np. przy timeoucie / anulowaniu po stronie Kotlin)
+        window._cancelGoogleSignIn = function() {
+            _removeGsiOverlay();
         };
     </script>
 </head>
