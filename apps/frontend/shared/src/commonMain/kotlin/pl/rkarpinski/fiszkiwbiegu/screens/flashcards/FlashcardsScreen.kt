@@ -84,6 +84,7 @@ fun FlashcardsScreen(
     viewModel: FlashcardsViewModel = koinViewModel(key = collection.id) { parametersOf(collection.id) },
     networkChecker: NetworkChecker = koinInject(),
     actions: FlashcardsActions = object : FlashcardsActions {},
+    showLearningCta: Boolean = true,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isOnline by networkChecker.isOnline.collectAsState()
@@ -97,6 +98,7 @@ fun FlashcardsScreen(
         onCancelDelete = { viewModel.cancelDelete() },
         onLoadFlashcards = { viewModel.loadFlashcards() },
         onDeleteFlashcardRequest = { id -> viewModel.requestDelete(id) },
+        showLearningCta = showLearningCta,
     )
 }
 
@@ -110,6 +112,7 @@ fun FlashcardsScreenContent(
     onCancelDelete: () -> Unit,
     onLoadFlashcards: () -> Unit,
     onDeleteFlashcardRequest: (String) -> Unit,
+    showLearningCta: Boolean = true,
 ) {
     var showCollectionMenu by remember { mutableStateOf(false) }
     var showDeleteCollectionDialog by remember { mutableStateOf(false) }
@@ -275,47 +278,49 @@ fun FlashcardsScreenContent(
                     }
 
                     // CTA button
-                    item {
-                        val ctaEnabled = uiState.flashcards.isNotEmpty() && isOnline
-                        Column(modifier = Modifier.padding(horizontal = 22.dp)) {
-                            Button(
-                                onClick = actions::onStartLearning,
-                                enabled = ctaEnabled,
-                                modifier = Modifier.fillMaxWidth().height(56.dp),
-                                shape = MaterialTheme.shapes.large,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = scheme.primary,
-                                    contentColor = scheme.onPrimary,
-                                    disabledContainerColor = scheme.surfaceVariant,
-                                    disabledContentColor = c.mute2,
-                                ),
-                                contentPadding = PaddingValues(horizontal = 16.dp),
-                            ) {
-                                Icon(
-                                    Icons.Default.Headphones,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp),
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    "Słuchaj w biegu",
-                                    style = MaterialTheme.typography.titleMedium,
-                                )
+                    if (showLearningCta) {
+                        item {
+                            val ctaEnabled = uiState.flashcards.isNotEmpty() && isOnline
+                            Column(modifier = Modifier.padding(horizontal = 22.dp)) {
+                                Button(
+                                    onClick = actions::onStartLearning,
+                                    enabled = ctaEnabled,
+                                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                                    shape = MaterialTheme.shapes.large,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = scheme.primary,
+                                        contentColor = scheme.onPrimary,
+                                        disabledContainerColor = scheme.surfaceVariant,
+                                        disabledContentColor = c.mute2,
+                                    ),
+                                    contentPadding = PaddingValues(horizontal = 16.dp),
+                                ) {
+                                    Icon(
+                                        Icons.Default.Headphones,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(20.dp),
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        "Słuchaj w biegu",
+                                        style = MaterialTheme.typography.titleMedium,
+                                    )
+                                }
+                                if (!isOnline) {
+                                    Spacer(Modifier.height(4.dp))
+                                    Text(
+                                        "Brak połączenia",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = scheme.onSurfaceVariant,
+                                    )
+                                }
+
                             }
-                            if (!isOnline) {
-                                Spacer(Modifier.height(4.dp))
-                                Text(
-                                    "Brak połączenia",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = scheme.onSurfaceVariant,
-                                )
-                            }
+
+                            Spacer(Modifier.height(20.dp))
+                            HorizontalDivider()
 
                         }
-
-                        Spacer(Modifier.height(20.dp))
-                        HorizontalDivider()
-
                     }
 
                     // Language pair

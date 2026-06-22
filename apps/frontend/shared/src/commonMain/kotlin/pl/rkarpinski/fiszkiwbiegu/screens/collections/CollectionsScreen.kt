@@ -65,6 +65,7 @@ fun CollectionsScreen(
     onCollectionClick: (CollectionDto) -> Unit,
     onResumeLearning: (CollectionDto) -> Unit = onCollectionClick,
     onAddClick: () -> Unit = {},
+    showLastStudied: Boolean = true,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -76,6 +77,7 @@ fun CollectionsScreen(
         onConfirmDelete = { viewModel.confirmDelete() },
         onCancelDelete = { viewModel.cancelDelete() },
         onRetry = { viewModel.loadCollections() },
+        showLastStudied = showLastStudied,
     )
 }
 
@@ -88,6 +90,7 @@ fun CollectionsScreenContent(
     onConfirmDelete: () -> Unit,
     onCancelDelete: () -> Unit,
     onRetry: () -> Unit,
+    showLastStudied: Boolean = true,
 ) {
     FiszkiThemedScreen(naturalDark = isSystemInDarkTheme()) {
         val scheme = MaterialTheme.colorScheme
@@ -164,13 +167,15 @@ fun CollectionsScreenContent(
 
                         if (uiState.collections.isNotEmpty()) {
 
-                            uiState.lastStudiedCollection?.let { last ->
-                                item {
-                                    LastUsedHero(
-                                        last,
-                                        onResume = { onResumeLearning(last) },
-                                        onOpen = { onCollectionClick(last) },
-                                    )
+                            if (showLastStudied) {
+                                uiState.lastStudiedCollection?.let { last ->
+                                    item {
+                                        LastUsedHero(
+                                            last,
+                                            onResume = { onResumeLearning(last) },
+                                            onOpen = { onCollectionClick(last) },
+                                        )
+                                    }
                                 }
                             }
 

@@ -16,6 +16,6 @@ fun main() {
         modules(appModule, webModule)
     }
     ComposeViewport {
-        App(onGoogleSignIn = { googleSignIn() })
+        App(onGoogleSignIn = { googleSignIn() }, learningEnabled = false)
     }
 }
