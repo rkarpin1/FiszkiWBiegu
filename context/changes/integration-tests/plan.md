@@ -326,9 +326,9 @@ Brak migracji DB. Jedyna zmiana produkcyjna to refaktor strukturalny crate'u (li
 ### Faza 5: Learning, deploy i finalizacja
 
 #### Automatyczne
-- [x] 5.1 Cały pakiet przechodzi: `cargo test`
-- [x] 5.2 CI-mode pomija integracje: `cargo build` (nie kompiluje testów/testcontainers)
-- [x] 5.3 Lint całości: `cargo clippy`
+- [x] 5.1 Cały pakiet przechodzi: `cargo test` — 7d51555
+- [x] 5.2 CI-mode pomija integracje: `cargo build` (nie kompiluje testów/testcontainers) — 7d51555
+- [x] 5.3 Lint całości: `cargo clippy` — 7d51555
 
 #### Ręczne
-- [x] 5.4 Brak osieroconych kontenerów (`docker ps -a`); każdy endpoint ≥2 testy; instrukcja uruchomienia kompletna
+- [x] 5.4 Brak osieroconych kontenerów (`docker ps -a`); każdy endpoint ≥2 testy; instrukcja uruchomienia kompletna — 7d51555
