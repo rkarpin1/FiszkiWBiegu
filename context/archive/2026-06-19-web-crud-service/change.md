@@ -1,9 +1,10 @@
 ---
 change_id: web-crud-service
 title: Serwis webowy — zarządzanie kolekcjami i fiszkami
-status: preparing
+status: archived
 created: 2026-06-19
-updated: 2026-06-19
+updated: 2026-06-22
+archived_at: 2026-06-22T17:21:24Z
 ---
 
 ## Goal
