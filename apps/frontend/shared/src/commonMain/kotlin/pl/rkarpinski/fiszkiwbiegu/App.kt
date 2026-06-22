@@ -173,6 +173,9 @@ fun App(
                                             onSuccess = { idToken ->
                                                 authRepository.loginWithGoogle(idToken).fold(
                                                     onSuccess = {
+                                                        // Token jest już zapisany — odśwież kolekcje,
+                                                        // bo początkowy load z init VM poszedł bez tokenu.
+                                                        collectionsVm.loadCollections()
                                                         backStack.clear()
                                                         backStack.add(Route.Collections)
                                                     },
