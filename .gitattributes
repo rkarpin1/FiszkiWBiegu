@@ -1,0 +1,4 @@
+# Force LF for SQL migrations so that sqlx's compile-time embedded checksums
+# match the checksums stored in the database, regardless of the developer's OS
+# or git core.autocrlf setting. Mixing CRLF locally caused sqlx VersionMismatch.
+*.sql text eol=lf
