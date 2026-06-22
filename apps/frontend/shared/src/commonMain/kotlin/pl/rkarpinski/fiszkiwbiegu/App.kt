@@ -65,6 +65,8 @@ private sealed interface Route {
 fun App(
     onGoogleSignIn: suspend () -> Result<String>,
     initialCollectionJson: String? = null,
+    learningEnabled: Boolean = true,
+    onDownloadApk: (() -> Unit)? = null,
 ) {
     val authRepository: AuthRepository = koinInject()
     val authEventBus: AuthEventBus = koinInject()
@@ -171,6 +173,9 @@ fun App(
                                             onSuccess = { idToken ->
                                                 authRepository.loginWithGoogle(idToken).fold(
                                                     onSuccess = {
+                                                        // Token jest już zapisany — odśwież kolekcje,
+                                                        // bo początkowy load z init VM poszedł bez tokenu.
+                                                        collectionsVm.loadCollections()
                                                         backStack.clear()
                                                         backStack.add(Route.Collections)
                                                     },
@@ -194,6 +199,8 @@ fun App(
                                 onCollectionClick = { backStack.add(Route.Flashcards(it)) },
                                 onResumeLearning = { backStack.add(Route.Learning(it)) },
                                 onAddClick = { backStack.add(Route.CollectionForm()) },
+                                showLastStudied = learningEnabled,
+                                onDownloadApk = onDownloadApk,
                             )
                         }
                         entry<Route.Flashcards> { route ->
@@ -202,6 +209,7 @@ fun App(
                                 ?: route.collection
                             FlashcardsScreen(
                                 collection = collection,
+                                showLearningCta = learningEnabled,
                                 actions = object : FlashcardsActions {
                                     override fun onBack() { backStack.removeLastOrNull() }
                                     override fun onStartLearning() { backStack.add(Route.Learning(collection)) }

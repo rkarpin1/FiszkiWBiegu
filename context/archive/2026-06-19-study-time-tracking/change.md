@@ -1,9 +1,10 @@
 ---
 change_id: study-time-tracking
 title: Śledzenie łącznego czasu nauki kolekcji
-status: preparing
+status: archived
 created: 2026-06-19
 updated: 2026-06-19
+archived_at: 2026-06-19T18:57:43Z
 ---
 
 ## Goal

@@ -14,23 +14,59 @@ This is a Kotlin Multiplatform project targeting Android, iOS, Web.
 
 ### Running the apps
 
-Use the run configurations provided by the run widget in your IDE's toolbar. You can also use these commands and options:
+#### Android
+```bash
+./gradlew :androidApp:assembleDebug
+```
 
-- Android app: `./gradlew :androidApp:assembleDebug`
-- Web app:
-  - Wasm target (faster, modern browsers): `./gradlew :webApp:wasmJsBrowserDevelopmentRun`
-  - JS target (slower, supports older browsers): `./gradlew :webApp:jsBrowserDevelopmentRun`
-- iOS app: open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+#### Web — Wasm target (faster, modern browsers)
+```bash
+./gradlew :webApp:wasmJsBrowserDevelopmentRun
+```
+
+#### Web — JS target (slower, supports older browsers)
+```bash
+./gradlew :webApp:jsBrowserDevelopmentRun
+```
+
+#### Web — production build (Wasm) → webApp/build/dist/wasmJs/productionExecutable/
+```bash
+./gradlew :webApp:composeCompatibilityBrowserDistribution
+```
+
+Deploy a dir `webApp/build/dist/composeWebCompatibility/productionExecutable` to a web server
+
+Starts a local dev server with hot reload. Open the URL printed in the console (typically `http://localhost:8080`).
+
+
+iOS: open the [/iosApp](./iosApp) directory in Xcode and run it from there.
 
 ### Running tests
 
-Use the run button in your IDE's editor gutter, or run tests using Gradle tasks:
+#### Shared (all platforms)
+```bash
+./gradlew :shared:test
+```
 
-- Android tests: `./gradlew :shared:testAndroidHostTest`
-- Web tests:
-  - Wasm target: `./gradlew :shared:wasmJsTest`
-  - JS target: `./gradlew :shared:jsTest`
-- iOS tests: `./gradlew :shared:iosSimulatorArm64Test`
+#### Android
+```bash
+./gradlew :shared:testAndroidHostTest
+```
+
+#### Web — Wasm
+```bash
+./gradlew :shared:wasmJsTest
+```
+
+#### Web — JS
+```bash
+./gradlew :shared:jsTest
+```
+
+#### iOS
+```bash
+./gradlew :shared:iosSimulatorArm64Test
+```
 
 ---
 

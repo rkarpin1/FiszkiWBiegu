@@ -2,7 +2,7 @@
 
 [package]
 name = "fiszki-w-biegu-server"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2024"
 
 [dependencies]
@@ -19,6 +19,16 @@ uuid = { version = "1", features = ["v4", "serde"] }
 jsonwebtoken = { version = "10.4.0", features = ["rust_crypto"] }
 dotenv = "0.15"
 reqwest = { version = "0.13", features = ["json", "rustls", "gzip","deflate","brotli"], default-features = false }
+
+[dev-dependencies]
+# Integration tests spin up a real Postgres in Docker. testcontainers manages
+# the container lifecycle; reqwest/sqlx/jsonwebtoken/uuid are reused from deps.
+testcontainers = "0.27.3"
+testcontainers-modules = { version = "0.15.0", features = ["postgres"] }
+# Process-exit hook to remove the shared container (testcontainers removes on Drop,
+# which never runs for a container held in a 'static OnceCell; no Ryuk reaper exists).
+# Destructors live in the `dtor` crate (split out of `ctor` in its 1.0 release).
+dtor = "1.0.5"
 
 [profile.release]
 opt-level = "z"      # optymalizuj pod kątem rozmiaru (alternatywnie "s" dla lepszego balansu)

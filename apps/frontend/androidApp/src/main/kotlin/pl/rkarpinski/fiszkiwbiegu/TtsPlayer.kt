@@ -1,6 +1,8 @@
 package pl.rkarpinski.fiszkiwbiegu
 
 import android.os.Looper
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.SimpleBasePlayer
@@ -26,14 +28,29 @@ class TtsPlayer : SimpleBasePlayer(Looper.getMainLooper()) {
                 .add(COMMAND_PLAY_PAUSE)
                 .add(COMMAND_SEEK_TO_NEXT)
                 .add(COMMAND_SEEK_TO_PREVIOUS)
+                .add(COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)
+                .add(COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM)
                 .add(COMMAND_STOP)
                 .add(COMMAND_GET_CURRENT_MEDIA_ITEM)
                 .build()
         )
         .setPlayWhenReady(isPlayWhenReady, PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST)
         .setPlaybackState(STATE_READY)
+        .setAudioAttributes(
+            AudioAttributes.Builder()
+                .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
+                .setUsage(C.USAGE_MEDIA)
+                .build()
+        )
+        // Bez REPEAT_MODE_ALL seekToNext/Previous z 1-elementową playlistą nie wywołuje handleSeek().
+        .setRepeatMode(Player.REPEAT_MODE_ALL)
         .setPlaylist(
-            ImmutableList.of(MediaItemData.Builder(uid).setMediaItem(currentMediaItem).build())
+            ImmutableList.of(
+                MediaItemData.Builder(uid)
+                    .setMediaItem(currentMediaItem)
+                    .setDurationUs(C.TIME_UNSET)
+                    .build()
+            )
         )
         .setCurrentMediaItemIndex(0)
         .build()
