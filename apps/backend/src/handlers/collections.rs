@@ -8,7 +8,7 @@ use crate::models::{Collection, CollectionRequest, LearningCompleteRequest};
 
 const VALID_LANGUAGES: &[&str] = &["pl", "en", "de", "es", "fr", "it"];
 
-fn validate_languages(src: &str, tgt: &str) -> bool {
+pub(crate) fn validate_languages(src: &str, tgt: &str) -> bool {
     VALID_LANGUAGES.contains(&src) && VALID_LANGUAGES.contains(&tgt) && src != tgt
 }
 

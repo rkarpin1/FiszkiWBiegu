@@ -137,7 +137,7 @@ pub async fn spawn_app_with_deploy_key(deploy_api_key: Option<String>) -> TestAp
         pool.clone(),
         JwtConfig { secret: JWT_SECRET.to_string() },
         GoogleConfig { client_id: "test-client-id".to_string() },
-        AppState { deploy_api_key },
+        AppState { deploy_api_key, translator: None },
     )
     .expect("failed to build server");
 

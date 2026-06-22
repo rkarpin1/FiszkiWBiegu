@@ -15,6 +15,8 @@ data class FlashcardsUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val pendingDeleteId: String? = null,
+    val isTranslating: Boolean = false,
+    val translationError: String? = null,
 )
 
 class FlashcardsViewModel(
@@ -89,6 +91,36 @@ class FlashcardsViewModel(
             repo.update(flashcard.id, flashcard.sourceText, flashcard.targetText).fold(
                 onSuccess = { loadFlashcards() },
                 onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
+            )
+        }
+    }
+
+    /**
+     * Translate [text] from [sourceLanguage] to [targetLanguage] and hand the
+     * result back via [onResult] so the form can place it in the right field.
+     * The direction is decided by the caller (which field is empty).
+     */
+    fun translate(
+        text: String,
+        sourceLanguage: String,
+        targetLanguage: String,
+        onResult: (String) -> Unit,
+    ) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isTranslating = true, translationError = null) }
+            repo.translate(text, sourceLanguage, targetLanguage).fold(
+                onSuccess = { translated ->
+                    _uiState.update { it.copy(isTranslating = false) }
+                    onResult(translated)
+                },
+                onFailure = {
+                    _uiState.update {
+                        it.copy(
+                            isTranslating = false,
+                            translationError = "Nie udało się przetłumaczyć",
+                        )
+                    }
+                },
             )
         }
     }

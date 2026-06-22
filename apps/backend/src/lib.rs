@@ -5,6 +5,7 @@ pub mod auth;
 pub mod error;
 pub mod handlers;
 pub mod models;
+pub mod translation;
 
 use actix_cors::Cors;
 use actix_web::dev::Server;
@@ -16,8 +17,12 @@ use std::net::TcpListener;
 // Re-export auth helpers used by the binary and by tests (e.g. minting JWTs in tests).
 pub use auth::{create_jwt, Claims, GoogleConfig, JwtConfig};
 
+use translation::Translator;
+
 pub struct AppState {
     pub deploy_api_key: Option<String>,
+    /// Selected translation backend, or `None` when not configured (handler → 503).
+    pub translator: Option<Translator>,
 }
 
 #[get("/info")]
@@ -65,7 +70,8 @@ pub fn register_routes(cfg: &mut web::ServiceConfig) {
             web::resource("/deploy")
                 .app_data(web::PayloadConfig::new(100 * 1024 * 1024))
                 .route(web::post().to(handlers::deploy::deploy)),
-        );
+        )
+        .route("/translate", web::post().to(handlers::translate::translate));
 }
 
 /// Build and start the HTTP server bound to an already-created listener.

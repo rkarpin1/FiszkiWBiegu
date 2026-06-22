@@ -15,3 +15,9 @@ services:
         sync: false
       - key: GOOGLE_CLIENT_ID
         sync: false
+      - key: TRANSLATION_PROVIDER
+        sync: false
+      - key: AZURE_TRANSLATOR_KEY
+        sync: false
+      - key: AZURE_TRANSLATOR_REGION
+        sync: false
