@@ -284,8 +284,8 @@ Brak zmian w bazie danych. Wdrożenie wymaga ustawienia nowych zmiennych env na 
 
 #### Automatyczne
 
-- [x] 1.1 Cache zapytań aktualny: `cargo sqlx prepare`
-- [x] 1.2 Kompilacja release przechodzi: `cargo build --release`
+- [x] 1.1 Cache zapytań aktualny: `cargo sqlx prepare` — c3c906a
+- [x] 1.2 Kompilacja release przechodzi: `cargo build --release` — c3c906a
 
 #### Ręczne
 
@@ -297,7 +297,7 @@ Brak zmian w bazie danych. Wdrożenie wymaga ustawienia nowych zmiennych env na 
 
 #### Automatyczne
 
-- [ ] 2.1 Testy współdzielone przechodzą: `./gradlew :shared:test`
+- [x] 2.1 Testy współdzielone przechodzą: `./gradlew :shared:test`
 
 ### Faza 3: Frontend — UI i ViewModel
 

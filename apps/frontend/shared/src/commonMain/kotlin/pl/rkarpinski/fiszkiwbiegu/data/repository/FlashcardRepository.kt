@@ -6,6 +6,8 @@ import pl.rkarpinski.fiszkiwbiegu.data.api.ApiClient
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardRequest
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardUpdateRequest
+import pl.rkarpinski.fiszkiwbiegu.data.api.TranslateRequest
+import pl.rkarpinski.fiszkiwbiegu.data.api.TranslateResponse
 
 class FlashcardRepository(private val api: ApiClient) {
     suspend fun getAll(collectionId: String): Result<List<FlashcardDto>> = runCatching {
@@ -40,6 +42,12 @@ class FlashcardRepository(private val api: ApiClient) {
     suspend fun getLearningSession(collectionId: String): Result<List<FlashcardDto>> = runCatching {
         val response = api.getLearningSession(collectionId)
         if (response.status.isSuccess()) response.body()
+        else error("HTTP ${response.status.value}")
+    }
+
+    suspend fun translate(sourceText: String, sourceLanguage: String, targetLanguage: String): Result<String> = runCatching {
+        val response = api.translate(TranslateRequest(sourceText, sourceLanguage, targetLanguage))
+        if (response.status.isSuccess()) response.body<TranslateResponse>().translatedText
         else error("HTTP ${response.status.value}")
     }
 }

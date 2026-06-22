@@ -135,3 +135,21 @@ data class LearningCompleteRequest(
     @SerialName("session_minutes")
     val sessionMinutes: Int,
 )
+
+@Serializable
+data class TranslateRequest(
+    @SerialName("source_text")
+    val sourceText: String,
+
+    @SerialName("source_language")
+    val sourceLanguage: String,
+
+    @SerialName("target_language")
+    val targetLanguage: String,
+)
+
+@Serializable
+data class TranslateResponse(
+    @SerialName("translated_text")
+    val translatedText: String,
+)
