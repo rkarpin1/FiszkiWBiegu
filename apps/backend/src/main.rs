@@ -2,21 +2,12 @@
 //   Copyright 2026 (c) Robert Karpiński
 // -------------------------------------------------------------------------------------------------
 
-mod auth;
-pub mod error;
-mod handlers;
-mod models;
+use std::net::TcpListener;
 
-pub struct AppState {
-    pub deploy_api_key: Option<String>,
-}
-
-use actix_cors::Cors;
-use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
-use actix_web::middleware::{Compress, Logger};
 use flexi_logger::{Age, Cleanup, Criterion, DeferredNow, FileSpec, Naming, WriteMode, TS_DASHES_BLANK_COLONS_DOT_BLANK};
 use log::{error, Record};
-use auth::{GoogleConfig, JwtConfig};
+
+use fiszki_w_biegu_server::{run, run_migrations, AppState, GoogleConfig, JwtConfig};
 
 pub fn main_format(
     w: &mut dyn std::io::Write,
@@ -31,16 +22,6 @@ pub fn main_format(
         record.module_path().unwrap_or("<unnamed>"),
         record.args()
     )
-}
-
-
-#[get("/info")]
-async fn info() -> impl Responder {
-    HttpResponse::Ok().body(format!(
-        "{} {}",
-        env!("CARGO_PKG_NAME"),
-        env!("CARGO_PKG_VERSION")
-    ))
 }
 
 #[actix_web::main]
@@ -86,62 +67,22 @@ async fn main() -> std::io::Result<()> {
         error!("PANIC at {location}: {msg}");
     }));
 
-
-
     let pool = sqlx::PgPool::connect(&database_url)
         .await
         .expect("Failed to connect to database");
 
-    sqlx::migrate!("./migrations")
-        .run(&pool)
+    run_migrations(&pool)
         .await
         .expect("Failed to run database migrations");
 
-    let pool = web::Data::new(pool);
-    let jwt_config = web::Data::new(JwtConfig { secret: jwt_secret });
-    let google_config = web::Data::new(GoogleConfig { client_id: google_client_id });
-    let app_state = web::Data::new(AppState { deploy_api_key });
+    let listener = TcpListener::bind(("0.0.0.0", port))?;
 
-    HttpServer::new(move || {
-        let cors = Cors::permissive();
-
-        App::new()
-            .wrap(cors)
-            .wrap(Logger::default())
-            .wrap(Compress::default())
-            .app_data(pool.clone())
-            .app_data(jwt_config.clone())
-            .app_data(google_config.clone())
-            .app_data(app_state.clone())
-            .service(info)
-            .service(
-                web::scope("/auth")
-                    .route("/login", web::post().to(handlers::auth::login))
-                    .route("/me", web::get().to(handlers::auth::me)),
-            )
-            .service(
-                web::scope("/collections")
-                    .route("", web::get().to(handlers::collections::list))
-                    .route("", web::post().to(handlers::collections::create))
-                    .route("/{id}", web::put().to(handlers::collections::update))
-                    .route("/{id}", web::delete().to(handlers::collections::delete))
-                    .route("/{id}/flashcards", web::get().to(handlers::flashcards::list))
-                    .route("/{id}/flashcards", web::post().to(handlers::flashcards::create))
-                    .route("/{id}/learning", web::get().to(handlers::learning::get_session))
-                    .route("/{id}/learning/complete", web::post().to(handlers::collections::learning_complete)),
-            )
-            .service(
-                web::scope("/flashcards")
-                    .route("/{id}", web::put().to(handlers::flashcards::update))
-                    .route("/{id}", web::delete().to(handlers::flashcards::delete)),
-            )
-            .service(
-                web::resource("/deploy")
-                    .app_data(web::PayloadConfig::new(100 * 1024 * 1024))
-                    .route(web::post().to(handlers::deploy::deploy)),
-            )
-    })
-    .bind(("0.0.0.0", port))?
-    .run()
+    run(
+        listener,
+        pool,
+        JwtConfig { secret: jwt_secret },
+        GoogleConfig { client_id: google_client_id },
+        AppState { deploy_api_key },
+    )?
     .await
 }

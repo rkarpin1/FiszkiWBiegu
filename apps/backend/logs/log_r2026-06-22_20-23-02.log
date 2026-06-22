@@ -1,0 +1,2 @@
+[2026-06-22 20:21:24.407781 +02:00] INFO [sqlx_postgres::connection::stream] relation "_sqlx_migrations" already exists, skipping
+[2026-06-22 20:21:24.559571 +02:00] ERROR [fiszki_w_biegu_server] PANIC at src\main.rs:76: Failed to run database migrations: VersionMismatch(1)
