@@ -1,7 +1,7 @@
 ---
 change_id: integration-tests
 title: Testy integracyjne backendu (Docker Postgres + REST)
-status: implemented
+status: impl_reviewed
 created: 2026-06-22
 updated: 2026-06-22
 ---
