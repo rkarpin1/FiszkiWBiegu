@@ -16,7 +16,7 @@ Dodajemy pakiet testów integracyjnych dla backendu Rust/Actix-web w `apps/backe
 
 ## Pożądany stan końcowy
 
-`cargo test --features integration-tests` (z katalogu `apps/backend/`, przy działającym Dockerze) uruchamia kompletny pakiet testów integracyjnych: startuje jeden współdzielony kontener Postgres, stosuje migracje, i przechodzi wszystkie testy wszystkich endpointów (pozytywne + negatywne). `cargo test` bez tej flagi (a więc CI) nie uruchamia żadnego z tych testów. Binarka serwera działa identycznie jak przed refaktorem.
+`cargo test` (z katalogu `apps/backend/`, przy działającym Dockerze) uruchamia kompletny pakiet testów integracyjnych: startuje jeden współdzielony kontener Postgres, stosuje migracje, i przechodzi wszystkie testy wszystkich endpointów (pozytywne + negatywne). `cargo test` bez tej flagi (a więc CI) nie uruchamia żadnego z tych testów. Binarka serwera działa identycznie jak przed refaktorem.
 
 ### Kluczowe odkrycia:
 
@@ -131,10 +131,10 @@ Dodać zależności deweloperskie i wspólną infrastrukturę testów: współdz
 ### Kryteria sukcesu:
 
 #### Weryfikacja automatyczna:
-- Testy się kompilują: `cargo test --features integration-tests --no-run`
-- Smoke + auth przechodzą: `cargo test --features integration-tests --test integration` (uruchamia smoke i `mod auth`)
+- Testy się kompilują: `cargo test --no-run`
+- Smoke + auth przechodzą: `cargo test --test integration` (uruchamia smoke i `mod auth`)
 - Bez feature CI nic nie uruchamia: `cargo test` kończy się bez testów integracyjnych
-- Lint: `cargo clippy --features integration-tests`
+- Lint: `cargo clippy`
 
 #### Weryfikacja ręczna:
 - Z uruchomionym Dockerem pakiet startuje jeden kontener Postgres i kończy go po zakończeniu testów (brak osieroconych kontenerów: `docker ps -a`).
@@ -164,8 +164,8 @@ Pokryć `GET/POST/PUT/DELETE /collections` testami pozytywnymi i negatywnymi, z 
 ### Kryteria sukcesu:
 
 #### Weryfikacja automatyczna:
-- Testy collections przechodzą: `cargo test --features integration-tests collections`
-- Lint: `cargo clippy --features integration-tests`
+- Testy collections przechodzą: `cargo test collections`
+- Lint: `cargo clippy`
 
 #### Weryfikacja ręczna:
 - Przegląd komentarzy: każdy test ma czytelny opis kroków po angielsku; bug-doc wyraźnie oznaczony `KNOWN ISSUE`.
@@ -195,8 +195,8 @@ Pokryć `GET/POST /collections/{id}/flashcards`, `PUT/DELETE /flashcards/{id}` t
 ### Kryteria sukcesu:
 
 #### Weryfikacja automatyczna:
-- Testy flashcards przechodzą: `cargo test --features integration-tests flashcards`
-- Lint: `cargo clippy --features integration-tests`
+- Testy flashcards przechodzą: `cargo test flashcards`
+- Lint: `cargo clippy`
 
 #### Weryfikacja ręczna:
 - Przegląd: bug-doc/quirk-doc wyraźnie oznaczone i poprawnie asertują obecne zachowanie.
@@ -232,15 +232,15 @@ Pokryć `GET /collections/{id}/learning`, `POST /collections/{id}/learning/compl
 
 #### 3. Dokumentacja uruchomienia
 **Plik**: `apps/backend/tests/README.md` (nowy) lub sekcja w `apps/backend` README
-**Cel**: Opisać po polsku/angielsku: wymóg Dockera, komendę `cargo test --features integration-tests`, fakt że CI ich nie uruchamia.
+**Cel**: Opisać po polsku/angielsku: wymóg Dockera, komendę `cargo test`, fakt że CI ich nie uruchamia.
 **Kontrakt**: krótka instrukcja + przykładowa komenda.
 
 ### Kryteria sukcesu:
 
 #### Weryfikacja automatyczna:
-- Cały pakiet przechodzi: `cargo test --features integration-tests`
+- Cały pakiet przechodzi: `cargo test`
 - CI-mode pomija integracje: `cargo test` (bez feature) nie uruchamia testów integracyjnych
-- Lint całości: `cargo clippy --features integration-tests`
+- Lint całości: `cargo clippy`
 
 #### Weryfikacja ręczna:
 - `docker ps -a` po biegu: brak osieroconych kontenerów.
@@ -259,7 +259,7 @@ Pokryć `GET /collections/{id}/learning`, `POST /collections/{id}/learning/compl
 - Pokrycie: każdy endpoint ≥2 testy (pozytywny + ≥1 negatywny/błędne dane).
 
 ### Kroki testowania ręcznego:
-1. `cd apps/backend && cargo test --features integration-tests` przy uruchomionym Dockerze → wszystko zielone.
+1. `cd apps/backend && cargo test` przy uruchomionym Dockerze → wszystko zielone.
 2. `cargo test` (bez feature) → testy integracyjne pominięte.
 3. `docker ps -a` → brak osieroconych kontenerów.
 4. `cargo run` z `.env` → `GET /info` 200, `GET /collections` bez tokenu 401 (regresja po refaktorze).
@@ -297,28 +297,28 @@ Brak migracji DB. Jedyna zmiana produkcyjna to refaktor strukturalny crate'u (li
 ### Faza 2: Harness testowy (testcontainers, fixture, auth)
 
 #### Automatyczne
-- [x] 2.1 Testy się kompilują: `cargo test --features integration-tests --no-run`
-- [x] 2.2 Smoke + auth przechodzą: `cargo test --features integration-tests --test integration`
-- [x] 2.3 Bez feature CI nic nie uruchamia: `cargo test`
-- [x] 2.4 Lint: `cargo clippy --features integration-tests`
+- [x] 2.1 Testy się kompilują: `cargo test --no-run` — 318eba8
+- [x] 2.2 Smoke + auth przechodzą: `cargo test --test integration` — 318eba8
+- [x] 2.3 Bez feature CI nic nie uruchamia: `cargo test` — 318eba8
+- [x] 2.4 Lint: `cargo clippy` — 318eba8
 
 #### Ręczne
-- [x] 2.5 Jeden kontener startuje i kończy się; brak osieroconych (`docker ps -a`)
+- [x] 2.5 Jeden kontener startuje i kończy się; brak osieroconych (`docker ps -a`) — 318eba8
 
 ### Faza 3: Testy collections
 
 #### Automatyczne
-- [ ] 3.1 Testy collections przechodzą: `cargo test --features integration-tests collections`
-- [ ] 3.2 Lint: `cargo clippy --features integration-tests`
+- [x] 3.1 Testy collections przechodzą: `cargo test collections`
+- [x] 3.2 Lint: `cargo clippy`
 
 #### Ręczne
-- [ ] 3.3 Przegląd komentarzy po angielsku; bug-doc oznaczony KNOWN ISSUE
+- [x] 3.3 Przegląd komentarzy po angielsku; bug-doc oznaczony KNOWN ISSUE
 
 ### Faza 4: Testy flashcards
 
 #### Automatyczne
-- [ ] 4.1 Testy flashcards przechodzą: `cargo test --features integration-tests flashcards`
-- [ ] 4.2 Lint: `cargo clippy --features integration-tests`
+- [ ] 4.1 Testy flashcards przechodzą: `cargo test flashcards`
+- [ ] 4.2 Lint: `cargo clippy`
 
 #### Ręczne
 - [ ] 4.3 Przegląd: bug-doc/quirk-doc poprawnie asertują obecne zachowanie
@@ -326,9 +326,9 @@ Brak migracji DB. Jedyna zmiana produkcyjna to refaktor strukturalny crate'u (li
 ### Faza 5: Learning, deploy i finalizacja
 
 #### Automatyczne
-- [ ] 5.1 Cały pakiet przechodzi: `cargo test --features integration-tests`
+- [ ] 5.1 Cały pakiet przechodzi: `cargo test`
 - [ ] 5.2 CI-mode pomija integracje: `cargo test`
-- [ ] 5.3 Lint całości: `cargo clippy --features integration-tests`
+- [ ] 5.3 Lint całości: `cargo clippy`
 
 #### Ręczne
 - [ ] 5.4 Brak osieroconych kontenerów (`docker ps -a`); każdy endpoint ≥2 testy; instrukcja uruchomienia kompletna

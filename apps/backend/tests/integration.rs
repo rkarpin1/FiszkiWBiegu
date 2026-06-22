@@ -1,16 +1,18 @@
 // Single integration-test binary. Every resource suite is a submodule so they all
-// share one Postgres container (started once by `common::shared_pg`). Gated behind
-// the `integration-tests` feature so plain `cargo test` (CI) skips it entirely.
+// share one Postgres container (started once by `common::shared_pg`).
 //
-// Run locally with Docker available:  cargo test --features integration-tests
-#![cfg(feature = "integration-tests")]
+// These tests require a running Docker daemon and are meant to be run locally:
+//   cargo test
+// CI does not run them: the deploy workflow only does `cargo build`, which never
+// compiles test targets or dev-dependencies (testcontainers).
 
 mod auth;
+mod collections;
 mod common;
 
 use common::{client, spawn_app};
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn info_returns_200_and_crate_name() {
     // Arrange: spawn the real server backed by the shared Postgres container.
     let app = spawn_app().await;

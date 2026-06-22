@@ -24,7 +24,7 @@ fn far_future_exp() -> usize {
         + 3600) as usize
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn missing_authorization_header_is_401() {
     // Arrange: a running server.
     let app = spawn_app().await;
@@ -38,7 +38,7 @@ async fn missing_authorization_header_is_401() {
     assert_eq!(resp.status().as_u16(), 401);
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn garbage_bearer_token_is_401() {
     let app = spawn_app().await;
     // Act: send a Bearer value that is not a JWT at all.
@@ -52,7 +52,7 @@ async fn garbage_bearer_token_is_401() {
     assert_eq!(resp.status().as_u16(), 401);
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn token_signed_with_wrong_secret_is_401() {
     let app = spawn_app().await;
     // Arrange: a structurally valid JWT, but signed with a secret the server does not use.
@@ -76,7 +76,7 @@ async fn token_signed_with_wrong_secret_is_401() {
     assert_eq!(resp.status().as_u16(), 401);
 }
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread")]
 async fn token_with_non_uuid_subject_is_401() {
     let app = spawn_app().await;
     // Arrange: correctly signed (right secret) but `sub` is not a UUID.

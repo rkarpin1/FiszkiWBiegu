@@ -1,17 +1,19 @@
 // Shared integration-test infrastructure.
 //
 // One Postgres 16 container is started once per test binary (via a process-global
-// OnceCell) and a single connection pool is shared by every spawned server and by
-// the tests' own DB assertions. Each test spawns the real Actix server in-process
-// on an OS-assigned port. Test isolation relies on every test seeding its own user
-// (unique google_id), because all application endpoints are scoped by user_id.
+// OnceCell) and migrations are applied once against it. Each test then builds its
+// OWN pool and spawns its OWN server on its own (multi-thread) runtime — sharing a
+// pool/server across tokio runtimes is unsafe because sqlx ties a pool's background
+// tasks to the runtime that created it. Only the container (a connection string) is
+// shared. Test isolation relies on each test seeding its own user (unique google_id),
+// because every application endpoint is scoped by user_id.
 
 #![allow(dead_code)] // helpers are shared across resource suites; not every suite uses all of them
 
 use std::net::TcpListener;
 use std::sync::Mutex;
 
-use fiszki_w_biegu_server::{create_jwt, run, AppState, GoogleConfig, JwtConfig};
+use fiszki_w_biegu_server::{create_jwt, run, run_migrations, AppState, GoogleConfig, JwtConfig};
 use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
 use testcontainers::runners::AsyncRunner;
@@ -23,8 +25,7 @@ use uuid::Uuid;
 // Secret the test server validates JWTs with; tests mint tokens using the same value.
 const JWT_SECRET: &str = "test-secret";
 
-// Started once, kept alive for the whole test run. The container handle lives in the
-// static so it is never dropped mid-run; testcontainers cleans it up at process exit.
+// Started once, kept alive for the whole test run.
 static PG: OnceCell<PgShared> = OnceCell::const_new();
 
 // Holds the shared container id so the process-exit hook can remove it.
@@ -44,14 +45,13 @@ fn remove_shared_container() {
 
 struct PgShared {
     _container: ContainerAsync<Postgres>,
-    pool: PgPool,
+    conn_string: String,
 }
 
 async fn shared_pg() -> &'static PgShared {
     PG.get_or_init(|| async {
-        // Start a disposable Postgres container and build the shared pool.
-        // Pin to 16-alpine: matches Supabase's major version and provides the
-        // built-in gen_random_uuid() that migration 001 relies on (absent in <13).
+        // Start a disposable Postgres container. Pin to 16-alpine: matches Supabase's
+        // major version and provides the built-in gen_random_uuid() migration 001 needs.
         let container = Postgres::default()
             .with_tag("16-alpine")
             .start()
@@ -61,23 +61,25 @@ async fn shared_pg() -> &'static PgShared {
             .get_host_port_ipv4(5432)
             .await
             .expect("failed to resolve mapped port");
+
         // Record the id so the process-exit hook can force-remove the container.
         *CONTAINER_ID.lock().unwrap() = Some(container.id().to_string());
 
-        let conn = format!("postgres://postgres:postgres@127.0.0.1:{port}/postgres");
+        let conn_string = format!("postgres://postgres:postgres@127.0.0.1:{port}/postgres");
 
-        let pool = PgPoolOptions::new()
-            .max_connections(20)
-            .connect(&conn)
+        // Apply all migrations exactly once, using a short-lived pool that is dropped
+        // here (so it never outlives this init runtime).
+        let migrator_pool = PgPoolOptions::new()
+            .max_connections(2)
+            .connect(&conn_string)
             .await
-            .expect("failed to connect shared pool");
-
-        // Apply all migrations once against the fresh database.
-        fiszki_w_biegu_server::run_migrations(&pool)
+            .expect("failed to connect migrator pool");
+        run_migrations(&migrator_pool)
             .await
             .expect("failed to run migrations");
+        migrator_pool.close().await;
 
-        PgShared { _container: container, pool }
+        PgShared { _container: container, conn_string }
     })
     .await
 }
@@ -109,7 +111,8 @@ impl TestApp {
     }
 }
 
-/// Spawn the real server in-process, backed by the shared Postgres container.
+/// Spawn the real server in-process on this test's own runtime, with its own pool,
+/// backed by the shared Postgres container.
 pub async fn spawn_app() -> TestApp {
     spawn_app_with_deploy_key(None).await
 }
@@ -117,7 +120,13 @@ pub async fn spawn_app() -> TestApp {
 /// Variant that lets deploy tests configure the deploy API key.
 pub async fn spawn_app_with_deploy_key(deploy_api_key: Option<String>) -> TestApp {
     let shared = shared_pg().await;
-    let pool = shared.pool.clone();
+
+    // Per-test pool, created on this test's runtime (no cross-runtime sharing).
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&shared.conn_string)
+        .await
+        .expect("failed to connect test pool");
 
     // Bind to port 0 so the OS hands us a free port; read it back before serving.
     let listener = TcpListener::bind("127.0.0.1:0").expect("failed to bind test listener");
