@@ -1,0 +1,9 @@
+### Azure Translator — proxy odwzorowany z translation.rs (AzureTranslator::translate)
+POST https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=pl&to=en
+Ocp-Apim-Subscription-Key:
+Ocp-Apim-Subscription-Region: germanywestcentral
+Content-Type: application/json; charset=UTF-8
+
+[{ "Text": "Witaj świecie" }]
+
+###

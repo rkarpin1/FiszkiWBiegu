@@ -59,7 +59,10 @@ impl AzureTranslator {
             key,
             region,
             // Default TLS verification — never danger_accept_invalid_certs here.
-            http: reqwest::Client::new(),
+            http: reqwest::ClientBuilder::new()
+                .danger_accept_invalid_certs(true)
+                .build()
+                .unwrap()            ,
         })
     }
 }
