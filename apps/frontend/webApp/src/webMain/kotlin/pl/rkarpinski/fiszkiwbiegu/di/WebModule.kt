@@ -3,6 +3,8 @@ package pl.rkarpinski.fiszkiwbiegu.di
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.dsl.module
+import pl.rkarpinski.fiszkiwbiegu.NetworkChecker
+import pl.rkarpinski.fiszkiwbiegu.WebNetworkChecker
 import pl.rkarpinski.fiszkiwbiegu.data.api.CollectionDto
 import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 import pl.rkarpinski.fiszkiwbiegu.domain.Rating
@@ -23,4 +25,5 @@ private object NoOpLearningController : LearningController {
 
 val webModule = module {
     single<LearningController> { NoOpLearningController }
+    single<NetworkChecker> { WebNetworkChecker() }
 }
