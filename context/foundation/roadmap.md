@@ -3,7 +3,7 @@ project: "FiszkiWBiegu"
 version: 1
 status: draft
 created: 2026-05-27
-updated: 2026-05-30
+updated: 2026-06-23
 prd_version: 1
 main_goal: market-feedback
 top_blocker: decisions
@@ -311,4 +311,4 @@ _(brak aktywnych pytań — wszystkie zablokowane przez F-01/S-02 zostały rozwi
 - **S-16: box-to-button — Box+clickable → Button composables** — Zarchiwizowano 2026-06-19 → `context/archive/2026-06-19-box-to-button/`. Lekcja: —.
 - **S-17: web-crud-service — serwis webowy CRUD (WASM/JS)** — Zarchiwizowano 2026-06-22 → `context/archive/2026-06-19-web-crud-service/`. Lekcja: —.
 - **S-19: integration-tests — testy integracyjne backendu (testcontainers)** — Zarchiwizowano 2026-06-22 → `context/archive/2026-06-22-integration-tests/`. Lekcja: —.
-- **S-18: flashcard-translate — przycisk „Przetłumacz" + endpoint `/translate`** — Zrealizowano 2026-06-22 (status: implemented; jeszcze niezarchiwizowane → `context/changes/flashcard-translate/`). Lekcja: —.
+- **S-18: flashcard-translate — przycisk „Przetłumacz" + endpoint `/translate`** — Zarchiwizowano 2026-06-23 → `context/archive/2026-06-22-flashcard-translate/`. Lekcja: —.
