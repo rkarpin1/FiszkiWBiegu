@@ -1,0 +1,631 @@
+openapi: 3.1.0
+info:
+  title: FiszkiWBiegu API
+  version: 0.1.8
+  description: |
+    REST API for FiszkiWBiegu — an audio flashcard app for runners
+    (PL↔EN vocabulary, hands-free).
+
+    Backend: Rust / Actix-web. Database: Supabase (PostgreSQL) via `sqlx`.
+
+    ## Authentication
+    All endpoints except `POST /auth/login`, `GET /info`, and `POST /deploy`
+    require an `Authorization: Bearer <jwt>` header. The JWT (HS256) is issued
+    by `/auth/login` and valid for 30 days.
+
+    ## Errors
+    All error responses share a single shape: `{ "error": "<message>" }`.
+
+    ## Language codes
+    Accepted: `pl`, `en`, `de`, `es`, `fr`, `it`. The backend enforces source ≠ target.
+servers:
+  - url: http://localhost:8080
+    description: Local development server (default port 8080, configurable via PORT)
+
+tags:
+  - name: meta
+    description: Server metadata
+  - name: auth
+    description: Authentication and user profile
+  - name: collections
+    description: Flashcard collections
+  - name: flashcards
+    description: Flashcards
+  - name: learning
+    description: Learning session
+  - name: translate
+    description: Text translation (proxy to an external provider)
+  - name: ops
+    description: Deployment operations
+
+security:
+  - bearerAuth: []
+
+paths:
+  /info:
+    get:
+      tags: [meta]
+      summary: Server name and version
+      security: []
+      responses:
+        "200":
+          description: Text in the format `<name> <version>`
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: fiszki-w-biegu-server 0.1.8
+
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: Google login (id_token → JWT)
+      description: |
+        Validates the Google `id_token` via the tokeninfo endpoint, creates or
+        updates the user (upsert on `google_id`), and returns an application JWT.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Application JWT
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                required: [token]
+        "401":
+          description: Invalid Google token or audience (`aud`) mismatch
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "500":
+          description: Database error or token generation failure
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /auth/me:
+    get:
+      tags: [auth]
+      summary: Profile of the authenticated user
+      responses:
+        "200":
+          description: Profile data
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserDto" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /collections:
+    get:
+      tags: [collections]
+      summary: List the user's collections
+      description: Sorted by `created_at` descending.
+      responses:
+        "200":
+          description: List of collections
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Collection" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      tags: [collections]
+      summary: Create a collection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CollectionRequest" }
+      responses:
+        "201":
+          description: Created collection
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Collection" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /collections/{id}:
+    parameters:
+      - $ref: "#/components/parameters/CollectionId"
+    put:
+      tags: [collections]
+      summary: Update a collection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CollectionRequest" }
+      responses:
+        "200":
+          description: Updated collection
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Collection" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    delete:
+      tags: [collections]
+      summary: Delete a collection
+      description: Cascades and deletes all flashcards in the collection.
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /collections/{id}/flashcards:
+    parameters:
+      - $ref: "#/components/parameters/CollectionId"
+    get:
+      tags: [flashcards]
+      summary: List flashcards in a collection
+      description: Sorted by `position` ascending.
+      responses:
+        "200":
+          description: List of flashcards
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Flashcard" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      tags: [flashcards]
+      summary: Add a flashcard
+      description: |
+        `position` is assigned automatically as `max(position)+1`
+        within the collection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FlashcardRequest" }
+      responses:
+        "201":
+          description: Created flashcard
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Flashcard" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /collections/{id}/learning:
+    parameters:
+      - $ref: "#/components/parameters/CollectionId"
+    get:
+      tags: [learning]
+      summary: Flashcards for a learning session
+      description: Ordered flashcards of the collection (by `position`) for a learning session.
+      responses:
+        "200":
+          description: List of flashcards for learning
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Flashcard" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /collections/{id}/learning/complete:
+    parameters:
+      - $ref: "#/components/parameters/CollectionId"
+    post:
+      tags: [learning]
+      summary: Record the result of a completed learning session
+      description: |
+        Sets `last_studied` to now, stores `progress`, and adds
+        `session_minutes` to `total_study_minutes`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LearningCompleteRequest" }
+      responses:
+        "204":
+          description: Saved
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /flashcards/{id}:
+    parameters:
+      - $ref: "#/components/parameters/FlashcardId"
+    put:
+      tags: [flashcards]
+      summary: Update a flashcard
+      description: |
+        Partial update — any omitted (null) field keeps its current value.
+        Ownership is verified through the parent collection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FlashcardUpdateRequest" }
+      responses:
+        "200":
+          description: Updated flashcard
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Flashcard" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    delete:
+      tags: [flashcards]
+      summary: Delete a flashcard
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /translate:
+    post:
+      tags: [translate]
+      summary: Translate text
+      description: |
+        Proxy to the configured translation provider (Azure Translator by default).
+        API keys never reach the client. Language codes are validated as in
+        collections (from the accepted set, source ≠ target).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TranslateRequest" }
+      responses:
+        "200":
+          description: Translated text
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TranslateResponse" }
+        "400":
+          description: Blank `source_text`
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/Unprocessable"
+        "503":
+          description: Translation not configured or provider unavailable
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /deploy:
+    post:
+      tags: [ops]
+      summary: Deploy a new binary (self-update)
+      description: |
+        Accepts a new server binary (up to 100 MB), swaps the executable, and
+        restarts the process. Authorized via the `X-Deploy-Key` header
+        (NOT via JWT). Available only when `DEPLOY_API_KEY` is set.
+      security: []
+      parameters:
+        - name: X-Deploy-Key
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: Deployment started; the process will restart in ~500 ms
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: deploying
+        "400":
+          description: Empty payload
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "401":
+          description: Invalid deploy key
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "500":
+          $ref: "#/components/responses/ServerError"
+        "503":
+          description: Deploy endpoint not configured
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    CollectionId:
+      name: id
+      in: path
+      required: true
+      description: Collection UUID
+      schema:
+        type: string
+        format: uuid
+    FlashcardId:
+      name: id
+      in: path
+      required: true
+      description: Flashcard UUID
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    Unauthorized:
+      description: Missing / invalid / expired token
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: Resource does not exist or does not belong to the user
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Unprocessable:
+      description: Invalid data (blank name or invalid/identical language codes)
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    ServerError:
+      description: Database / internal error
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    LanguageCode:
+      type: string
+      enum: [pl, en, de, es, fr, it]
+
+    LoginRequest:
+      type: object
+      properties:
+        id_token:
+          type: string
+          description: Google id_token from the Sign-In flow
+      required: [id_token]
+
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        display_name:
+          type: [string, "null"]
+        streak_days:
+          type: integer
+      required: [id, email, streak_days]
+
+    Collection:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        source_language:
+          $ref: "#/components/schemas/LanguageCode"
+        target_language:
+          $ref: "#/components/schemas/LanguageCode"
+        created_at:
+          type: string
+          format: date-time
+        last_studied:
+          type: [string, "null"]
+          format: date-time
+        progress:
+          type: number
+          format: double
+          description: Learning progress (0.0–1.0)
+        total_study_minutes:
+          type: integer
+        flashcard_count:
+          type: integer
+          format: int64
+          description: Number of flashcards in the collection (computed)
+      required:
+        - id
+        - user_id
+        - name
+        - description
+        - source_language
+        - target_language
+        - created_at
+        - progress
+        - total_study_minutes
+        - flashcard_count
+
+    CollectionRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Non-blank name (after trimming whitespace)
+        description:
+          type: string
+        source_language:
+          $ref: "#/components/schemas/LanguageCode"
+        target_language:
+          $ref: "#/components/schemas/LanguageCode"
+      required: [name, description, source_language, target_language]
+
+    LearningCompleteRequest:
+      type: object
+      properties:
+        progress:
+          type: number
+          format: float
+          description: Learning progress (0.0–1.0)
+        session_minutes:
+          type: integer
+          description: Session duration in minutes, added to total_study_minutes
+      required: [progress, session_minutes]
+
+    Flashcard:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        collection_id:
+          type: string
+          format: uuid
+        source_text:
+          type: string
+        target_text:
+          type: string
+        position:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        srs_level:
+          type: number
+          format: float
+          description: SRS (spaced repetition) level
+        last_studied_at:
+          type: [string, "null"]
+          format: date-time
+      required:
+        - id
+        - collection_id
+        - source_text
+        - target_text
+        - position
+        - created_at
+        - srs_level
+
+    FlashcardRequest:
+      type: object
+      properties:
+        source_text:
+          type: string
+        target_text:
+          type: string
+      required: [source_text, target_text]
+
+    FlashcardUpdateRequest:
+      type: object
+      description: Partial update — omitted fields are left unchanged.
+      properties:
+        source_text:
+          type: [string, "null"]
+        target_text:
+          type: [string, "null"]
+        srs_level:
+          type: [number, "null"]
+          format: float
+        last_studied_at:
+          type: [string, "null"]
+          format: date-time
+
+    TranslateRequest:
+      type: object
+      properties:
+        source_text:
+          type: string
+        source_language:
+          $ref: "#/components/schemas/LanguageCode"
+        target_language:
+          $ref: "#/components/schemas/LanguageCode"
+      required: [source_text, source_language, target_language]
+
+    TranslateResponse:
+      type: object
+      properties:
+        translated_text:
+          type: string
+      required: [translated_text]

@@ -41,6 +41,17 @@ Biegacze tracą dziesiątki godzin miesięcznie, które mogłyby być poświęco
 | S-06   | rename-flashcard-fields    | przemianowanie pól fiszki: `polish_text`→`source_text`, `english_text`→`target_text` w DB, API i całym frontendzie | S-05 | — | done |
 | S-07   | frontend-improvements      | zmiany i optymalizacje w UI lub kodzie frontendu; realizowane etapami, zamknięte przez impl-review | S-06 | — | done |
 | S-08   | material-design-3          | kompatybilność aplikacji z Material Design 3 — przegląd i dostosowanie komponentów UI              | S-07 | — | done    |
+| S-09   | srs-learning               | ocenić znajomość słowa (3 poziomy) i mieć słowa kolejkowane algorytmem SRS w sesji nauki           | S-08 | — | done    |
+| S-10   | srs-learning-2             | srs_level słów zanika wg krzywej zapominania na podstawie czasu od ostatniej nauki (`last_studied_at`) | S-09 | — | done |
+| S-11   | study-time-tracking        | widzieć łączny czas nauki kolekcji (`total_study_minutes`, format „X dn Y min")                    | S-09 | — | done    |
+| S-12   | headphone-buttons          | oceniać fiszkę przyciskami NEXT/PREV słuchawek (Bluetooth AVRCP + przewodowe) w trybie nauki       | S-09 | FR-013 | done |
+| S-13   | srs-local-refresh          | widzieć zaktualizowany poziom SRS bieżącej fiszki natychmiast po ocenie (lokalny refresh)          | S-09 | — | done    |
+| S-14   | learning-start-bug         | (bugfix) niezawodny start odtwarzania po wejściu na ekran nauki                                    | S-09 | — | done    |
+| S-15   | back-stack-leak            | (bugfix) poprawny back stack po wyjściu z trybu nauki przez powiadomienie                          | S-08 | — | done    |
+| S-16   | box-to-button              | (refaktor) prawdziwe Button/IconButton zamiast Box+clickable, bez zmiany wyglądu                   | S-08 | — | done    |
+| S-17   | web-crud-service           | zarządzać kolekcjami i fiszkami (CRUD + logowanie Google) z przeglądarki (WASM/JS), bez trybu nauki | S-01 | — | done   |
+| S-18   | flashcard-translate        | przetłumaczyć tekst fiszki przyciskiem „Przetłumacz" (proxy `POST /translate` → Azure Translator)  | S-17 | — | done    |
+| S-19   | integration-tests          | (jakość) testy integracyjne backendu — Docker Postgres (testcontainers) + REST, wszystkie endpointy | S-08 | — | done   |
 
 ## Strumienie
 
@@ -53,14 +64,14 @@ Pomoc nawigacyjna — grupuje elementy, które dzielą łańcuch wymagań wstęp
 
 ## Baza
 
-Co już jest na miejscu w bazie kodu na dzień 2026-05-29 (automatycznie zbadane + potwierdzone przez użytkownika).
+Co już jest na miejscu w bazie kodu na dzień 2026-06-23 (automatycznie zbadane + potwierdzone przez użytkownika).
 Fundamenty poniżej zakładają, że te elementy są obecne i NIE tworzą ich ponownie.
 
 - **Frontend:** obecny — Compose Multiplatform + Material3 + design system Dawn Run (paleta, czcionki Bricolage/JetBrains Mono); routing navigation3-compose (App.kt, mutableStateListOf backstack); 7 ekranów: LoginScreen, CollectionsScreen, FlashcardsScreen, LearningScreen, ProfileScreen, CollectionFormScreen, CardFormScreen; bottom-tab bar (Kolekcje / Konto); moduły androidApp i webApp
-- **Backend / API:** obecny — Actix-web 4.13; auth JWT (Google OAuth); endpointy: POST /auth/login; GET|POST /collections, PUT|DELETE /collections/{id}; GET|POST /collections/{id}/flashcards, GET /collections/{id}/learning; PUT|DELETE /flashcards/{id}; walidacja: kody języka (pl/en/de/es/fr/it), source ≠ target, nazwa niepusta (422)
-- **Dane:** częściowy — sqlx + PostgreSQL (backend); migracje: `001_init` (collections + flashcards, indeksy), `002_add_users` (tabela users + FK collections→users), `003_add_languages` (source/target_language w collections), `004_add_description` (description w collections), `005_add_user_profile` (display_name, streak_days w users), `006_add_collection_tracking` (last_studied, progress, flashcard_count w collections), `007_rename_flashcard_columns` (polish_text→source_text, english_text→target_text; S-06); schemat: `users(google_id, email, display_name, streak_days)`, `collections(user_id, name, description, source_language, target_language, last_studied, progress, flashcard_count)`, `flashcards(collection_id, source_text, target_text, position)`; BRAK lokalnego cache fiszek we frontendzie (dane sieciowe); token JWT persistowany przez multiplatform-settings
+- **Backend / API:** obecny — Actix-web 4.13 (v0.1.8); auth JWT (Google OAuth, 30 dni); endpointy: GET /info; POST /auth/login, GET /auth/me; GET|POST /collections, PUT|DELETE /collections/{id}; GET|POST /collections/{id}/flashcards, GET /collections/{id}/learning, POST /collections/{id}/learning/complete; PUT|DELETE /flashcards/{id}; POST /translate (proxy do Azure Translator, 503 gdy nieskonfigurowane); POST /deploy (self-update binarium, auth X-Deploy-Key); walidacja: kody języka (pl/en/de/es/fr/it), source ≠ target, nazwa niepusta (422); pełna specyfikacja: `context/docs/openapi.yaml`. Testy integracyjne w `apps/backend/tests/` (testcontainers + Docker Postgres)
+- **Dane:** obecny — sqlx + PostgreSQL (backend); migracje 001–010 (następna: 011): `001_init`, `002_add_users`, `003_add_languages`, `004_add_description`, `005_add_user_profile`, `006_add_collection_tracking`, `007_rename_flashcard_columns` (polish_text→source_text, english_text→target_text; S-06), `008_add_srs_level`, `009_add_last_studied_at`, `010_add_total_study_minutes`; schemat: `users(google_id, email, display_name, streak_days)`, `collections(user_id, name, description, source_language, target_language, last_studied, progress, total_study_minutes)` — `flashcard_count` liczone per zapytanie, nie kolumna, `flashcards(collection_id, source_text, target_text, position, srs_level, last_studied_at)`; pełny schemat: `context/docs/database.md`; lokalny cache fiszek offline obecny (F-01, Android); token JWT persistowany przez multiplatform-settings
 - **Autoryzacja:** obecna — backend: Google id_token validation (`auth.rs`), JWT issue/verify, `AuthUser` extractor na trasach; frontend: `GoogleSignInHelper.kt` (Android Credential Manager), `AuthRepository.kt` (login/logout/isLoggedIn + token storage), `AuthEventBus.kt` (unauthorizedEvents → auto-logout), `LoginScreen.kt`
-- **Wdrożenie / infra:** częściowe — GitHub Actions CI: backend (`cargo build --release` + `cargo test` na push/PR do master); BRAK pipeline CI dla frontendu (APK budowany lokalnie); backend: auto-deploy via Render.com (`render.yaml`, Frankfurt, starter plan, `healthCheckPath: /health`); env vars w panelu Render: DATABASE_URL, JWT_SECRET, GOOGLE_CLIENT_ID; BRAK Dockerfile (Render używa natywnego runtime Rust)
+- **Wdrożenie / infra:** obecne — backend wdrażany na własny serwer (self-hosted) przez self-update: GitHub Actions (`.github/workflows/backend-deploy.yml`, wyzwalane zmianą `apps/backend/Cargo.toml` na master) buduje statyczne binarium musl (`x86_64-unknown-linux-musl`, strip) i wysyła je `POST` na endpoint `/deploy` (sekrety `DEPLOY_URL`, `DEPLOY_API_KEY`; nagłówek `X-Deploy-Key`); serwer podmienia plik wykonywalny i restartuje proces; `SQLX_OFFLINE=true` + committed `.sqlx/`; BRAK pipeline CI dla frontendu (APK budowany lokalnie); env vars na serwerze: DATABASE_URL, JWT_SECRET, GOOGLE_CLIENT_ID, TRANSLATION_PROVIDER, AZURE_TRANSLATOR_KEY, AZURE_TRANSLATOR_REGION, DEPLOY_API_KEY; `render.yaml` jest nieaktualny/nieużywany (Render porzucony)
 - **Obserwowalność:** minimalna — backend: wyłącznie `eprintln!` na błędach DB/JWT (13 miejsc w handlerach); brak `tracing`/`log`; logi dostępne w panelu Render.com; frontend: brak Crashlytics / Sentry; brak metryk, alertów ani dashboardu
 
 ## Fundamenty
@@ -290,3 +301,14 @@ _(brak aktywnych pytań — wszystkie zablokowane przez F-01/S-02 zostały rozwi
 - **S-06: przemianowanie pól fiszki — `polish_text`→`source_text`, `english_text`→`target_text` w DB, API i całym frontendzie** — Zarchiwizowano 2026-05-29 → `context/archive/2026-05-29-rename-flashcard-fields/`. Lekcja: —.
 - **S-07: zmiany i optymalizacje w UI lub kodzie frontendu** — Zrealizowano 2026-05-29. Lekcja: —.
 - **#5: Rozszerzenie na wiele języków** — Zrealizowano 2026-05-29.
+- **S-09: srs-learning — algorytm SRS do kolejkowania słów (3 poziomy oceny)** — Zarchiwizowano 2026-06-18 → `context/archive/2026-06-18-srs-learning/`. Lekcja: —.
+- **S-10: srs-learning-2 — decay srs_level wg krzywej zapominania** — Zarchiwizowano 2026-06-18 → `context/archive/2026-06-18-srs-learning-2/`. Lekcja: —.
+- **S-11: study-time-tracking — `total_study_minutes` per kolekcja** — Zarchiwizowano 2026-06-19 → `context/archive/2026-06-19-study-time-tracking/`. Lekcja: —.
+- **S-12: headphone-buttons — NEXT/PREV słuchawek oceniają fiszkę** — Zarchiwizowano 2026-06-19 → `context/archive/2026-06-19-headphone-buttons/`. Lekcja: —.
+- **S-13: srs-local-refresh — lokalna aktualizacja SRS po ocenie** — Zarchiwizowano 2026-06-19 → `context/archive/2026-06-19-srs-local-refresh/`. Lekcja: —.
+- **S-14: learning-start-bug — naprawa startu odtwarzania** — Zarchiwizowano 2026-06-19 → `context/archive/2026-06-19-learning-start-bug/`. Lekcja: —.
+- **S-15: back-stack-leak — poprawny back stack po powiadomieniu** — Zarchiwizowano 2026-06-19 → `context/archive/2026-06-19-back-stack-leak/`. Lekcja: —.
+- **S-16: box-to-button — Box+clickable → Button composables** — Zarchiwizowano 2026-06-19 → `context/archive/2026-06-19-box-to-button/`. Lekcja: —.
+- **S-17: web-crud-service — serwis webowy CRUD (WASM/JS)** — Zarchiwizowano 2026-06-22 → `context/archive/2026-06-19-web-crud-service/`. Lekcja: —.
+- **S-19: integration-tests — testy integracyjne backendu (testcontainers)** — Zarchiwizowano 2026-06-22 → `context/archive/2026-06-22-integration-tests/`. Lekcja: —.
+- **S-18: flashcard-translate — przycisk „Przetłumacz" + endpoint `/translate`** — Zrealizowano 2026-06-22 (status: implemented; jeszcze niezarchiwizowane → `context/changes/flashcard-translate/`). Lekcja: —.
