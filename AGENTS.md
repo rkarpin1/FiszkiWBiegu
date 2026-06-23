@@ -21,39 +21,17 @@ Full layout and run instructions: `@README.md`.
 - `apps/frontend/webApp/` — Web target (WASM + JS fallback); CRUD only, no learning mode
 - `apps/frontend/iosApp/` — iOS Xcode project (out of MVP scope)
 
-## DB Schema (current, after all migrations)
+## DB Schema
 
-```
-users(id, google_id, email, display_name, streak_days, created_at)
-collections(id, user_id, name, description, source_language, target_language, last_studied, progress, total_study_minutes, created_at)
-flashcards(id, collection_id, source_text, target_text, position, srs_level, last_studied_at, created_at)
-```
+Tables: `users`, `collections`, `flashcards`. Full schema (columns, types, FKs): `@context/docs/database.md`.
 
 `flashcard_count` is not a column — the backend computes it per query as `COUNT(*)`.
 
-Migrations live in `apps/backend/migrations/`. Next migration number: **011**. Full schema + history: `@context/docs/database.md`.
+Migrations live in `apps/backend/migrations/`. Next migration number: **011**.
 
 ## API Endpoints
 
-All endpoints require `Authorization: Bearer <jwt>` except `GET /info`, `POST /auth/login`, and `POST /deploy` (the last uses the `X-Deploy-Key` header). Full spec: `@context/docs/openapi.yaml`.
-
-```
-GET    /info                                — server name + version (public)
-POST   /auth/login                          — Google id_token → JWT
-GET    /auth/me                             — UserDto (display_name, streak_days)
-GET    /collections                         — list user's collections
-POST   /collections                         — create collection
-PUT    /collections/{id}                    — update collection
-DELETE /collections/{id}                    — delete collection
-GET    /collections/{id}/flashcards         — list flashcards
-POST   /collections/{id}/flashcards         — create flashcard
-GET    /collections/{id}/learning           — ordered flashcards for learning session
-POST   /collections/{id}/learning/complete  — record session result (progress, minutes)
-PUT    /flashcards/{id}                     — update flashcard
-DELETE /flashcards/{id}                     — delete flashcard
-POST   /translate                           — translate text via provider (Azure default); 503 if unconfigured
-POST   /deploy                              — self-update binary (X-Deploy-Key auth)
-```
+All endpoints require `Authorization: Bearer <jwt>` except `GET /info`, `POST /auth/login`, and `POST /deploy` (the last uses the `X-Deploy-Key` header). Full endpoint list + spec: `@context/docs/openapi.yaml`.
 
 ## Build, Test, and Dev Commands
 
