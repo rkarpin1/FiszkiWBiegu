@@ -1,4 +1,4 @@
 package pl.rkarpinski.fiszkiwbiegu
 
-/** Pobiera plik APK aplikacji na Androida (same-origin, więc atrybut download działa). */
+/** Pobiera plik APK aplikacji na Androida (jako blob z MIME apk, by uniknąć zapisu jako .zip). */
 expect fun downloadApk()
