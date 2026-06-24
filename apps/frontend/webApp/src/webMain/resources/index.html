@@ -71,14 +71,28 @@
             card.appendChild(btnHost);
             card.appendChild(cancel);
             overlay.appendChild(card);
-            overlay.addEventListener('click', function(e) {
-                if (e.target === overlay) {
-                    _removeGsiOverlay();
-                    onError('Logowanie anulowane.');
-                }
-            });
             document.body.appendChild(overlay);
             _gsiOverlay = overlay;
+
+            // Zamknięcie przez kliknięcie w tło — odporne na "ghost click".
+            // Compose (WASM) renderuje UI na <canvas>; tap w przycisk tworzy tę nakładkę
+            // synchronicznie, a przeglądarka mobilna emituje jeszcze osobny `click` w tym
+            // samym punkcie, który trafia w świeżo wstawioną nakładkę i natychmiast ją zamyka
+            // ("okienko miga"). Zabezpieczenie: zamykamy tylko gdy tło dostało WŁASNE
+            // `pointerdown` przed `click` (ghost click ma pointerdown sprzed istnienia nakładki,
+            // więc `armed` zostaje false). setTimeout to dodatkowy bufor czasowy.
+            var armed = false;
+            overlay.addEventListener('pointerdown', function(e) {
+                if (e.target === overlay) armed = true;
+            });
+            setTimeout(function() {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay && armed) {
+                        _removeGsiOverlay();
+                        onError('Logowanie anulowane.');
+                    }
+                });
+            }, 350);
 
             google.accounts.id.renderButton(btnHost, {
                 type: 'standard',

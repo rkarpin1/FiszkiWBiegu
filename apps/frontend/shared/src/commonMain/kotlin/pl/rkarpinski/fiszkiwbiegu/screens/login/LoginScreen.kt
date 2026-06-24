@@ -5,14 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -41,106 +39,87 @@ fun LoginScreen(
 ) {
     FiszkiThemedScreen(naturalDark = isSystemInDarkTheme()) {
         val scheme = MaterialTheme.colorScheme
-        // BoxWithConstraints + heightIn(min = maxHeight) + SpaceBetween: w pionie treść mieści się,
-        // więc przyciski są przyklejone do dołu; w poziomie (niski viewport) treść jest wyższa od
-        // ekranu i verticalScroll pozwala ją przewinąć — przyciski pozostają osiągalne.
-        // (Modifier.weight wewnątrz verticalScroll kolapsuje do 0 i nie przykleja przycisków.)
-        BoxWithConstraints(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(scheme.background),
+                .background(scheme.background)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 28.dp),
         ) {
-            val viewportHeight = maxHeight
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-            ) {
-                Column(
+            Spacer(Modifier.height(56.dp))
+
+            // Brand mark
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = viewportHeight)
-                        .padding(horizontal = 28.dp),
-                    verticalArrangement = Arrangement.SpaceBetween,
+                        .size(34.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .background(scheme.primary),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Column {
-                        Spacer(Modifier.height(56.dp))
-
-                        // Brand mark
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .size(34.dp)
-                                    .clip(MaterialTheme.shapes.small)
-                                    .background(scheme.primary),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                ) {
-                                    repeat(3) {
-                                        Box(Modifier.width(18.dp).height(2.dp).background(scheme.onPrimary))
-                                    }
-                                }
-                            }
-                            Spacer(Modifier.width(10.dp))
-                            Text(
-                                "FiszkiWBiegu",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = scheme.onBackground,
-                            )
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        repeat(3) {
+                            Box(Modifier.width(18.dp).height(2.dp).background(scheme.onPrimary))
                         }
-
-                        Spacer(Modifier.height(48.dp))
-
-                        // Hero copy
-                        CapsLabel("// ZACZNIJ W 5 SEKUND", color = scheme.secondary)
-                        Spacer(Modifier.height(12.dp))
-                        Text(
-                            "Wejdź\ni ruszaj.",
-                            style = MaterialTheme.typography.displayMedium,
-                            color = scheme.onBackground,
-                        )
-                        Spacer(Modifier.height(12.dp))
-                        Text(
-                            "Słuchaj fiszek podczas biegu. Bez ekranu, bez rozpraszania.",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = scheme.onSurfaceVariant,
-                        )
-                    }
-
-                    Column {
-                        Spacer(Modifier.height(24.dp))
-
-                        if (error != null) {
-                            Text(
-                                text = error,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = scheme.error,
-                            )
-                            Spacer(Modifier.height(12.dp))
-                        }
-
-                        if (isLoading) {
-                            Box(
-                                modifier = Modifier.fillMaxWidth().height(60.dp),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                CircularProgressIndicator(color = scheme.primary)
-                            }
-                        } else {
-                            AuthButton(label = "Kontynuuj z Google", enabled = true, onClick = onSignInClick)
-                            Spacer(Modifier.height(10.dp))
-                            AuthButton(label = "Kontynuuj z Apple", enabled = false, onClick = {})
-                            Spacer(Modifier.height(10.dp))
-                            AuthButton(label = "Kontynuuj z Facebook", enabled = false, onClick = {})
-                        }
-
-                        Spacer(Modifier.height(40.dp))
                     }
                 }
+                Spacer(Modifier.width(10.dp))
+                Text(
+                    "FiszkiWBiegu",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = scheme.onBackground,
+                )
             }
+
+            Spacer(Modifier.height(48.dp))
+
+            // Hero copy
+            CapsLabel("// ZACZNIJ W 5 SEKUND", color = scheme.secondary)
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "Wejdź\ni ruszaj.",
+                style = MaterialTheme.typography.displayMedium,
+                color = scheme.onBackground,
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "Słuchaj fiszek podczas biegu. Bez ekranu, bez rozpraszania.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = scheme.onSurfaceVariant,
+            )
+
+            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(16.dp))
+
+
+            if (error != null) {
+                Text(
+                    text = error,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = scheme.error,
+                )
+                Spacer(Modifier.height(12.dp))
+            }
+
+            if (isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(60.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator(color = scheme.primary)
+                }
+            } else {
+                AuthButton(label = "Kontynuuj z Google", enabled = true, onClick = onSignInClick)
+                Spacer(Modifier.height(10.dp))
+                AuthButton(label = "Kontynuuj z Apple", enabled = false, onClick = {})
+                Spacer(Modifier.height(10.dp))
+                AuthButton(label = "Kontynuuj z Facebook", enabled = false, onClick = {})
+            }
+
+            Spacer(Modifier.height(40.dp))
         }
     }
 }
