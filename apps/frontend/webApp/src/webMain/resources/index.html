@@ -58,11 +58,23 @@
 
             var btnHost = document.createElement('div');
 
+            // Ochrona przed "ghost click": Compose (WASM) renderuje UI na <canvas>; tap w przycisk
+            // tworzy tę nakładkę synchronicznie, a przeglądarka mobilna emituje jeszcze osobny `click`
+            // w tym samym punkcie, który trafia w świeżo wstawioną nakładkę i natychmiast ją zamyka
+            // ("okienko miga"; długie przytrzymanie nie generuje tego clicku, więc "pomaga"). Każde
+            // zamknięcie (tło oraz "Anuluj") ignorujemy przez pierwsze 500 ms od otwarcia nakładki.
+            var openedAt = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+            function _ghostClick() {
+                var now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+                return (now - openedAt) < 500;
+            }
+
             var cancel = document.createElement('button');
             cancel.textContent = 'Anuluj';
             cancel.style.cssText = 'background:none;border:none;color:#666;font-size:14px;' +
                 'cursor:pointer;font-family:sans-serif;';
             cancel.onclick = function() {
+                if (_ghostClick()) return;
                 _removeGsiOverlay();
                 onError('Logowanie anulowane.');
             };
@@ -74,25 +86,13 @@
             document.body.appendChild(overlay);
             _gsiOverlay = overlay;
 
-            // Zamknięcie przez kliknięcie w tło — odporne na "ghost click".
-            // Compose (WASM) renderuje UI na <canvas>; tap w przycisk tworzy tę nakładkę
-            // synchronicznie, a przeglądarka mobilna emituje jeszcze osobny `click` w tym
-            // samym punkcie, który trafia w świeżo wstawioną nakładkę i natychmiast ją zamyka
-            // ("okienko miga"). Zabezpieczenie: zamykamy tylko gdy tło dostało WŁASNE
-            // `pointerdown` przed `click` (ghost click ma pointerdown sprzed istnienia nakładki,
-            // więc `armed` zostaje false). setTimeout to dodatkowy bufor czasowy.
-            var armed = false;
-            overlay.addEventListener('pointerdown', function(e) {
-                if (e.target === overlay) armed = true;
+            overlay.addEventListener('click', function(e) {
+                if (_ghostClick()) return;
+                if (e.target === overlay) {
+                    _removeGsiOverlay();
+                    onError('Logowanie anulowane.');
+                }
             });
-            setTimeout(function() {
-                overlay.addEventListener('click', function(e) {
-                    if (e.target === overlay && armed) {
-                        _removeGsiOverlay();
-                        onError('Logowanie anulowane.');
-                    }
-                });
-            }, 350);
 
             google.accounts.id.renderButton(btnHost, {
                 type: 'standard',
