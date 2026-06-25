@@ -150,22 +150,22 @@ Brak — żadnych zmian schematu. Istniejące konta nie są seedowane wstecznie 
 
 #### Automatyczne
 
-- [x] 1.1 Kompilacja przechodzi: `cargo check --tests`
-- [x] 1.2 Istniejący pakiet testów przechodzi: `cargo test`
+- [x] 1.1 Kompilacja przechodzi: `cargo check --tests` — f5fc497
+- [x] 1.2 Istniejący pakiet testów przechodzi: `cargo test` — f5fc497
 
 #### Ręczne
 
-- [x] 1.3 Przegląd logiki kopii (podzbiory kolumn, reset z domyślnych, jedna transakcja)
+- [x] 1.3 Przegląd logiki kopii (podzbiory kolumn, reset z domyślnych, jedna transakcja) — f5fc497
 
 ### Faza 2: Wpięcie w login
 
 #### Automatyczne
 
-- [ ] 2.1 Kompilacja przechodzi: `cargo check --tests`
-- [ ] 2.2 Istniejący pakiet testów przechodzi: `cargo test`
+- [x] 2.1 Kompilacja przechodzi: `cargo check --tests`
+- [x] 2.2 Istniejący pakiet testów przechodzi: `cargo test`
 
 #### Ręczne
 
-- [ ] 2.3 Rejestracja nowego konta → kopie kolekcji i fiszek z resetem i nowymi ID
-- [ ] 2.4 Ponowne logowanie istniejącego użytkownika → brak duplikatów
-- [ ] 2.5 Brak szablonu → login nadal zwraca token (best-effort)
+- [x] 2.3 Rejestracja nowego konta → kopie kolekcji i fiszek z resetem i nowymi ID
+- [x] 2.4 Ponowne logowanie istniejącego użytkownika → brak duplikatów
+- [x] 2.5 Brak szablonu → login nadal zwraca token (best-effort)

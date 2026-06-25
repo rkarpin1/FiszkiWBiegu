@@ -58,12 +58,22 @@ pub async fn login(
             Err(e) => return HttpResponse::Unauthorized().json(json!({"error": e})),
         };
 
-    let user = sqlx::query_as::<_, User>(
+    // `(xmax = 0)` jest prawdziwe wyłącznie dla wiersza świeżo wstawionego w tej
+    // instrukcji; ścieżka `ON CONFLICT DO UPDATE` zwraca `xmax <> 0`. To pozwala
+    // odróżnić rejestrację (nowy user) od ponownego logowania w jednym zapytaniu.
+    #[derive(sqlx::FromRow)]
+    struct UpsertedUser {
+        #[sqlx(flatten)]
+        user: User,
+        is_new: bool,
+    }
+
+    let upserted = sqlx::query_as::<_, UpsertedUser>(
         r#"INSERT INTO users (google_id, email, display_name)
            VALUES ($1, $2, $3)
            ON CONFLICT (google_id)
              DO UPDATE SET email = EXCLUDED.email, display_name = EXCLUDED.display_name
-           RETURNING id, google_id, email, display_name, streak_days, created_at"#,
+           RETURNING id, google_id, email, display_name, streak_days, created_at, (xmax = 0) AS is_new"#,
     )
     .bind(&token_info.sub)
     .bind(&token_info.email)
@@ -71,7 +81,7 @@ pub async fn login(
     .fetch_one(pool.get_ref())
     .await;
 
-    let user = match user {
+    let UpsertedUser { user, is_new } = match upserted {
         Ok(u) => u,
         Err(e) => {
             eprintln!("DB error upserting user: {e}");
@@ -79,6 +89,13 @@ pub async fn login(
                 .json(json!({"error": "Database error"}));
         }
     };
+
+    // Best-effort: błąd seedowania (lub brak konta-szablonu) nie blokuje logowania.
+    if is_new {
+        if let Err(e) = crate::seed::seed_new_user(pool.get_ref(), user.id).await {
+            eprintln!("seed error for new user {}: {e}", user.id);
+        }
+    }
 
     match create_jwt(user.id, &jwt_config.secret) {
         Ok(token) => HttpResponse::Ok().json(json!({"token": token})),
