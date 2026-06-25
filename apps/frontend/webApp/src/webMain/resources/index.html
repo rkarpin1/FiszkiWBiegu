@@ -58,11 +58,23 @@
 
             var btnHost = document.createElement('div');
 
+            // Ochrona przed "ghost click": Compose (WASM) renderuje UI na <canvas>; tap w przycisk
+            // tworzy tę nakładkę synchronicznie, a przeglądarka mobilna emituje jeszcze osobny `click`
+            // w tym samym punkcie, który trafia w świeżo wstawioną nakładkę i natychmiast ją zamyka
+            // ("okienko miga"; długie przytrzymanie nie generuje tego clicku, więc "pomaga"). Każde
+            // zamknięcie (tło oraz "Anuluj") ignorujemy przez pierwsze 500 ms od otwarcia nakładki.
+            var openedAt = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+            function _ghostClick() {
+                var now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+                return (now - openedAt) < 500;
+            }
+
             var cancel = document.createElement('button');
             cancel.textContent = 'Anuluj';
             cancel.style.cssText = 'background:none;border:none;color:#666;font-size:14px;' +
                 'cursor:pointer;font-family:sans-serif;';
             cancel.onclick = function() {
+                if (_ghostClick()) return;
                 _removeGsiOverlay();
                 onError('Logowanie anulowane.');
             };
@@ -71,14 +83,16 @@
             card.appendChild(btnHost);
             card.appendChild(cancel);
             overlay.appendChild(card);
+            document.body.appendChild(overlay);
+            _gsiOverlay = overlay;
+
             overlay.addEventListener('click', function(e) {
+                if (_ghostClick()) return;
                 if (e.target === overlay) {
                     _removeGsiOverlay();
                     onError('Logowanie anulowane.');
                 }
             });
-            document.body.appendChild(overlay);
-            _gsiOverlay = overlay;
 
             google.accounts.id.renderButton(btnHost, {
                 type: 'standard',

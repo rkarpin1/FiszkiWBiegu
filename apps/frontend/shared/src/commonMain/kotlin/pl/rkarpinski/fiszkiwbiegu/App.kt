@@ -210,6 +210,7 @@ fun App(
                             FlashcardsScreen(
                                 collection = collection,
                                 showLearningCta = learningEnabled,
+                                onRefreshCollection = { collectionsVm.loadCollections() },
                                 actions = object : FlashcardsActions {
                                     override fun onBack() { backStack.removeLastOrNull() }
                                     override fun onStartLearning() { backStack.add(Route.Learning(collection)) }

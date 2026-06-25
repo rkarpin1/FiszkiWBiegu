@@ -11,6 +11,8 @@ tech_stack:
   database: Supabase (PostgreSQL, zewnętrzny)
 ---
 
+> **NIEAKTUALNE (2026-06-23):** Ten dokument to badanie z 2026-05-25. Render NIE został ostatecznie wybrany — backend działa na własnym serwerze (self-hosted) i jest aktualizowany przez self-update: GitHub Actions buduje statyczne binarium musl i wysyła je na endpoint `/deploy` (`X-Deploy-Key`). `render.yaml` w repo jest nieaktualny/nieużywany. Sekcje Supabase (baza danych, sqlx, RLS, JWT) pozostają aktualne. Aktualny stan wdrożenia: `context/foundation/roadmap.md` §Baza.
+
 ## Rekomendacja
 
 **Wdróż backend na Render + Supabase jako bazę danych i dostawcę auth.**

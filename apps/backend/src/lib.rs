@@ -5,6 +5,7 @@ pub mod auth;
 pub mod error;
 pub mod handlers;
 pub mod models;
+pub mod seed;
 pub mod translation;
 
 use actix_cors::Cors;

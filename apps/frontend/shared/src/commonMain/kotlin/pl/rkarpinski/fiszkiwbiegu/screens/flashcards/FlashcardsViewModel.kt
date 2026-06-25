@@ -13,6 +13,7 @@ import pl.rkarpinski.fiszkiwbiegu.data.repository.FlashcardRepository
 data class FlashcardsUiState(
     val flashcards: List<FlashcardDto> = emptyList(),
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val error: String? = null,
     val pendingDeleteId: String? = null,
     val isTranslating: Boolean = false,
@@ -34,25 +35,38 @@ class FlashcardsViewModel(
     fun loadFlashcards() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            repo.getAll(collectionId).fold(
-                onSuccess = { list ->
-                    _uiState.update {
-                        it.copy(
-                            flashcards = list,
-                            isLoading = false
-                        )
-                    }
-                },
-                onFailure = { e ->
-                    _uiState.update {
-                        it.copy(
-                            error = e.message,
-                            isLoading = false
-                        )
-                    }
-                },
-            )
+            // finally gwarantuje wyłączenie spinnera niezależnie od ścieżki
+            // (sukces, błąd, timeout, anulowanie) — bez tego zawis zostawia
+            // isLoading = true na zawsze.
+            try {
+                fetchFlashcards()
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
+    }
+
+    /**
+     * Odświeżenie inicjowane gestem (pull-to-refresh). Używa osobnego
+     * [FlashcardsUiState.isRefreshing], by lista fiszek pozostała widoczna
+     * (inline spinner przy isLoading zastąpiłby ją).
+     */
+    fun refresh() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isRefreshing = true, error = null) }
+            try {
+                fetchFlashcards()
+            } finally {
+                _uiState.update { it.copy(isRefreshing = false) }
+            }
+        }
+    }
+
+    private suspend fun fetchFlashcards() {
+        repo.getAll(collectionId).fold(
+            onSuccess = { list -> _uiState.update { it.copy(flashcards = list) } },
+            onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
+        )
     }
 
     fun requestDelete(id: String) = _uiState.update { it.copy(pendingDeleteId = id) }

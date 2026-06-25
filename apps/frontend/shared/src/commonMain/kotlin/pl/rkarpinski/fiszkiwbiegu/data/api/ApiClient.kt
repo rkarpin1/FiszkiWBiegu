@@ -2,6 +2,7 @@ package pl.rkarpinski.fiszkiwbiegu.data.api
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpCallValidator
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.delete
@@ -22,6 +23,15 @@ class ApiClient(
     private val authEventBus: AuthEventBus,
 ) {
     private val client = HttpClient {
+        // Bez timeoutu zawieszone żądanie (np. cold-start Render lub martwe
+        // połączenie keep-alive) wisi w nieskończoność i zostawia spinner na
+        // zawsze. Wartości tolerują cold-start serwera (~30–60 s), a po ich
+        // przekroczeniu żądanie kończy się błędem → ekran pokazuje "Ponów".
+        install(HttpTimeout) {
+            requestTimeoutMillis = 60_000
+            connectTimeoutMillis = 15_000
+            socketTimeoutMillis = 60_000
+        }
         install(ContentNegotiation) {
             json(Json { ignoreUnknownKeys = true })
         }
@@ -93,11 +103,11 @@ class ApiClient(
             setBody(request)
         }
 
-    suspend fun patchLearningComplete(collectionId: String, progress: Float, sessionMinutes: Int): HttpResponse =
+    suspend fun patchLearningComplete(collectionId: String, sessionMinutes: Int): HttpResponse =
         client.post("$API_BASE_URL/collections/$collectionId/learning/complete") {
             bearerAuth(requireToken())
             contentType(ContentType.Application.Json)
-            setBody(LearningCompleteRequest(progress, sessionMinutes))
+            setBody(LearningCompleteRequest(sessionMinutes))
         }
 
     private fun requireToken(): String =

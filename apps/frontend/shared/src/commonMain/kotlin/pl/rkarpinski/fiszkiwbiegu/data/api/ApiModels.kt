@@ -131,7 +131,6 @@ data class UserDto(
 
 @Serializable
 data class LearningCompleteRequest(
-    val progress: Float,
     @SerialName("session_minutes")
     val sessionMinutes: Int,
 )

@@ -1,9 +1,10 @@
 ---
 change_id: flashcard-translate
 title: Przycisk „Przetłumacz" w oknie definicji fiszki (darmowe API tłumaczeń przez backend)
-status: implemented
+status: archived
+archived_at: 2026-06-23T12:57:22Z
 created: 2026-06-22
-updated: 2026-06-22
+updated: 2026-06-23
 ---
 
 ## Goal

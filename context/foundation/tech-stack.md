@@ -5,9 +5,9 @@ project_name: fiszki-w-biegu
 hints:
   language_family: multi
   team_size: solo
-  deployment_target: fly
+  deployment_target: self-hosted
   ci_provider: github-actions
-  ci_default_flow: auto-deploy-on-merge
+  ci_default_flow: build-and-push-binary-to-deploy-endpoint
   bootstrapper_confidence: best-effort
   path_taken: custom
   quality_override: true
@@ -29,7 +29,7 @@ hints:
 Solo developer building FiszkiWBiegu — a hands-free flashcard audio app for runners.
 The project is two components: a Rust/Actix-web backend API (cloud storage for flashcards,
 OAuth Google auth via Supabase Auth; PostgreSQL via Supabase + sqlx) in `apps/backend/`, and a
-Kotlin Multiplatform frontend (Kotlin 2.3.21 + Compose Multiplatform 1.11.0) in `apps/frontend/`. The KMP frontend targets Android (foreground
+Kotlin Multiplatform frontend (Kotlin 2.4.0 + Compose Multiplatform 1.11.1) in `apps/frontend/`. The KMP frontend targets Android (foreground
 audio service, MediaSession headphone control for learning mode) and Web (flashcard
 management UI) from a single shared Kotlin codebase; iOS is not configured in MVP.
 No single registry starter covers this combination; `rust` binary crate is the bootstrapper

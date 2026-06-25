@@ -29,22 +29,25 @@ class ProfileViewModel(private val repo: ProfileRepository) : ViewModel() {
     private fun loadProfile() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            repo.getMe().fold(
-                onSuccess = { user ->
-                    _uiState.update {
-                        it.copy(
-                            displayName = user.displayName
-                                ?: user.email.substringBefore('@'),
-                            email = user.email,
-                            streakDays = user.streakDays,
-                            isLoading = false,
-                        )
-                    }
-                },
-                onFailure = { e ->
-                    _uiState.update { it.copy(error = e.message, isLoading = false) }
-                },
-            )
+            // finally gwarantuje wyłączenie spinnera niezależnie od ścieżki
+            // (sukces, błąd, timeout, anulowanie).
+            try {
+                repo.getMe().fold(
+                    onSuccess = { user ->
+                        _uiState.update {
+                            it.copy(
+                                displayName = user.displayName
+                                    ?: user.email.substringBefore('@'),
+                                email = user.email,
+                                streakDays = user.streakDays,
+                            )
+                        }
+                    },
+                    onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
+                )
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 }
