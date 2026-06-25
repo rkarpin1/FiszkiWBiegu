@@ -1,8 +1,9 @@
 package pl.rkarpinski.fiszkiwbiegu
 
 actual fun downloadApk() {
-    // Pobiera APK jako blob z jawnym MIME application/vnd.android.package-archive — bez tego
-    // przeglądarki mobilne sniffują zawartość (APK = archiwum ZIP) i zapisują plik jako .zip,
-    // ignorując atrybut download. W razie błędu fetch wracamy do bezpośredniego linku.
-    js("(function(){var u='https://fiszkiwbiegu.xtaxi.eu/FiszkiWBiegu.apk';function direct(){var a=document.createElement('a');a.href=u;a.download='FiszkiWBiegu.apk';document.body.appendChild(a);a.click();a.remove();}fetch(u).then(function(r){return r.blob();}).then(function(b){var apk=new Blob([b],{type:'application/vnd.android.package-archive'});var o=URL.createObjectURL(apk);var a=document.createElement('a');a.href=o;a.download='FiszkiWBiegu.apk';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(o);},10000);}).catch(direct);})()")
+    // Bezpośredni link (same-origin). NIE używamy blob/createObjectURL — Safe Browsing
+    // (Chrome/Edge) flaguje pliki .apk z blob: jako "może być szkodliwy" i potrafi je blokować.
+    // Poprawny MIME (application/vnd.android.package-archive) + Content-Disposition ustawia
+    // serwer nginx hostujący plik, więc przeglądarka zapisuje go jako .apk, a nie .zip.
+    js("(function(){var a=document.createElement('a');a.href='https://fiszkiwbiegu.xtaxi.eu/FiszkiWBiegu.apk';a.download='FiszkiWBiegu.apk';document.body.appendChild(a);a.click();a.remove();})()")
 }
