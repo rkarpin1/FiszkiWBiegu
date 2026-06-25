@@ -2,7 +2,7 @@
 change_id: seed-new-user
 created: 2026-06-25
 updated: 2026-06-25
-status: implementing
+status: implemented
 ---
 
 # seed-new-user

@@ -161,11 +161,11 @@ Brak — żadnych zmian schematu. Istniejące konta nie są seedowane wstecznie 
 
 #### Automatyczne
 
-- [x] 2.1 Kompilacja przechodzi: `cargo check --tests`
-- [x] 2.2 Istniejący pakiet testów przechodzi: `cargo test`
+- [x] 2.1 Kompilacja przechodzi: `cargo check --tests` — 3a5eb96
+- [x] 2.2 Istniejący pakiet testów przechodzi: `cargo test` — 3a5eb96
 
 #### Ręczne
 
-- [x] 2.3 Rejestracja nowego konta → kopie kolekcji i fiszek z resetem i nowymi ID
-- [x] 2.4 Ponowne logowanie istniejącego użytkownika → brak duplikatów
-- [x] 2.5 Brak szablonu → login nadal zwraca token (best-effort)
+- [x] 2.3 Rejestracja nowego konta → kopie kolekcji i fiszek z resetem i nowymi ID — 3a5eb96
+- [x] 2.4 Ponowne logowanie istniejącego użytkownika → brak duplikatów — 3a5eb96
+- [x] 2.5 Brak szablonu → login nadal zwraca token (best-effort) — 3a5eb96
