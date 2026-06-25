@@ -7,21 +7,21 @@ Projekt powstał w ramach szkolenia **10xDevs 3.0**.
 ## "Fiszki w biegu" co to jest ????
 Pomysł jest prosty.
 
-Nie miałeś wrażenia, że gdy biegasz, sprzątasz, myjesz naczynia i Twoje ręce są zajęte, to w tym czasie mógłbyś powtórzyć jakiś materiał np. z języka angielskiego ? 
-Jest sporo programów do fiszek, ale one wszystkie wymagają Twojej uwagi. Coś trzeba nacisnąć, coś wpisać, coś przeczytać.
+Nie miałeś wrażenia, że gdy biegasz, sprzątasz, myjesz naczynia i Twoje ręce są zajęte, to w tym czasie mógłbyś powtórzyć jakiś materiał np. z języka angielskiego ?<br> 
+Jest sporo programów do fiszek, ale one wszystkie wymagają Twojej uwagi. Coś trzeba nacisnąć, coś wpisać, coś przeczytać.<br>
 "Fiszki w biegu" to może właśnie ta aplikacja, na którą zawsze czekałeś?
 
 
 ## Jak to działa?
 
-Aplikacja w wielu aspektach niczym nie różni się od innych aplikacji do fiszek. 
+Aplikacja w wielu aspektach niczym nie różni się od innych aplikacji do fiszek.<br>
 Aplikacja ma "standardowe" funkcje jak:
 - tworzenie kolekcji dla wybranych języków, 
 - tworzenie nowych fiszek,
 - edycję, usuwanie kolekcji i fiszek,
 ... generalnie nuda.
 
-To, co jest "fajne" w tej aplikacji to tryb nauki.
+To, co jest "fajne" w tej aplikacji to tryb nauki. <br>
 Włączamy tryb nauki dla danej kolekcji, chowamy telefon do kieszeni i biegniemy w siną dal.
 
 Tryb nauki działa tak (na przykładzie j.polskiego i j.angielskiego):
@@ -39,7 +39,7 @@ Ale, ale!? Ale... niektóre fiszki już znam, a niektóre nie chcą mi wejść d
 
 Aplikacja posiada prosty system oceny znajomości fiszki. Im więcej "listków" przy fiszce, tym lepiej pamiętasz fiszkę.
 
-W trakcie nauki sami możemy ocenić, jak dobrze znamy fiszkę!
+W trakcie nauki sami możemy ocenić, jak dobrze znamy fiszkę!<br>
 Na ekranie "Nauki" sprawa jest prosta. Mamy dwa przyciski "Nie wiem" oraz "Wiem!"
 - gdy wybierzemy "Nie wiem", to jest to znak, że totalnie nie wiem, jak odpowiedzieć. Aplikacja jak najszybciej ponowi odtwarzanie tej fiszki.
 - gdy wybierzemy "Wiem!", to znak, że fiszka jest bardzo dobrze znana. Aplikacja postara się, żeby rzadziej odtwarzać tę fiszkę.
@@ -47,8 +47,8 @@ Na ekranie "Nauki" sprawa jest prosta. Mamy dwa przyciski "Nie wiem" oraz "Wiem!
 
 **Ale telefon jest w kieszeni !!! Co mam naciskać ???**
 
-My biegacze, biegamy już w słuchawkach i ręce oprócz nudnych ruchów biegowych są **WOLNE** !!!
-Słuchawki ... ręce .... ??? Hmmmm ... Tak zgadłeś! Wykorzystajmy słuchawki to oceny fiszki!!!
+My biegacze, biegamy już w słuchawkach i ręce oprócz nudnych ruchów biegowych są **WOLNE** !!!<br>
+Słuchawki ... ręce .... ??? Hmmmm ... Tak zgadłeś! Wykorzystajmy słuchawki to oceny fiszki!!!<br>
 Zasada jest prosta:
 - przycisk na słuchawkach **"Next"** oznacza **"Wiem!"**,
 - przycisk **"Prev"** - **"Nie wiem"**
