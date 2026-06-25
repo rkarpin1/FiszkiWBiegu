@@ -62,6 +62,7 @@ Zasada jest prosta:
 - przycisk na słuchawkach **"Next"** oznacza **"Wiem!"**,
 - przycisk **"Prev"** - **"Nie wiem"**
 - przycisk **Pause/Start** - zatrzymuje/wznawia odtwarzanie,
+- a przez 99% czasu nic nie naciskamy - to też jest ocena! Przecież powtarzamy materiał!
 
 
 ## Inne ciekawostki!
