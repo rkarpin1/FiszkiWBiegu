@@ -159,24 +159,24 @@ Gest na ekranie kolekcji wywołuje dwa równoległe żądania (fiszki + kolekcje
 
 #### Automatyczne
 
-- [x] 1.1 Kompilacja + testy shared przechodzą: `./gradlew :shared:testAndroidHostTest`
+- [x] 1.1 Kompilacja + testy shared przechodzą: `./gradlew :shared:testAndroidHostTest` — d8414cb
 
 #### Ręczne
 
-- [x] 1.2 Przeciągnięcie w dół na liście kolekcji pokazuje wskaźnik i odświeża dane
-- [x] 1.3 Podczas odświeżania lista pozostaje widoczna (brak podwójnego spinnera/znikania)
-- [x] 1.4 Po zakończeniu wskaźnik znika; offline → snackbar „Ponów" i wskaźnik znika
-- [x] 1.5 Pierwsze ładowanie (pusta lista) nadal pokazuje wyśrodkowany spinner
+- [x] 1.2 Przeciągnięcie w dół na liście kolekcji pokazuje wskaźnik i odświeża dane — d8414cb
+- [x] 1.3 Podczas odświeżania lista pozostaje widoczna (brak podwójnego spinnera/znikania) — d8414cb
+- [x] 1.4 Po zakończeniu wskaźnik znika; offline → snackbar „Ponów" i wskaźnik znika — d8414cb
+- [x] 1.5 Pierwsze ładowanie (pusta lista) nadal pokazuje wyśrodkowany spinner — d8414cb
 
 ### Faza 2: Ekran kolekcji
 
 #### Automatyczne
 
-- [ ] 2.1 Kompilacja + testy shared przechodzą: `./gradlew :shared:testAndroidHostTest`
+- [x] 2.1 Kompilacja + testy shared przechodzą: `./gradlew :shared:testAndroidHostTest`
 
 #### Ręczne
 
-- [ ] 2.2 Przeciągnięcie w dół na ekranie kolekcji odświeża listę fiszek
-- [ ] 2.3 Statystyki nagłówka (CZAS / „ostatnio" / nazwa) odświeżają się po geście
-- [ ] 2.4 Podczas odświeżania lista fiszek pozostaje widoczna
-- [ ] 2.5 Offline → snackbar „Ponów"; wskaźnik znika
+- [x] 2.2 Przeciągnięcie w dół na ekranie kolekcji odświeża listę fiszek
+- [x] 2.3 Statystyki nagłówka (CZAS / „ostatnio" / nazwa) odświeżają się po geście
+- [x] 2.4 Podczas odświeżania lista fiszek pozostaje widoczna
+- [x] 2.5 Offline → snackbar „Ponów"; wskaźnik znika

@@ -30,6 +30,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -38,6 +39,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -85,6 +87,7 @@ fun FlashcardsScreen(
     networkChecker: NetworkChecker = koinInject(),
     actions: FlashcardsActions = object : FlashcardsActions {},
     showLearningCta: Boolean = true,
+    onRefreshCollection: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isOnline by networkChecker.isOnline.collectAsState()
@@ -98,10 +101,14 @@ fun FlashcardsScreen(
         onCancelDelete = { viewModel.cancelDelete() },
         onLoadFlashcards = { viewModel.loadFlashcards() },
         onDeleteFlashcardRequest = { id -> viewModel.requestDelete(id) },
+        // Pull-to-refresh odświeża fiszki ORAZ dane kolekcji (nagłówek: CZAS /
+        // „ostatnio" / nazwa pochodzą z CollectionsViewModel, nie z tego VM).
+        onRefresh = { viewModel.refresh(); onRefreshCollection() },
         showLearningCta = showLearningCta,
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FlashcardsScreenContent(
     collection: CollectionDto,
@@ -112,6 +119,7 @@ fun FlashcardsScreenContent(
     onCancelDelete: () -> Unit,
     onLoadFlashcards: () -> Unit,
     onDeleteFlashcardRequest: (String) -> Unit,
+    onRefresh: () -> Unit = {},
     showLearningCta: Boolean = true,
 ) {
     var showCollectionMenu by remember { mutableStateOf(false) }
@@ -167,6 +175,11 @@ fun FlashcardsScreenContent(
             },
         ) { paddingValues ->
             Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+                PullToRefreshBox(
+                    isRefreshing = uiState.isRefreshing,
+                    onRefresh = onRefresh,
+                    modifier = Modifier.fillMaxSize(),
+                ) {
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     // Top bar
                     item {
@@ -392,6 +405,7 @@ fun FlashcardsScreenContent(
                     }
 
                     item { Spacer(Modifier.height(80.dp)) }
+                }
                 }
 
                 uiState.error?.let { err ->
