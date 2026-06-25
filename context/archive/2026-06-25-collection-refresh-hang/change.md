@@ -2,7 +2,8 @@
 change_id: collection-refresh-hang
 created: 2026-06-25
 updated: 2026-06-25
-status: preparing
+status: archived
+archived_at: 2026-06-25T14:46:53Z
 ---
 
 # collection-refresh-hang
