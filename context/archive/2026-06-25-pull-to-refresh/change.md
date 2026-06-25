@@ -2,7 +2,8 @@
 change_id: pull-to-refresh
 created: 2026-06-25
 updated: 2026-06-25
-status: implemented
+status: archived
+archived_at: 2026-06-25T09:06:31Z
 ---
 
 # pull-to-refresh
