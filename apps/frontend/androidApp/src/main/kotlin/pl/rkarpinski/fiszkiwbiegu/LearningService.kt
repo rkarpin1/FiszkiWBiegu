@@ -251,12 +251,14 @@ class LearningService : MediaSessionService() {
                 rateCard(Rating.KNOW_WELL)
             }
 
+            // PREV ze słuchawek = „Nie wiem" z ekranu: dogrywaj fiszkę do końca
+            // (nie ucinaj TTS), tylko zablokuj ponowną ocenę — tak jak ACTION_RATE.
             override fun seekToPrevious() {
-                rateCard(Rating.DONT_KNOW)
+                rateCard(Rating.DONT_KNOW, playToEnd = true)
             }
 
             override fun seekToPreviousMediaItem() {
-                rateCard(Rating.DONT_KNOW)
+                rateCard(Rating.DONT_KNOW, playToEnd = true)
             }
 
             // ExoPlayer z 1 elementem w REPEAT_MODE_ONE nie udostępnia tych komend

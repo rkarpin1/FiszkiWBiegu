@@ -45,8 +45,8 @@ android {
         applicationId = "pl.rkarpinski.fiszkiwbiegu"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 4
-        versionName = "1.4"
+        versionCode = 5
+        versionName = "1.5"
     }
     packaging {
         resources {
