@@ -83,7 +83,7 @@ Są i takie ...
 - import kolekcji z pliku tekstowego,
 - tworzenie kolekcji tematycznych przez AI,
 - aplikacja na iOS,
-- zmiana domeny,
+- zmiana domeny internetowe - na razie zapożyczam firmową,
 - aplikacja w sklepach Google, Apple, 
 
 ## Wow! Super! Ale gdzie demo?!
