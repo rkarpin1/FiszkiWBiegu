@@ -67,6 +67,7 @@ Są takie ...
 
 "Fiszki w biegu" to projekt "domowy", ale przy tworzeniu tej aplikacji rodzą się kolejne pomysły jak:
 - kolekcje publiczne, 
+- opcje dla trybu nauki np. ile powtórek, czy np. najpierw j.angielski, potem j.polski,
 - dodanie standardowego logowania i logowania via Apple, Facebook, 
 - sterowanie głosowe, czyli nie potrzebujemy rąk ! 
 - import kolekcji z pliku tekstowego,
