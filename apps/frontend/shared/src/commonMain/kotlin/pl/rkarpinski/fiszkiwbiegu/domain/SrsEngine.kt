@@ -32,7 +32,10 @@ object SrsEngine {
 
     fun intervalFor(level: Float, rating: Rating, rng: Random = Random.Default): Int {
         val base = when (rating) {
-            Rating.DONT_KNOW -> return 0
+            // "Nie wiem": stały interval 1 (bez jittera) — fiszka wraca za następną kartą,
+            // nigdy zaraz po sobie. dueAtIndex = globalIndex + 1, a globalIndex jest już
+            // zinkrementowany w pickNext(), więc najbliższe losowanie wybierze inną kartę.
+            Rating.DONT_KNOW -> return 1
             Rating.KNOW      -> maxOf(3, (level * 10f).toInt())
             Rating.KNOW_WELL -> maxOf(10, (level * 30f).toInt())
         }

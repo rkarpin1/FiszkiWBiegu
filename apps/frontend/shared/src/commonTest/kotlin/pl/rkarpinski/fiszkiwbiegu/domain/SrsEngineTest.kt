@@ -8,8 +8,8 @@ import pl.rkarpinski.fiszkiwbiegu.data.api.FlashcardDto
 
 class SrsEngineTest {
 
-    private fun card(srsLevel: Float = 0f, lastStudiedAt: String? = null) = FlashcardDto(
-        id = "id",
+    private fun card(srsLevel: Float = 0f, lastStudiedAt: String? = null, id: String = "id") = FlashcardDto(
+        id = id,
         collectionId = "col",
         sourceText = "src",
         targetText = "tgt",
@@ -20,11 +20,11 @@ class SrsEngineTest {
     )
 
     @Test
-    fun `intervalFor DONT_KNOW always returns 0`() {
+    fun `intervalFor DONT_KNOW always returns 1`() {
         repeat(20) {
-            assertEquals(0, SrsEngine.intervalFor(0f, Rating.DONT_KNOW))
-            assertEquals(0, SrsEngine.intervalFor(0.5f, Rating.DONT_KNOW))
-            assertEquals(0, SrsEngine.intervalFor(1f, Rating.DONT_KNOW))
+            assertEquals(1, SrsEngine.intervalFor(0f, Rating.DONT_KNOW))
+            assertEquals(1, SrsEngine.intervalFor(0.5f, Rating.DONT_KNOW))
+            assertEquals(1, SrsEngine.intervalFor(1f, Rating.DONT_KNOW))
         }
     }
 
@@ -101,6 +101,24 @@ class SrsEngineTest {
         )
         val picked = SrsEngine.pickNext(cards, globalIndex = 0)
         assertEquals(3, picked.dueAtIndex)
+    }
+
+    @Test
+    fun `DONT_KNOW does not replay the same card immediately`() {
+        // Regresja na regułę "fiszka nie odtwarza się zaraz po sobie": po ocenie
+        // DONT_KNOW kolejne losowanie musi zwrócić INNĄ fiszkę (gdy w kolejce jest >= 2).
+        val flashcards = (1..3).map { card(id = "c$it") }
+        repeat(50) { seed ->
+            val queue = SrsQueue(Random(seed.toLong()))
+            queue.init(flashcards)
+            val first = queue.pickNext()
+            queue.rate(first, Rating.DONT_KNOW)
+            val second = queue.pickNext()
+            assertTrue(
+                first.flashcard.id != second.flashcard.id,
+                "DONT_KNOW replayed ${first.flashcard.id} immediately (seed=$seed)",
+            )
+        }
     }
 
     @Test
