@@ -67,7 +67,7 @@ Zasada jest prosta:
 
 ## Inne ciekawostki!
 
-Są takie ...
+Są i takie ...
 - aplikacja w trybie nauki zawsze losuje kolejność odtwarzania fiszek, ale bierze też pod uwagę ocenę zapamiętania fiszki.
 - przy tworzeniu fiszki, nie musisz wpisywać wyrażeń w obu językach. Jest dostępna opcja tłumaczenia! 
 - wpisywanie fiszek na telefonie, nie jest zawsze wygodnie. Jest zatem dostępna wersja na przeglądarkę, która to świetnie robi.
