@@ -1,4 +1,9 @@
+import com.android.build.api.artifact.ArtifactTransformationRequest
+import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.variant.BuiltArtifact
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.io.File
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -40,8 +45,8 @@ android {
         applicationId = "pl.rkarpinski.fiszkiwbiegu"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 3
-        versionName = "1.3"
+        versionCode = 4
+        versionName = "1.4"
     }
     packaging {
         resources {
@@ -61,5 +66,42 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+
+// Zmień nazwę wynikowego APK na FiszkiWBiegu.apk na poziomie artefaktu AGP
+// (SingleArtifact.APK). Dzięki temu właściwą nazwę dostają wszyscy konsumenci:
+// `./gradlew assembleRelease` ORAZ kreator "Generate Signed Bundle / APK"
+// w Android Studio (który robi własny build z pominięciem zadania assemble).
+@DisableCachingByDefault(because = "Tylko kopiuje/zmienia nazwę APK")
+abstract class RenameApkTask : DefaultTask() {
+    @get:InputFiles
+    abstract val apkFolder: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val outFolder: DirectoryProperty
+
+    @get:Internal
+    abstract val transformationRequest: Property<ArtifactTransformationRequest<RenameApkTask>>
+
+    @TaskAction
+    fun taskAction() {
+        transformationRequest.get().submit(this) { builtArtifact: BuiltArtifact ->
+            val output = File(outFolder.get().asFile, "FiszkiWBiegu.apk")
+            File(builtArtifact.outputFile).copyTo(output, overwrite = true)
+            output
+        }
+    }
+}
+
+androidComponents {
+    onVariants(selector().withBuildType("release")) { variant ->
+        val taskProvider = tasks.register<RenameApkTask>(
+            "rename${variant.name.replaceFirstChar { it.uppercase() }}Apk",
+        )
+        val request = variant.artifacts.use(taskProvider)
+            .wiredWithDirectories(RenameApkTask::apkFolder, RenameApkTask::outFolder)
+            .toTransformMany(SingleArtifact.APK)
+        taskProvider.configure { transformationRequest.set(request) }
     }
 }
