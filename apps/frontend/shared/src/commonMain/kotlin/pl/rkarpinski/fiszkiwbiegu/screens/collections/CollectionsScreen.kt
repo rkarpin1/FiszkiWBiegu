@@ -30,11 +30,13 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -79,11 +81,13 @@ fun CollectionsScreen(
         onConfirmDelete = { viewModel.confirmDelete() },
         onCancelDelete = { viewModel.cancelDelete() },
         onRetry = { viewModel.loadCollections() },
+        onRefresh = { viewModel.refresh() },
         showLastStudied = showLastStudied,
         onDownloadApk = onDownloadApk,
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CollectionsScreenContent(
     uiState: CollectionsUiState,
@@ -93,6 +97,7 @@ fun CollectionsScreenContent(
     onConfirmDelete: () -> Unit,
     onCancelDelete: () -> Unit,
     onRetry: () -> Unit,
+    onRefresh: () -> Unit = {},
     showLastStudied: Boolean = true,
     onDownloadApk: (() -> Unit)? = null,
 ) {
@@ -165,6 +170,11 @@ fun CollectionsScreenContent(
                         }
                     }
 
+                    PullToRefreshBox(
+                        isRefreshing = uiState.isRefreshing,
+                        onRefresh = onRefresh,
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
 
                         if (uiState.collections.isEmpty() && !uiState.isLoading) {
@@ -240,6 +250,7 @@ fun CollectionsScreenContent(
                                 }
                             }
                         }
+                    }
                     }
                 }
 

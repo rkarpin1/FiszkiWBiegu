@@ -14,6 +14,7 @@ data class CollectionsUiState(
     val collections: List<CollectionDto> = emptyList(),
     val lastStudiedCollection: CollectionDto? = null,
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val isSubmitting: Boolean = false,
     val error: String? = null,
     val pendingDeleteId: String? = null,
@@ -37,22 +38,42 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
             // finally gwarantuje wyłączenie spinnera niezależnie od ścieżki
             // (sukces, błąd, timeout, anulowanie).
             try {
-                repo.getAll().fold(
-                    onSuccess = { list ->
-                        _uiState.update {
-                            it.copy(
-                                collections = list,
-                                lastStudiedCollection = list.filter { c -> c.lastStudied != null }
-                                    .maxByOrNull { c -> c.lastStudied!! },
-                            )
-                        }
-                    },
-                    onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
-                )
+                fetchCollections()
             } finally {
                 _uiState.update { it.copy(isLoading = false) }
             }
         }
+    }
+
+    /**
+     * Odświeżenie inicjowane gestem (pull-to-refresh). Używa osobnego
+     * [CollectionsUiState.isRefreshing], by lista pozostała widoczna i nie
+     * pojawił się wyśrodkowany spinner pierwszego ładowania.
+     */
+    fun refresh() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isRefreshing = true, error = null) }
+            try {
+                fetchCollections()
+            } finally {
+                _uiState.update { it.copy(isRefreshing = false) }
+            }
+        }
+    }
+
+    private suspend fun fetchCollections() {
+        repo.getAll().fold(
+            onSuccess = { list ->
+                _uiState.update {
+                    it.copy(
+                        collections = list,
+                        lastStudiedCollection = list.filter { c -> c.lastStudied != null }
+                            .maxByOrNull { c -> c.lastStudied!! },
+                    )
+                }
+            },
+            onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
+        )
     }
 
     fun createCollection(dto: CollectionDto, onSuccess: () -> Unit = {}) {
