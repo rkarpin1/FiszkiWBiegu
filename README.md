@@ -10,8 +10,14 @@ Pomysł jest prosty.
 Nie miałeś wrażenia, że gdy biegasz, sprzątasz, myjesz naczynia i Twoje ręce są zajęte, to w tym czasie mógłbyś powtórzyć jakiś materiał np. z języka angielskiego ?<br> 
 Jest sporo programów do fiszek, ale one wszystkie wymagają Twojej uwagi. Coś trzeba nacisnąć, coś wpisać, coś przeczytać.<br>
 "Fiszki w biegu" to może właśnie ta aplikacja, na którą zawsze czekałeś?
+<br>
+<br>
 
+https://github.com/user-attachments/assets/888e4b82-8a1c-474c-89dc-f58266dfdbac
 
+<br>
+<br>
+  
 ## Jak to działa?
 
 Aplikacja w wielu aspektach niczym nie różni się od innych aplikacji do fiszek.<br>
