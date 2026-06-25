@@ -28,6 +28,7 @@ pub struct Collection {
     pub target_language: String,
     pub created_at: DateTime<Utc>,
     pub last_studied: Option<DateTime<Utc>>,
+    // Nie jest kolumną — backend liczy go w zapytaniu jako średni decayLevel fiszek.
     pub progress: f64,
     pub total_study_minutes: i32,
     pub flashcard_count: i64,
@@ -43,7 +44,6 @@ pub struct CollectionRequest {
 
 #[derive(Debug, Deserialize)]
 pub struct LearningCompleteRequest {
-    pub progress: f32,
     pub session_minutes: i32,
 }
 

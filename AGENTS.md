@@ -27,7 +27,7 @@ Tables: `users`, `collections`, `flashcards`. Full schema (columns, types, FKs):
 
 `flashcard_count` is not a column — the backend computes it per query as `COUNT(*)`.
 
-Migrations live in `apps/backend/migrations/`. Next migration number: **011**.
+Migrations live in `apps/backend/migrations/`. Next migration number: **012**.
 
 ## API Endpoints
 

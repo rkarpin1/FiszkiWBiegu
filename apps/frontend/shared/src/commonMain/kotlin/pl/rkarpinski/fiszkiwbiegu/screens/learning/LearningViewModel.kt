@@ -39,10 +39,11 @@ class LearningViewModel(
     fun stop(elapsedSec: Int = 0) {
         val s = controller.state.value
         if (s.flashcards.isNotEmpty()) {
-            val progress = s.flashcards.map { it.decayLevel() }.average().toFloat()
+            // progress nie jest już wysyłany — backend liczy go z decayLevel fiszek,
+            // których srs_level zapisuje LearningService w trakcie sesji.
             val sessionMinutes = elapsedSec / 60
             viewModelScope.launch {
-                collectionRepo.markStudied(collectionId, progress, sessionMinutes)
+                collectionRepo.markStudied(collectionId, sessionMinutes)
             }
         }
         controller.stop()

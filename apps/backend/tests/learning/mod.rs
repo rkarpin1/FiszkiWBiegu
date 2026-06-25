@@ -91,31 +91,31 @@ async fn get_learning_of_another_users_collection_is_200_empty_known_issue() {
 // ---- POST /collections/{id}/learning/complete ----------------------------------
 
 #[tokio::test(flavor = "multi_thread")]
-async fn learning_complete_updates_progress_and_accumulates_minutes() {
+async fn learning_complete_accumulates_minutes_and_stamps_last_studied() {
     let app = spawn_app().await;
     let token = app.jwt_for(app.seed_user("learn-complete@test.dev").await);
     let coll = create_collection(&app, &token).await;
 
-    // Act 1: complete a session (progress 0.5, 10 minutes).
+    // Act 1: complete a session (10 minutes). progress is no longer persisted —
+    // it is computed on read from the flashcards' decayLevel.
     let r1 = client()
         .post(format!("{}/collections/{}/learning/complete", app.base_url, coll))
         .bearer_auth(&token)
-        .json(&json!({"progress": 0.5, "session_minutes": 10}))
+        .json(&json!({"session_minutes": 10}))
         .send()
         .await
         .unwrap();
     assert_eq!(r1.status().as_u16(), 204);
 
-    // Assert (DB): progress set, minutes accumulated, last_studied stamped.
-    let (progress, minutes, last): (f64, i32, Option<chrono::DateTime<chrono::Utc>>) =
+    // Assert (DB): minutes accumulated, last_studied stamped.
+    let (minutes, last): (i32, Option<chrono::DateTime<chrono::Utc>>) =
         sqlx::query_as(
-            "SELECT progress, total_study_minutes, last_studied FROM collections WHERE id = $1",
+            "SELECT total_study_minutes, last_studied FROM collections WHERE id = $1",
         )
         .bind(coll)
         .fetch_one(&app.pool)
         .await
         .unwrap();
-    assert!((progress - 0.5).abs() < 1e-6, "progress = {progress}");
     assert_eq!(minutes, 10);
     assert!(last.is_some(), "last_studied should be set");
 
@@ -123,19 +123,18 @@ async fn learning_complete_updates_progress_and_accumulates_minutes() {
     let r2 = client()
         .post(format!("{}/collections/{}/learning/complete", app.base_url, coll))
         .bearer_auth(&token)
-        .json(&json!({"progress": 0.8, "session_minutes": 5}))
+        .json(&json!({"session_minutes": 5}))
         .send()
         .await
         .unwrap();
     assert_eq!(r2.status().as_u16(), 204);
 
-    let (progress2, minutes2): (f64, i32) =
-        sqlx::query_as("SELECT progress, total_study_minutes FROM collections WHERE id = $1")
+    let minutes2: i32 =
+        sqlx::query_scalar("SELECT total_study_minutes FROM collections WHERE id = $1")
             .bind(coll)
             .fetch_one(&app.pool)
             .await
             .unwrap();
-    assert!((progress2 - 0.8).abs() < 1e-6, "progress = {progress2}");
     assert_eq!(minutes2, 15); // 10 + 5
 }
 
@@ -150,7 +149,7 @@ async fn learning_complete_of_another_user_is_404() {
     let resp = client()
         .post(format!("{}/collections/{}/learning/complete", app.base_url, coll))
         .bearer_auth(&token_b)
-        .json(&json!({"progress": 0.5, "session_minutes": 10}))
+        .json(&json!({"session_minutes": 10}))
         .send()
         .await
         .unwrap();
@@ -169,7 +168,7 @@ async fn learning_complete_missing_field_is_400() {
     let resp = client()
         .post(format!("{}/collections/{}/learning/complete", app.base_url, coll))
         .bearer_auth(&token)
-        .json(&json!({"progress": 0.5}))
+        .json(&json!({}))
         .send()
         .await
         .unwrap();
@@ -188,7 +187,7 @@ async fn learning_complete_negative_minutes_decrements_known_issue() {
     client()
         .post(format!("{}/collections/{}/learning/complete", app.base_url, coll))
         .bearer_auth(&token)
-        .json(&json!({"progress": 0.5, "session_minutes": 10}))
+        .json(&json!({"session_minutes": 10}))
         .send()
         .await
         .unwrap();
@@ -198,7 +197,7 @@ async fn learning_complete_negative_minutes_decrements_known_issue() {
     let resp = client()
         .post(format!("{}/collections/{}/learning/complete", app.base_url, coll))
         .bearer_auth(&token)
-        .json(&json!({"progress": 0.5, "session_minutes": -4}))
+        .json(&json!({"session_minutes": -4}))
         .send()
         .await
         .unwrap();

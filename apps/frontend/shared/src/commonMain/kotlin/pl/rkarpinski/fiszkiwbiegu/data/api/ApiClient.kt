@@ -93,11 +93,11 @@ class ApiClient(
             setBody(request)
         }
 
-    suspend fun patchLearningComplete(collectionId: String, progress: Float, sessionMinutes: Int): HttpResponse =
+    suspend fun patchLearningComplete(collectionId: String, sessionMinutes: Int): HttpResponse =
         client.post("$API_BASE_URL/collections/$collectionId/learning/complete") {
             bearerAuth(requireToken())
             contentType(ContentType.Application.Json)
-            setBody(LearningCompleteRequest(progress, sessionMinutes))
+            setBody(LearningCompleteRequest(sessionMinutes))
         }
 
     private fun requireToken(): String =

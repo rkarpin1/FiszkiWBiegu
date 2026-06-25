@@ -252,6 +252,15 @@ fun FlashcardsScreenContent(
 
                     // Stats row
                     item {
+                        // Postęp liczony na żywo ze srs-poziomów aktualnych fiszek
+                        // (ta sama formuła co przy zapisie sesji w LearningViewModel),
+                        // dzięki czemu dodanie/usunięcie fiszki od razu go aktualizuje.
+                        val liveProgress = uiState.flashcards
+                            .takeIf { it.isNotEmpty() }
+                            ?.map { it.decayLevel() }
+                            ?.average()
+                            ?.toFloat()
+                            ?: collection.progress
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -265,7 +274,7 @@ fun FlashcardsScreenContent(
                             )
                             StatTile(
                                 label = "POSTĘP",
-                                value = "${(collection.progress * 100).toInt()}%",
+                                value = "${(liveProgress * 100).toInt()}%",
                                 modifier = Modifier.weight(1f)
                             )
                             StatTile(

@@ -35,12 +35,16 @@ The insert on login is an **upsert** on `google_id` (updates `email` and
 | `source_language`     | `TEXT`        | `NOT NULL DEFAULT 'pl'`                             | Source language (`pl`,`en`,`de`,`es`,`fr`,`it`) |
 | `target_language`     | `TEXT`        | `NOT NULL DEFAULT 'en'`                             | Target language; source ≠ target       |
 | `last_studied`        | `TIMESTAMPTZ` | nullable                                            | Last learning session                  |
-| `progress`            | `FLOAT`       | `NOT NULL DEFAULT 0`                                | Learning progress (0.0–1.0)            |
 | `total_study_minutes` | `INTEGER`     | `NOT NULL DEFAULT 0`                                | Total study time in minutes            |
 | `created_at`          | `TIMESTAMPTZ` | `NOT NULL DEFAULT now()`                            | Creation timestamp                     |
 
 > `flashcard_count` (number of flashcards) is **not a column** — the backend
 > computes it in the query as `SELECT COUNT(*) ... AS flashcard_count`.
+>
+> `progress` (learning progress 0.0–1.0) is also **not a column** (dropped in
+> migration 011) — the backend computes it per query as the average decayed SRS
+> level of the collection's flashcards (`AVG` of the same exp-decay formula the
+> client uses in `FlashcardDto.decayLevel`).
 
 Language-code validation happens in the backend (422 on invalid/identical codes).
 

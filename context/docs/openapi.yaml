@@ -261,8 +261,9 @@ paths:
       tags: [learning]
       summary: Record the result of a completed learning session
       description: |
-        Sets `last_studied` to now, stores `progress`, and adds
-        `session_minutes` to `total_study_minutes`.
+        Sets `last_studied` to now and adds `session_minutes` to
+        `total_study_minutes`. Progress is not stored — it is computed on read
+        from the flashcards' decayed SRS level.
       requestBody:
         required: true
         content:
@@ -509,7 +510,7 @@ components:
         progress:
           type: number
           format: double
-          description: Learning progress (0.0–1.0)
+          description: Learning progress (0.0–1.0), computed as the average decayed SRS level of the collection's flashcards
         total_study_minutes:
           type: integer
         flashcard_count:
@@ -545,14 +546,10 @@ components:
     LearningCompleteRequest:
       type: object
       properties:
-        progress:
-          type: number
-          format: float
-          description: Learning progress (0.0–1.0)
         session_minutes:
           type: integer
           description: Session duration in minutes, added to total_study_minutes
-      required: [progress, session_minutes]
+      required: [session_minutes]
 
     Flashcard:
       type: object
