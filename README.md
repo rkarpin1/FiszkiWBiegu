@@ -16,6 +16,9 @@ Jest sporo programów do fiszek, ale one wszystkie wymagają Twojej uwagi. Coś 
 https://github.com/user-attachments/assets/888e4b82-8a1c-474c-89dc-f58266dfdbac
 
 <br>
+
+https://github.com/user-attachments/assets/75744a50-a359-42ff-bb4b-b0e052928f16
+
 <br>
   
 ## Jak to działa?
