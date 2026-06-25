@@ -172,11 +172,11 @@ Gest na ekranie kolekcji wywołuje dwa równoległe żądania (fiszki + kolekcje
 
 #### Automatyczne
 
-- [x] 2.1 Kompilacja + testy shared przechodzą: `./gradlew :shared:testAndroidHostTest`
+- [x] 2.1 Kompilacja + testy shared przechodzą: `./gradlew :shared:testAndroidHostTest` — c3ec11d
 
 #### Ręczne
 
-- [x] 2.2 Przeciągnięcie w dół na ekranie kolekcji odświeża listę fiszek
-- [x] 2.3 Statystyki nagłówka (CZAS / „ostatnio" / nazwa) odświeżają się po geście
-- [x] 2.4 Podczas odświeżania lista fiszek pozostaje widoczna
-- [x] 2.5 Offline → snackbar „Ponów"; wskaźnik znika
+- [x] 2.2 Przeciągnięcie w dół na ekranie kolekcji odświeża listę fiszek — c3ec11d
+- [x] 2.3 Statystyki nagłówka (CZAS / „ostatnio" / nazwa) odświeżają się po geście — c3ec11d
+- [x] 2.4 Podczas odświeżania lista fiszek pozostaje widoczna — c3ec11d
+- [x] 2.5 Offline → snackbar „Ponów"; wskaźnik znika — c3ec11d
