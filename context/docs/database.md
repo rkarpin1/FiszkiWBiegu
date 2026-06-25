@@ -6,7 +6,7 @@ The backend uses **Supabase (PostgreSQL)**. It connects via `sqlx` using
 
 Migrations live in `apps/backend/migrations/`, are embedded into the binary
 (`sqlx::migrate!`), and run on server startup.
-**Next migration number: 011.**
+**Next migration number: 012.**
 
 ## Schema (state after all migrations)
 

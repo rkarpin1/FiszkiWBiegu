@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: FiszkiWBiegu API
-  version: 0.1.8
+  version: 0.1.9
   description: |
     REST API for FiszkiWBiegu — an audio flashcard app for runners
     (PL↔EN vocabulary, hands-free).
@@ -54,7 +54,7 @@ paths:
             text/plain:
               schema:
                 type: string
-                example: fiszki-w-biegu-server 0.1.8
+                example: fiszki-w-biegu-server 0.1.9
 
   /auth/login:
     post:
