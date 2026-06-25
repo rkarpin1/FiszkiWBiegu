@@ -83,7 +83,7 @@ Są i takie ...
 - import kolekcji z pliku tekstowego,
 - tworzenie kolekcji tematycznych przez AI,
 - aplikacja na iOS,
-- zmiana domeny internetowe - na razie zapożyczam firmową,
+- zmiana domeny internetowej - na razie zapożyczam firmową,
 - aplikacja w sklepach Google, Apple, 
 
 ## Wow! Super! Ale gdzie demo?!
@@ -98,7 +98,7 @@ Trzeba je zignorować! Kod jest dostępny, więc obiecuję, że nic niecnego nie
 Aplikacja na "przeglądarkę" przeznaczona jest jedynie do wprowadzania danych.  
 Z niej też można pobrać aplikację na telefon z Androidem.
 
-
+Logować można się jedynie poprzez konto Google.
 
 # Dalej, to technikalia ...
 
