@@ -15,6 +15,9 @@ data class LearningState(
     val phase: LearningPhase = LearningPhase.IDLE,
     val currentCard: FlashcardDto? = null,
     val playbackSpeed: Float = 1.0f,
+    /** Bieżąca fiszka została już oceniona — blokuje przyciski „Wiem"/„Nie wiem"
+     *  do czasu przejścia do kolejnej fiszki (np. gdy „Nie wiem" dogrywa do końca). */
+    val isRated: Boolean = false,
 )
 
 interface LearningController {

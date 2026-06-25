@@ -201,6 +201,7 @@ class LearningService : MediaSessionService() {
     private val srsEngine = SrsQueue()
     private var currentSrsCard: SrsCard? = null
     private var cardRated = false
+    private var currentPhase = LearningPhase.IDLE
     private val flashcardRepo: FlashcardRepository by inject()
     private var isPlaying = false
     private var playbackSpeed = 1.0f
@@ -313,7 +314,9 @@ class LearningService : MediaSessionService() {
             ACTION_RATE -> {
                 val rating =
                     Rating.valueOf(intent.getStringExtra(EXTRA_RATING) ?: return START_STICKY)
-                rateCard(rating)
+                // „Nie wiem" z ekranu: dogrywaj fiszkę do końca (nie przerywaj),
+                // tylko zablokuj ponowną ocenę. „Wiem" jak dotąd — natychmiast dalej.
+                rateCard(rating, playToEnd = rating == Rating.DONT_KNOW)
             }
 
             ACTION_PLAY -> resume()
@@ -491,15 +494,22 @@ class LearningService : MediaSessionService() {
         startPlayJob()
     }
 
-    private fun rateCard(rating: Rating) {
+    private fun rateCard(rating: Rating, playToEnd: Boolean = false) {
         val card = currentSrsCard
         if (card != null && !cardRated) {
             cardRated = true
             applyRating(card, rating)
             playRatingSound(rating)
-            tts?.stop()
-            playJob?.cancel()
-            if (isPlaying) startPlayJob()
+            if (playToEnd) {
+                // Nie przerywaj odtwarzania — pętla dograj fiszkę do końca i sama
+                // przejdzie dalej. Re-emit bieżącej fazy, by od razu zablokować
+                // przyciski (isRated = cardRated).
+                publishState(currentPhase, card.flashcard)
+            } else {
+                tts?.stop()
+                playJob?.cancel()
+                if (isPlaying) startPlayJob()
+            }
         }
     }
 
@@ -521,6 +531,7 @@ class LearningService : MediaSessionService() {
         phase: LearningPhase = LearningPhase.IDLE,
         card: FlashcardDto? = null
     ) {
+        currentPhase = phase
         state.value = LearningState(
             isActive = true,
             isPlaying = isPlaying,
@@ -529,6 +540,7 @@ class LearningService : MediaSessionService() {
             phase = phase,
             currentCard = card,
             playbackSpeed = playbackSpeed,
+            isRated = cardRated,
         )
     }
 

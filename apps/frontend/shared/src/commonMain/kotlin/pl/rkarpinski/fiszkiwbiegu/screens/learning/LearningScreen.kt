@@ -346,11 +346,12 @@ fun LearningContent(
 
             Spacer(Modifier.height(24.dp))
 
-            // Wiem / Nie wiem
-            val isAnswerPhase = state.phase in listOf(
+            // Wiem / Nie wiem — aktywne tylko w fazie odpowiedzi i dopóki bieżąca
+            // fiszka nie została oceniona (po „Nie wiem" dogrywa do końca z blokadą).
+            val canRate = state.phase in listOf(
                 LearningPhase.ANSWER,
                 LearningPhase.SPEAKING_TARGET, LearningPhase.REPEATING
-            );
+            ) && !state.isRated
 
             var dontKnowPressed by remember { mutableStateOf(false) }
             val dontKnowBg by animateColorAsState(
@@ -381,11 +382,11 @@ fun LearningContent(
                         .background(dontKnowBg)
                         .border(
                             1.dp,
-                            if (isAnswerPhase) scheme.outline else scheme.outlineVariant,
+                            if (canRate) scheme.outline else scheme.outlineVariant,
                             MaterialTheme.shapes.large,
                         )
                         .then(
-                            if (isAnswerPhase) Modifier.clickable {
+                            if (canRate) Modifier.clickable {
                                 dontKnowPressed = true
                                 onDontKnow()
                             } else Modifier
@@ -395,7 +396,7 @@ fun LearningContent(
                     Text(
                         "Nie wiem",
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (isAnswerPhase) scheme.onSurface else c.mute2,
+                        color = if (canRate) scheme.onSurface else c.mute2,
                     )
                 }
 
@@ -413,11 +414,11 @@ fun LearningContent(
                         .background(knowWellBg)
                         .border(
                             1.dp,
-                            if (isAnswerPhase) scheme.outline else scheme.outlineVariant,
+                            if (canRate) scheme.outline else scheme.outlineVariant,
                             MaterialTheme.shapes.large,
                         )
                         .then(
-                            if (isAnswerPhase) Modifier.clickable {
+                            if (canRate) Modifier.clickable {
                                 knowWellPressed = true
                                 onKnowWell()
                             } else Modifier
@@ -427,7 +428,7 @@ fun LearningContent(
                     Text(
                         "Wiem!",
                         style = MaterialTheme.typography.titleMedium,
-                        color = if (isAnswerPhase) scheme.onSurface else c.mute2,
+                        color = if (canRate) scheme.onSurface else c.mute2,
                     )
                 }
             }
