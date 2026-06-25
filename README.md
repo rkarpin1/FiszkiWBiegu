@@ -175,3 +175,16 @@ Requires a `.env` file with `DATABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`. See 
 cd apps/frontend
 ./gradlew :shared:test
 ```
+
+## License
+
+Copyright (c) 2026 Robert Karpiński.
+
+This project is licensed under the **Creative Commons
+Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)** — see
+[`LICENSE`](LICENSE) for the full text.
+
+You may use, copy, modify, and share this work for **non-commercial purposes
+only**, with attribution. **Commercial use is not permitted** without the prior
+written permission of the copyright holder.
+[License summary](https://creativecommons.org/licenses/by-nc/4.0/).
