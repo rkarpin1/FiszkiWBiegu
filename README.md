@@ -62,11 +62,12 @@ Zasada jest prosta:
 - przycisk na słuchawkach **"Next"** oznacza **"Wiem!"**,
 - przycisk **"Prev"** - **"Nie wiem"**
 - przycisk **Pause/Start** - zatrzymuje/wznawia odtwarzanie,
+- a przez 99% czasu nic nie naciskamy - to też jest ocena! Przecież powtarzamy materiał!
 
 
 ## Inne ciekawostki!
 
-Są takie ...
+Są i takie ...
 - aplikacja w trybie nauki zawsze losuje kolejność odtwarzania fiszek, ale bierze też pod uwagę ocenę zapamiętania fiszki.
 - przy tworzeniu fiszki, nie musisz wpisywać wyrażeń w obu językach. Jest dostępna opcja tłumaczenia! 
 - wpisywanie fiszek na telefonie, nie jest zawsze wygodnie. Jest zatem dostępna wersja na przeglądarkę, która to świetnie robi.
@@ -82,7 +83,7 @@ Są takie ...
 - import kolekcji z pliku tekstowego,
 - tworzenie kolekcji tematycznych przez AI,
 - aplikacja na iOS,
-- zmiana domeny,
+- zmiana domeny internetowej - na razie zapożyczam firmową,
 - aplikacja w sklepach Google, Apple, 
 
 ## Wow! Super! Ale gdzie demo?!
@@ -97,7 +98,7 @@ Trzeba je zignorować! Kod jest dostępny, więc obiecuję, że nic niecnego nie
 Aplikacja na "przeglądarkę" przeznaczona jest jedynie do wprowadzania danych.  
 Z niej też można pobrać aplikację na telefon z Androidem.
 
-
+Logować można się jedynie poprzez konto Google.
 
 # Dalej, to technikalia ...
 
