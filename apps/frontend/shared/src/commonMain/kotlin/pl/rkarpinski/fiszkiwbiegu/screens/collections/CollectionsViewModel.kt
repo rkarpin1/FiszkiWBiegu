@@ -34,26 +34,24 @@ class CollectionsViewModel(private val repo: CollectionRepository) : ViewModel()
     fun loadCollections() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            repo.getAll().fold(
-                onSuccess = { list ->
-                    _uiState.update {
-                        it.copy(
-                            collections = list,
-                            lastStudiedCollection = list.filter { c -> c.lastStudied != null }
-                                .maxByOrNull { c -> c.lastStudied!! },
-                            isLoading = false
-                        )
-                    }
-                },
-                onFailure = { e ->
-                    _uiState.update {
-                        it.copy(
-                            error = e.message,
-                            isLoading = false
-                        )
-                    }
-                },
-            )
+            // finally gwarantuje wyłączenie spinnera niezależnie od ścieżki
+            // (sukces, błąd, timeout, anulowanie).
+            try {
+                repo.getAll().fold(
+                    onSuccess = { list ->
+                        _uiState.update {
+                            it.copy(
+                                collections = list,
+                                lastStudiedCollection = list.filter { c -> c.lastStudied != null }
+                                    .maxByOrNull { c -> c.lastStudied!! },
+                            )
+                        }
+                    },
+                    onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
+                )
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 

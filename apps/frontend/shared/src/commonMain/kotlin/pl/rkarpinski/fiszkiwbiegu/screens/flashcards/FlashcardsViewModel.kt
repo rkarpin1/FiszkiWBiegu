@@ -34,24 +34,17 @@ class FlashcardsViewModel(
     fun loadFlashcards() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            repo.getAll(collectionId).fold(
-                onSuccess = { list ->
-                    _uiState.update {
-                        it.copy(
-                            flashcards = list,
-                            isLoading = false
-                        )
-                    }
-                },
-                onFailure = { e ->
-                    _uiState.update {
-                        it.copy(
-                            error = e.message,
-                            isLoading = false
-                        )
-                    }
-                },
-            )
+            // finally gwarantuje wyłączenie spinnera niezależnie od ścieżki
+            // (sukces, błąd, timeout, anulowanie) — bez tego zawis zostawia
+            // isLoading = true na zawsze.
+            try {
+                repo.getAll(collectionId).fold(
+                    onSuccess = { list -> _uiState.update { it.copy(flashcards = list) } },
+                    onFailure = { e -> _uiState.update { it.copy(error = e.message) } },
+                )
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
         }
     }
 
